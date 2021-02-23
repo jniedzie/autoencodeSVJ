@@ -10,7 +10,8 @@ output_path = "trainingResults/"
 summary_path = output_path+"summary/"
 results_path = output_path+"trainingRuns/"
 
-qcd_path = "../../data/backgrounds/qcd/h5_qcd/*.h5"
+# qcd_path = "../../data/backgrounds/qcd/h5_qcd/*.h5"
+qcd_path = "../../data/training_data/qcd/base_3/*.h5"
 
 
 # ---------------------------------------------

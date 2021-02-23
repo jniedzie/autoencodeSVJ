@@ -8,16 +8,9 @@ import pandas as pd
 # This script will draw reconstruction loss for a a mixture of all models found in the
 # "signals_base_path" and backgrounds as specified in the training summary file.
 # ------------------------------------------------------------------------------------------------
+training_version = 0
 
-scalers_and_best_training_versions = {"standardScaler": 56,
-                                      "customScaler": 12,
-                                      "robustScaler": 47,
-                                      "minMaxScaler": 57,
-                                      "maxAbsScaler": 76,
-                                      "customStandardScaler": 86,
-                                      }
-
-signals_base_path = "../../data/training_data/all_signals/"
+signals_base_path = "../../data/s_channel_delphes/h5_signal_no_MET_over_mt_cut/"
 
 # masses = [1500, 2000, 2500, 3000, 3500, 4000]
 masses = [2500]
@@ -36,8 +29,8 @@ def get_signals():
     return signals
 
 
-def get_evaluator(scaler_type, training_version):
-    summaries_path = "trainingResults/summary/{}/".format(scaler_type)
+def get_evaluator(training_version):
+    summaries_path = "trainingResults/summary/"
     summary_base_name = "hlf_eflow{}_{}_".format(efp_base, bottleneck_dim)
     input_summary_path = summaryProcessor.get_latest_summary_file_path(summaries_path=summaries_path,
                                                                        file_name_base=summary_base_name,
@@ -47,8 +40,8 @@ def get_evaluator(scaler_type, training_version):
     return AutoEncoderEvaluator(input_summary_path, signals=signals)
 
 
-def get_losses(scaler_type, training_version):
-    evaluator = get_evaluator(scaler_type, training_version)
+def get_losses(training_version):
+    evaluator = get_evaluator(training_version)
     
     loss_qcd = evaluator.qcd_err.mae
     loss_signal = []
@@ -68,18 +61,15 @@ n_rows = 2
 canvas = plt.figure(figsize=(10, 10))
 i_plot = 1
 
-for scaler_type, training_version in scalers_and_best_training_versions.items():
+loss_hist = canvas.add_subplot(n_rows, n_columns, i_plot)
+i_plot += 1
 
-    loss_hist = canvas.add_subplot(n_rows, n_columns, i_plot)
-    i_plot += 1
+loss_qcd, loss_signal = get_losses(training_version)
     
-    loss_qcd, loss_signal = get_losses(scaler_type, training_version)
-    
-    loss_hist.hist(loss_qcd, bins=numpy.linspace(0, 0.4, 100), label="qcd", histtype="step", density=True)
-    loss_hist.hist(loss_signal, bins=numpy.linspace(0, 0.4, 100), label="signal", histtype="step", density=True)
-    loss_hist.set_yscale("log")
-    loss_hist.set_ylim(bottom=1E-2, top=1E2)
-    loss_hist.title.set_text(scaler_type)
-    loss_hist.legend(loc='upper right')
+loss_hist.hist(loss_qcd, bins=numpy.linspace(0, 0.4, 100), label="qcd", histtype="step", density=True)
+loss_hist.hist(loss_signal, bins=numpy.linspace(0, 0.4, 100), label="signal", histtype="step", density=True)
+loss_hist.set_yscale("log")
+loss_hist.set_ylim(bottom=1E-2, top=1E2)
+loss_hist.legend(loc='upper right')
 
 plt.show()

@@ -11,8 +11,8 @@
 #include "Result.hpp"
 #include "ResultsProcessor.hpp"
 
-string aucsPath =  "../trainingResults/aucs/customStandardScaler/";
-string resultsPath =  "../trainingResults/trainingRuns/customStandardScaler/";
+string aucsPath =  "../trainingResults/aucs/";
+string resultsPath =  "../trainingResults/trainingRuns/";
 string filePattern = "hlf_eflow3_8_v";
 
 

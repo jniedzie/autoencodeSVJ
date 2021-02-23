@@ -21,6 +21,7 @@ vector<ModelStats> ResultsProcessor::getModelStatsFromPathMarchingPatter(string 
   vector<string> fileNames = getFileInPathMatchingPattern(aucsPath, filePattern);
   
   for(string fileName : fileNames){
+    cout<<"Loading file: "<<fileName<<endl;
     ModelStats statsForTraining;
     
     statsForTraining.aucsFileName = aucsPath+fileName;

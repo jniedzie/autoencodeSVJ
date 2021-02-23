@@ -3,16 +3,16 @@
 #include "Result.hpp"
 #include "ResultsProcessor.hpp"
 
-string aucsPath =  "../trainingResults/aucs/customStandardScaler/";
-string resultsPath =  "../trainingResults/trainingRuns/customStandardScaler/";
+string aucsPath =  "../trainingResults/aucs/";
+string resultsPath =  "../trainingResults/trainingRuns/";
 string filePattern = "hlf_eflow3_8_v";
-string plotsTitle = "customStandardScaler";
+string plotsTitle = "";
 
 vector<double> r_invs = {0.15, 0.30, 0.45, 0.60, 0.75};
 vector<double> masses = {1500, 2000, 2500, 3000, 3500, 4000};
 vector<int> colors = {kRed, kOrange, kGreen, kGreen+2, kBlue, kViolet, kBlack};
 
-const double xMin = 0.6;
+const double xMin = 0.0;
 const double xMax = 1.0;
 
 const int nBinsRinv = 130;

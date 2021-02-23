@@ -9,9 +9,9 @@ import pandas as pd
 # "signals_base_path" and background as specified in the training summary.
 # ------------------------------------------------------------------------------------------------
 
-scaler_type = "customScaler"
+scaler_type = "standardScaler"
 
-training_version = {"standardScaler": 56,
+training_version = {"standardScaler": 0,
                     "customScaler": 12,
                     "robustScaler": 47,
                     "minMaxScaler": 57,
@@ -20,7 +20,8 @@ training_version = {"standardScaler": 56,
                     "": None
                     }
 
-summaries_path = "trainingResults/summary/{}/".format(scaler_type)
+# summaries_path = "trainingResults/summary/{}/".format(scaler_type)
+summaries_path = "trainingResults/summary/"
 
 
 efp_base = 3
@@ -38,7 +39,7 @@ masses = [2500]
 # rinvs = [0.15, 0.30, 0.45, 0.60, 0.75]
 rinvs = [0.45]
 
-signals_base_path = "../../data/training_data/all_signals/"
+signals_base_path = "../../data/s_channel_delphes/h5_signal_no_MET_over_mt_cut/"
 
 signals = {"signal_{}_{}".format(mass, rinv).replace(".", "p") : "{}{}GeV_{:1.2f}/base_3/*.h5".format(signals_base_path, mass, rinv)
            for mass in masses

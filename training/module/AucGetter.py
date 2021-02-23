@@ -129,14 +129,14 @@ class AucGetter(object):
                                                        scaler=qcd_scaler)
         
         for key in normed:
-            normed[key].output_file_prefix = key
+            normed[key].name = key
         
         auto_encoder = self.trainer.load_model()
         
         err, recon = utils.get_recon_errors(normed, auto_encoder, **kwargs)
         
         for key, value in err.items():
-            err[key].output_file_prefix = value.name.rstrip('error').strip()
+            err[key].name = value.name.rstrip('error').strip()
         
         for key, value in recon.items():
             recon[key] = data_processor.normalize(data_table=value,

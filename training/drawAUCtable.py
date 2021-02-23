@@ -11,10 +11,10 @@ import module.SummaryProcessor as summaryProcessor
 # file stored in "AUCs_path" with version specified by "training_version".
 # ------------------------------------------------------------------------------------------------
 
-scaler_type = "customScaler"
+scaler_type = "standardScaler"
 
 training_version = {
-    "standardScaler": 56,
+    "standardScaler": 76,
     "customScaler": 12,
     "robustScaler": 47,
     "minMaxScaler": 57,
@@ -25,8 +25,11 @@ training_version = {
 efp_base = 3
 bottleneck_dim = 8
 
-AUCs_path = "trainingResults/aucs/{}/*".format(scaler_type)
-summaries_path = "trainingResults/summary/{}/".format(scaler_type)
+# AUCs_path = "trainingResults/aucs/{}/*".format(scaler_type)
+# summaries_path = "trainingResults/summary/{}/".format(scaler_type)
+
+AUCs_path = "trainingResults/aucs/*"
+summaries_path = "trainingResults/summary/"
 
 matplotlib.rcParams.update({'font.size': 16})
 plt.rc('text', usetex=True)

@@ -7,9 +7,9 @@ from module.AutoEncoderEvaluator import AutoEncoderEvaluator
 # will be used.
 # ------------------------------------------------------------------------------------------------
 
-scaler_type = "customStandardScaler"
+scaler_type = "standardScaler"
 
-training_version = {"standardScaler": 8,
+training_version = {"standardScaler": 0,
                     "customScaler": 47,
                     "robustScaler": 63,
                     "customStandardScaler": 86
@@ -17,7 +17,9 @@ training_version = {"standardScaler": 8,
 
 efp_base = 3
 bottleneck_dim = 8
-summaries_path = "trainingResults/summary/{}/".format(scaler_type)
+# summaries_path = "trainingResults/summary/{}/".format(scaler_type)
+summaries_path = "trainingResults/summary/"
+
 summary_base_name = "hlf_eflow{}_{}_".format(efp_base, bottleneck_dim)
 
 input_summary_path = summaryProcessor.get_latest_summary_file_path(summaries_path=summaries_path,
@@ -29,7 +31,7 @@ input_summary_path = summaryProcessor.get_latest_summary_file_path(summaries_pat
 masses = [2000]
 rinvs = [0.15, 0.30, 0.45, 0.60, 0.75]
 
-signals_base_path = "../../data/training_data/all_signals/"
+signals_base_path = "../../data/s_channel_delphes/h5_signal_no_MET_over_mt_cut/"
 
 signals = {"{}, {}".format(mass, rinv) : "{}{}GeV_{:1.2f}/base_3/*.h5".format(signals_base_path, mass, rinv)
            for mass in masses

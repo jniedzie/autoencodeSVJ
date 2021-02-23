@@ -6,8 +6,9 @@ import module.SummaryProcessor as summaryProcessor
 # in "input_path". The output will be stored in "aucs_path".
 # ------------------------------------------------------------------------------------------------
 
-summary_path = "trainingResults/summary/"
-input_path = "../../data/s_channel_delphes/h5_signal_no_MET_over_mt_cut/*.h5"
+summary_path = "trainingResults_all_cuts/summary/"
+# input_path = "../../data/s_channel_delphes/h5_signal_no_MET_over_mt_cut/*/base_3/*.h5"
+input_path = "../../data/s_channel_delphes/h5_signal_all_cuts/*/base_3/*.h5"
 
 AUCs_path = "trainingResults/aucs/"
 
