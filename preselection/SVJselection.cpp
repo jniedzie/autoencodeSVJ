@@ -10,8 +10,10 @@ const int minNjets = 2;
 const double maxJetEta = 2.4;
 const double minJetPt = 200; //GeV
 const double maxJetDeltaEta = 1.5;
-const double minJetMt = 0; //GeV
-const double minMetRatio = 0;
+const double minJetMt = 1500; //GeV
+const double minMetRatio = 0.25;
+
+const bool useFatJets = true;
 
 
 int leptonCount(vector<LorentzMock>* leptons)
@@ -64,7 +66,15 @@ int main(int argc, char **argv)
   
   // add componenets for jets (tlorentz)
   
-  vector<TLorentzVector>* Jets = core.AddLorentz("Jet", {"Jet.PT","Jet.Eta","Jet.Phi","Jet.Mass"});
+  vector<TLorentzVector> *Jets;
+  
+  if(useFatJets){
+    Jets = core.AddLorentz("FatJet", {"FatJet.PT","FatJet.Eta","FatJet.Phi","FatJet.Mass"});
+  }
+  else{
+    Jets = core.AddLorentz("Jet", {"Jet.PT","Jet.Eta","Jet.Phi","Jet.Mass"});
+  }
+  
   vector<LorentzMock>* Electrons = core.AddLorentzMock("Electron", {"Electron.PT","Electron.Eta", "Electron.IsolationVarRhoCorr"});
   vector<LorentzMock>* Muons = core.AddLorentzMock("Muon", {"MuonLoose.PT", "MuonLoose.Eta", "MuonLoose.IsolationVarRhoCorr"});
   double* metFull_Pt = core.AddVar("metMET", "MissingET.MET");

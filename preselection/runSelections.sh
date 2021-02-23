@@ -1,5 +1,7 @@
 #!/bin/bash
 
+output_path=results/all_cuts_fat_jets/
+
 nEvents=$1
 i=$(($2-1))
 
@@ -17,4 +19,4 @@ rinv=${rinvs[$ir]}
 
 echo "Running for mass: ${mass}, r_inv: ${rinv}"
 
-./SVJselection inputFileLists/input_file_list_m${mass}_r${rinv}.txt SVJ_m${mass}_r${rinv} results/ 0 $nEvents
+./SVJselection inputFileLists/input_file_list_m${mass}_r${rinv}.txt SVJ_m${mass}_r${rinv} ${output_path} 0 $nEvents
