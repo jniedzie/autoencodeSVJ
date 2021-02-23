@@ -59,8 +59,9 @@ enum vectorType {
 };
 
 enum class CutType {
-  leptonCounts = 0,
-  jetCounts = 1,
+  electronCounts = 0,
+  muonCounts = 1,
+  jetCounts,
   jetEtas,
   jetDeltaEtas,
   jetPt,
@@ -70,7 +71,8 @@ enum class CutType {
 };
 
 const vector<CutType> cutTypes = {
-  CutType::leptonCounts,
+  CutType::electronCounts,
+  CutType::muonCounts,
   CutType::jetCounts,
   CutType::jetEtas,
   CutType::jetDeltaEtas,
@@ -81,7 +83,8 @@ const vector<CutType> cutTypes = {
 };
 
 const map<CutType, string> CutName {
-  {CutType::leptonCounts, "0 Passing Leptons"},
+  {CutType::electronCounts, "0 Passing Electrons"},
+  {CutType::muonCounts, "0 Passing Muons"},
   {CutType::jetCounts, "n Jets > 1"},
   {CutType::jetEtas, "abs jet Etas < 2.4"},
   {CutType::jetDeltaEtas, "abs DeltaEta < 1.5"},

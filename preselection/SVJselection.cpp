@@ -1,7 +1,8 @@
 #include "SVJFinder.hpp"
 #include "LorentzMock.h"
 
-const int maxNleptons = 0;
+const int maxNelectrons = 0;
+const int maxNmuons = 0;
 const double minLeptonPt = 10; // GeV
 const double maxLeptonEta = 2.4;
 const double minLeptonIsolation = 0.4;
@@ -95,10 +96,13 @@ int main(int argc, char **argv)
     core.Fill(HistType::pre_lep, Muons->size() + Electrons->size());
     
     // made it here
-    bool passesNleptons = (leptonCount(Muons) + leptonCount(Electrons)) <= maxNleptons;
-    core.SetCutValue(passesNleptons, CutType::leptonCounts);
+    bool passesNelectrons = leptonCount(Electrons) <= maxNelectrons;
+    core.SetCutValue(passesNelectrons, CutType::electronCounts);
     
-    if (!passesNleptons){
+    bool passesNmuons = leptonCount(Muons) <= maxNmuons;
+    core.SetCutValue(passesNmuons, CutType::muonCounts);
+    
+    if (!passesNelectrons || !passesNmuons){
       core.UpdateCutFlow();
       continue;
     }
@@ -142,7 +146,7 @@ int main(int argc, char **argv)
     core.Fill(HistType::pre_mjj, Mjj);
     
     // leading jet etas both meet eta veto
-    bool passesJetEta = fabs(Jets->at(0).Eta()) <= maxJetEta && fabs(Jets->at(0).Eta()) <= maxJetEta;
+    bool passesJetEta = fabs(Jets->at(0).Eta()) <= maxJetEta && fabs(Jets->at(1).Eta()) <= maxJetEta;
     core.SetCutValue(passesJetEta, CutType::jetEtas);
     
     // leading jets meet delta eta veto
