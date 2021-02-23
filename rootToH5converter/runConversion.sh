@@ -33,7 +33,12 @@ rinv=${rinvs[$ir]}
 
 echo "Running for mass: ${mass}, r_inv: ${rinv}"
 
-selections_path=../preselection/results/all_cuts/SVJ_m${mass}_r${rinv}_selection.txt
-output_path=results/all_cuts/SVJ_m${mass}_r${rinv}.h5
+#selections_type=all_cuts_fat_jets
+#selections_type=all_cuts_ak4_jets
+selections_type=no_lepton_veto_fat_jets
+#selections_type=no_lepton_veto_ak4_jets
+
+selections_path=../preselection/results/${selections_type}/SVJ_m${mass}_r${rinv}_selection.txt
+output_path=results/${selections_type}/SVJ_m${mass}_r${rinv}.h5
 
 python rootToH5.py -i $selections_path -o $output_path -e 3
