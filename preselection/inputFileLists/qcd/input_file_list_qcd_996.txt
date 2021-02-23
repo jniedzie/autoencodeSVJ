@@ -1,0 +1,1 @@
+/eos/cms/store/cmst3/group/dehep/TOPGEN/Delphes/qcd_sqrtshatTeV_13TeV_PU20/qcd_sqrtshatTeV_13TeV_PU20_996.root
