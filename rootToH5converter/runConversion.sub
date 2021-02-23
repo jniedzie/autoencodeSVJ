@@ -1,0 +1,13 @@
+Universe              = vanilla
+executable            = runConversion.sh
+arguments             = $(ProcId)
+#arguments             = 21
+GetEnv                = True
+output                = output/$(ClusterId).$(ProcId).out
+error                 = error/$(ClusterId).$(ProcId).err
+log                   = log/$(ClusterId).log
+requirements 	      = (OpSysAndVer =?= "CentOS7")
++JobFlavour           = "espresso"
+
+queue 31
+#queue 1
