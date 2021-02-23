@@ -22,8 +22,15 @@ rinvs = [0.15, 0.30, 0.45, 0.60, 0.75]
 i_mass = i_sample % len(masses)
 i_rinv = int(i_sample / len(masses))
 
+# qcd_path = "../../data/training_data/qcd/base_3/*.h5"
+# signal_path = "../../data/training_data/all_signals/{}GeV_{:3.2f}/base_3/*.h5".format(masses[i_mass], rinvs[i_rinv])
+# model_output_path = "trainingResults/models/model_{}GeV_{:3.2f}.sav".format(masses[i_mass], rinvs[i_rinv])
+
+# qcd_path = "../../data/backgrounds/qcd/h5_qcd/*.h5"
 qcd_path = "../../data/training_data/qcd/base_3/*.h5"
-signal_path = "../../data/training_data/all_signals/{}GeV_{:3.2f}/base_3/*.h5".format(masses[i_mass], rinvs[i_rinv])
+
+# signal_path = "../../data/s_channel_delphes/h5_signal_no_MET_over_mt_cut/{}GeV_{:3.2f}/base_3/*.h5".format(masses[i_mass], rinvs[i_rinv])
+signal_path = "../../data/s_channel_delphes/h5_signal_all_cuts/{}GeV_{:3.2f}/base_3/*.h5".format(masses[i_mass], rinvs[i_rinv])
 model_output_path = "trainingResults/models/model_{}GeV_{:3.2f}.sav".format(masses[i_mass], rinvs[i_rinv])
 
 print("Signal path: ", signal_path)

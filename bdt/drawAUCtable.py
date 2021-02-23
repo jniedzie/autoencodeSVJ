@@ -9,7 +9,7 @@ import pickle
 import numpy as np
 import pandas as pd
 
-qcd_path = "../../data/training_data/qcd/base_3/*.h5"
+qcd_path = "../../data/backgrounds/qcd/h5_qcd/*.h5"
 aucs_file_name = "trainingResults/aucs.txt"
 
 matplotlib.rcParams.update({'font.size': 16})
