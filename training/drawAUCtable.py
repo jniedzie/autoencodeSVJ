@@ -3,37 +3,24 @@ import pandas as pd
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-
+import importlib, argparse
 import module.SummaryProcessor as summaryProcessor
 
 # ------------------------------------------------------------------------------------------------
 # This script will draw a table with AUCs (areas under ROC curve) values based on the CSV
-# file stored in "AUCs_path" with version specified by "training_version".
+# file stored in "AUCs_path" with version specified by "training_version" from the provided
+# config file.
 # ------------------------------------------------------------------------------------------------
 
-scaler_type = "standardScaler"
-
-training_version = {
-    "standardScaler": 76,
-    "customScaler": 12,
-    "robustScaler": 47,
-    "minMaxScaler": 57,
-    "maxAbsScaler": 76,
-    "customStandardScaler": 86,
-}
-
-efp_base = 3
-bottleneck_dim = 8
-
-# AUCs_path = "trainingResults/aucs/{}/*".format(scaler_type)
-# summaries_path = "trainingResults/summary/{}/".format(scaler_type)
-
-AUCs_path = "trainingResults/aucs/*"
-summaries_path = "trainingResults/summary/"
+parser = argparse.ArgumentParser(description="Argument parser")
+parser.add_argument("-c", "--config", dest="config_path", default=None, required=True, help="Path to the config file")
+args = parser.parse_args()
+config = importlib.import_module(args.config_path)
 
 matplotlib.rcParams.update({'font.size': 16})
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
+
 
 def plot_signal_aucs_from_lp(lp, title=None):
     fac = 1.5
@@ -78,7 +65,7 @@ def plot_signal_aucs(aucs, title=None):
 
 auc_dict = {}
 
-for f in glob.glob(AUCs_path):
+for f in glob.glob(config.AUCs_path+"*"):
     data_elt = pd.read_csv(f)
     file_elt = str(f.split('/')[-1])
     data_elt['name'] = file_elt
@@ -90,9 +77,7 @@ aucs = pd.concat(auc_dict)
 aucs['mass_nu_ratio'] = list(zip(aucs.mass, aucs.nu))
 aucs = aucs.pivot('mass_nu_ratio', 'name', 'auc')
 
-
-
-summaries = summaryProcessor.summary(summary_path=summaries_path)
+summaries = summaryProcessor.summary(summary_path=config.summary_path)
 
 model_acceptance_fraction = 10  # take top N best performing models
 # take lowest 10% losses of all trainings
@@ -105,8 +90,7 @@ model_acceptance_fraction = 10  # take top N best performing models
 # print("The best model: ", best_name)
 
 
-
-AUC_file_name = "hlf_eflow{}_{}_v{}".format(efp_base, bottleneck_dim, training_version[scaler_type])
+AUC_file_name = "hlf_eflow{}_{}_v{}".format(config.efp_base, config.target_dim, config.best_model)
 
 print("AUCs: ", aucs[AUC_file_name].to_frame())
 

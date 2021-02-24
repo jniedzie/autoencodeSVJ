@@ -1,10 +1,10 @@
 preselection/._SVJselection.cpp
 preselection/jniedzie.cc
 
-training/trainingResults/*
-training/trainingResults/aucs/*
-training/trainingResults/summary/*
-training/trainingResults/trainingRuns/*
+training/trainingResults*/*
+training/trainingResults*/aucs/*
+training/trainingResults*/summary/*
+training/trainingResults*/trainingRuns/*
 analysis/h5analysis/h5parser
 preselection/SVJselection
 training/analysis/drawAucDistributions

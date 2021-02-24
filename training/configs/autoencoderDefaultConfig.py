@@ -5,15 +5,22 @@
 
 
 # ---------------------------------------------
-# Input data path
+# Path to training data
 # qcd_path = "../../data/backgrounds/qcd/h5_qcd/*.h5"
 qcd_path = "../../data/training_data/qcd/base_3/*.h5"
+
+# Path to testing data
+# input_path = "../../data/s_channel_delphes/h5_signal_no_MET_over_mt_cut/*/base_3/*.h5"
+signals_base_path = "../../data/s_channel_delphes/h5_signal_no_MET_over_mt_cut/"
+input_path = signals_base_path+"/*/base_3/*.h5"
 
 # ---------------------------------------------
 # Output paths
 output_path = "trainingResults_test/"
 summary_path = output_path+"summary/"
 results_path = output_path+"trainingRuns/"
+AUCs_path = output_path+"aucs/"
+stat_hists_path = output_path+"stat_hists.root"
 
 # ---------------------------------------------
 # Training parameters
@@ -29,6 +36,7 @@ training_params = {
 }
 
 target_dim = 8
+efp_base = 3
 
 # ---------------------------------------------
 # Number of models to train
@@ -75,3 +83,14 @@ normalizations = {
 }
 
 norm_args = normalizations[norm_name]
+
+# ---------------------------------------------
+# Once the training is done, you can specify
+# which model was the best and use it for
+# further tests/plotting
+best_model = 0
+
+# ---------------------------------------------
+# Statistical analysis parameters
+svj_jet_cut = 0.037
+n_events_per_class = 10000

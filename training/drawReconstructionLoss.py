@@ -3,26 +3,26 @@ from module.AutoEncoderEvaluator import AutoEncoderEvaluator
 import matplotlib.pyplot as plt
 import numpy
 import pandas as pd
+import importlib, argparse
 
 # ------------------------------------------------------------------------------------------------
 # This script will draw reconstruction loss for a a mixture of all models found in the
 # "signals_base_path" and backgrounds as specified in the training summary file.
 # ------------------------------------------------------------------------------------------------
-training_version = 0
 
-signals_base_path = "../../data/s_channel_delphes/h5_signal_no_MET_over_mt_cut/"
+parser = argparse.ArgumentParser(description="Argument parser")
+parser.add_argument("-c", "--config", dest="config_path", default=None, required=True, help="Path to the config file")
+args = parser.parse_args()
+config = importlib.import_module(args.config_path)
 
 # masses = [1500, 2000, 2500, 3000, 3500, 4000]
 masses = [2500]
 # rinvs = [0.15, 0.30, 0.45, 0.60, 0.75]
 rinvs = [0.45]
 
-efp_base = 3
-bottleneck_dim = 8
-
 def get_signals():
     signals = {"signal_{}_{}".format(mass, rinv).replace(".", "p"):
-                   "{}{}GeV_{:1.2f}/base_3/*.h5".format(signals_base_path, mass, rinv)
+                   "{}{}GeV_{:1.2f}/base_3/*.h5".format(config.signals_base_path, mass, rinv)
                for mass in masses
                for rinv in rinvs}
     
@@ -30,11 +30,10 @@ def get_signals():
 
 
 def get_evaluator(training_version):
-    summaries_path = "trainingResults/summary/"
-    summary_base_name = "hlf_eflow{}_{}_".format(efp_base, bottleneck_dim)
-    input_summary_path = summaryProcessor.get_latest_summary_file_path(summaries_path=summaries_path,
+    summary_base_name = "hlf_eflow{}_{}_".format(config.efp_base, config.target_dim)
+    input_summary_path = summaryProcessor.get_latest_summary_file_path(summaries_path=config.summary_path,
                                                                        file_name_base=summary_base_name,
-                                                                       version=training_version)
+                                                                       version=config.best_model)
     
     signals = get_signals()
     return AutoEncoderEvaluator(input_summary_path, signals=signals)
@@ -64,7 +63,7 @@ i_plot = 1
 loss_hist = canvas.add_subplot(n_rows, n_columns, i_plot)
 i_plot += 1
 
-loss_qcd, loss_signal = get_losses(training_version)
+loss_qcd, loss_signal = get_losses(config.best_model)
     
 loss_hist.hist(loss_qcd, bins=numpy.linspace(0, 0.4, 100), label="qcd", histtype="step", density=True)
 loss_hist.hist(loss_signal, bins=numpy.linspace(0, 0.4, 100), label="signal", histtype="step", density=True)

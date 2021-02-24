@@ -3,50 +3,40 @@ from module.AutoEncoderEvaluator import AutoEncoderEvaluator
 import matplotlib.pyplot as plt
 import numpy
 import pandas as pd
+import importlib, argparse
 
 # ------------------------------------------------------------------------------------------------
 # This script will draw input and reconstructed variables for signal found in the
 # "signals_base_path" and background as specified in the training summary.
 # ------------------------------------------------------------------------------------------------
 
-scaler_type = "standardScaler"
-
-training_version = {"standardScaler": 0,
-                    "customScaler": 12,
-                    "robustScaler": 47,
-                    "minMaxScaler": 57,
-                    "maxAbsScaler": 76,
-                    "customStandardScaler": 86,
-                    "": None
-                    }
-
-# summaries_path = "trainingResults/summary/{}/".format(scaler_type)
-summaries_path = "trainingResults/summary/"
+parser = argparse.ArgumentParser(description="Argument parser")
+parser.add_argument("-c", "--config", dest="config_path", default=None, required=True, help="Path to the config file")
+args = parser.parse_args()
+config = importlib.import_module(args.config_path)
 
 
-efp_base = 3
-bottleneck_dim = 8
-summary_base_name = "hlf_eflow{}_{}_".format(efp_base, bottleneck_dim)
 
-input_summary_path = summaryProcessor.get_latest_summary_file_path(summaries_path=summaries_path,
-                                                                   file_name_base=summary_base_name,
-                                                                   version=training_version[scaler_type])
+summary_base_name = "hlf_eflow{}_{}_".format(config.efp_base, config.target_dim)
+
+input_summary_path = summaryProcessor.get_latest_summary_file_path(
+    summaries_path=config.summary_path,
+    file_name_base=summary_base_name,
+    version=config.best_model
+)
     
-print("Loading summary: ",          input_summary_path             )
+print("Loading summary: ", input_summary_path)
 
 # masses = [1500, 2000, 2500, 3000, 3500, 4000]
 masses = [2500]
 # rinvs = [0.15, 0.30, 0.45, 0.60, 0.75]
 rinvs = [0.45]
 
-signals_base_path = "../../data/s_channel_delphes/h5_signal_no_MET_over_mt_cut/"
-
-signals = {"signal_{}_{}".format(mass, rinv).replace(".", "p") : "{}{}GeV_{:1.2f}/base_3/*.h5".format(signals_base_path, mass, rinv)
+signals = {"signal_{}_{}".format(mass, rinv).replace(".", "p") : "{}{}GeV_{:1.2f}/base_3/*.h5".format(config.signals_base_path, mass, rinv)
            for mass in masses
            for rinv in rinvs}
 
 evaluator = AutoEncoderEvaluator(input_summary_path, signals=signals)
-
 
 n_columns = 5
 n_rows = 4
