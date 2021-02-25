@@ -33,4 +33,4 @@ signals = {"{}, {}".format(mass, rinv) : "{}{}GeV_{:1.2f}/base_3/*.h5".format(co
 print("\n\nDraing ROC curves for summary: ", input_summary_path)
 
 evaluator = AutoEncoderEvaluator(input_summary_path, signals=signals)
-evaluator.roc(xscale='log', metrics=["mae"])
+evaluator.draw_ROCs(xscale='log', metrics=["mae"])

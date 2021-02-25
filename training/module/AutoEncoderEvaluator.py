@@ -3,13 +3,15 @@ from module.Trainer import Trainer
 import module.SummaryProcessor as summaryProcessor
 from module.DataProcessor import DataProcessor
 from module.DataLoader import DataLoader
-from module.DataTable import DataTable
+from module.AucGetter import AucGetter
+from module.DataHolder import DataHolder
 
-import os
 import numpy as np
 import pandas as pd
 from collections import OrderedDict as odict
-
+from pathlib import Path
+import tensorflow as tf
+import glob, os
 
 class AutoEncoderEvaluator:
     
@@ -145,24 +147,7 @@ class AutoEncoderEvaluator:
                                              means=means,
                                              stds=stds,
                                              scaler=qcd_scaler))
-        
-        self.qcd_reps = DataTable(self.model.layers[1].predict(self.qcd_test_data_normalized.data), name='QCD reps')
-        
-        for signal in self.signals:
-            setattr(self, signal + '_reps',
-                    DataTable(self.model.layers[1].predict(getattr(self, signal + '_norm').data),name=signal + ' reps'))
-        
-        self.qcd_err_jets = [
-            utils.DataTable(self.qcd_err.loc[self.qcd_err.index % 2 == i], name=self.qcd_err.name + " jet " + str(i))
-            for i in range(2)]
-        
-        for signal in self.signals:
-            serr = getattr(self, signal + '_err')
-            setattr(self, signal + '_err_jets',
-                    [DataTable(serr.loc[serr.index % 2 == i], name=serr.name + " jet " + str(i)) for i in range(2)])
-        
-        self.test_flavor = self.qcd_flavor.iloc[self.qcd_test_data.index]
-        
+                
         names = list(self.signals.keys())
         
         self.norms_dict = odict([(name, getattr(self, name + '_norm')) for name in names])
@@ -233,16 +218,17 @@ class AutoEncoderEvaluator:
                 if self.training_output_path.endswith(".h5"):
                     self.training_output_path.rstrip(".h5")
     
-    def roc(self, show_plot=True, metrics=None, figsize=8, figloc=(0.3, 0.2), *args, **kwargs):
+    def draw_ROCs(self, metrics=None, figsize=8, figloc=(0.3, 0.2), *args, **kwargs):
         
         if metrics is None:
             metrics=['mae', 'mse']
         
         qcd = self.errs_dict['qcd']
         others = [self.errs_dict[n] for n in self.all_names if n != 'qcd']
-   
-        if show_plot:
-            utils.roc_auc_plot(qcd, others, metrics=metrics, figsize=figsize, figloc=figloc, *args, **kwargs)
-            return
         
-        return utils.roc_auc_dict(qcd, others, metrics=metrics)
+        utils.roc_auc_plot(qcd, others, metrics=metrics, figsize=figsize, figloc=figloc, *args, **kwargs)
+        return
+
+    @staticmethod
+    def save_AUCs(input_path, AUCs_path, summary_path):
+        AucGetter.save_AUCs(input_path, AUCs_path, summary_path)

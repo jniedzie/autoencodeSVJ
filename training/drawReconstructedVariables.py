@@ -36,8 +36,6 @@ signals = {"signal_{}_{}".format(mass, rinv).replace(".", "p") : "{}{}GeV_{:1.2f
            for mass in masses
            for rinv in rinvs}
 
-evaluator = AutoEncoderEvaluator(input_summary_path, signals=signals)
-
 n_columns = 5
 n_rows = 4
 
@@ -69,6 +67,7 @@ bins = {
     "eflow 12"  : (0, 1, 100),
 }
 
+
 def draw_histogram_for_variable(input_data, reconstructed_data, variable_name, i_plot):
     hist = canvas.add_subplot(n_rows, n_columns, i_plot)
     
@@ -80,17 +79,13 @@ def draw_histogram_for_variable(input_data, reconstructed_data, variable_name, i
     hist.title.set_text(variable_name)
 
 
-print("input test data size: ", len(evaluator.qcd_test_data.df.index))
-print("input normalized test data size: ", len(evaluator.qcd_test_data_normalized.df.index))
-print("reco normalized data size: ", len(evaluator.qcd_recon.df.index))
+evaluator = AutoEncoderEvaluator(input_summary_path, signals=signals)
 
 for variable_name in bins:
     draw_histogram_for_variable(input_data=evaluator.qcd_test_data,
                                 reconstructed_data=evaluator.qcd_recon,
                                 variable_name=variable_name, i_plot=i_plot)
     i_plot += 1
-
-
 
 
 legend = canvas.add_subplot(n_rows, n_columns, i_plot)

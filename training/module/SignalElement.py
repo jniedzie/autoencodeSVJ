@@ -12,7 +12,7 @@ class SignalElement(object):
     def keys(self):
         return [elt for elt in dir(self) if not elt.startswith('__')]
     
-    def _load(self, hlf=True, eflow=True, hlf_to_drop=['Energy', 'Flavor']):
+    def load(self, hlf=True, eflow=True, hlf_to_drop=['Energy', 'Flavor']):
         if all([hlf == self._hlf, self._eflow == eflow, set(self._hlf_to_drop) == set(hlf_to_drop)]):
             if self._loaded:
                 return

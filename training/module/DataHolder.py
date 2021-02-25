@@ -18,4 +18,4 @@ class DataHolder(object):
     
     def load(self, hlf=True, eflow=True, hlf_to_drop=['Energy', 'Flavor']):
         for key, value in list(self.KEYS.items()):
-            value._load(hlf, eflow, hlf_to_drop)
+            value.load(hlf, eflow, hlf_to_drop)
