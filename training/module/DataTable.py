@@ -1,4 +1,3 @@
-import module.utils as utils
 from module.Logger import Logger
 
 import sklearn.preprocessing as prep
@@ -155,8 +154,28 @@ class DataTable(Logger):
         
         return DataTable(t1, headers=match_list, name=self.name), DataTable(t2, headers=other, name=self.name)
 
+    def parse_globlist(self, glob_list, match_list):
+        if not hasattr(glob_list, "__iter__") or isinstance(glob_list, str):
+            glob_list = [glob_list]
+    
+        for i, x in enumerate(glob_list):
+            if isinstance(x, int):
+                glob_list[i] = match_list[x]
+    
+        assert all([isinstance(c, str) for c in glob_list])
+    
+        match = set()
+    
+        if type(match_list[0]) is bytes:
+            match_list = [x.decode("utf-8") for x in match_list]
+    
+        for g in glob_list:
+            match.update(glob.fnmatch.filter(match_list, g))
+    
+        return match
+
     def cdrop(self, globstr, inplace=False):
-        to_drop = list(utils.parse_globlist(globstr, list(self.df.columns)))
+        to_drop = list(self.parse_globlist(globstr, list(self.df.columns)))
         
         if inplace:
             modify = self
@@ -188,7 +207,7 @@ class DataTable(Logger):
         return modify
     
     def cfilter(self, globstr, inplace=False):
-        to_keep = utils.parse_globlist(globstr, list(self.df.columns))
+        to_keep = self.parse_globlist(globstr, list(self.df.columns))
         to_drop = set(self.headers).difference(to_keep)
         
         to_drop = list(to_drop)

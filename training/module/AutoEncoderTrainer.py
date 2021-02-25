@@ -1,6 +1,6 @@
 import module.utils as utils
-import module.Trainer as trainer
-import module.AutoEncoderBase as models
+from module.Trainer import Trainer
+from module.AutoEncoderBase import AutoEncoderBase
 import module.SummaryProcessor as summaryProcessor
 from module.DataProcessor import DataProcessor
 from module.DataLoader import DataLoader
@@ -118,7 +118,9 @@ class AutoEncoderTrainer:
         
         self.start_timestamp = datetime.datetime.now()
         
-        trainer.Trainer(self.training_output_path, verbose=verbose).train(
+        trainer = Trainer(self.training_output_path, verbose=verbose)
+        
+        trainer.train(
             x_train=self.train_data_normalized.data,
             x_test=self.validation_data_normalized.data,
             y_train=self.train_data_normalized.data,
@@ -191,7 +193,7 @@ class AutoEncoderTrainer:
         intermediate_architecture and bottleneck_size
         """
         
-        aes = models.AutoEncoderBase()
+        aes = AutoEncoderBase()
         aes.add(self.input_size)
         for elt in self.intermediate_architecture:
             aes.add(elt, activation='relu')

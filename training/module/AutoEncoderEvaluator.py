@@ -1,8 +1,9 @@
 import module.utils as utils
-import module.Trainer as trainer
+from module.Trainer import Trainer
 import module.SummaryProcessor as summaryProcessor
 from module.DataProcessor import DataProcessor
 from module.DataLoader import DataLoader
+from module.DataTable import DataTable
 
 import os
 import numpy as np
@@ -33,8 +34,8 @@ class AutoEncoderEvaluator:
                                                       )
         
         self.find_pkl_file()
-        self.trainer = trainer.Trainer(self.training_output_path)
-        self.model = self.trainer.load_model()
+        trainer = Trainer(self.training_output_path)
+        self.model = trainer.load_model()
         
         # Set random seed to the same value as during the training
         utils.set_random_seed(self.seed)
@@ -145,12 +146,11 @@ class AutoEncoderEvaluator:
                                              stds=stds,
                                              scaler=qcd_scaler))
         
-        self.qcd_reps = utils.DataTable(self.model.layers[1].predict(self.qcd_test_data_normalized.data), name='QCD reps')
+        self.qcd_reps = DataTable(self.model.layers[1].predict(self.qcd_test_data_normalized.data), name='QCD reps')
         
         for signal in self.signals:
             setattr(self, signal + '_reps',
-                    utils.DataTable(self.model.layers[1].predict(getattr(self, signal + '_norm').data),
-                                    name=signal + ' reps'))
+                    DataTable(self.model.layers[1].predict(getattr(self, signal + '_norm').data),name=signal + ' reps'))
         
         self.qcd_err_jets = [
             utils.DataTable(self.qcd_err.loc[self.qcd_err.index % 2 == i], name=self.qcd_err.name + " jet " + str(i))
@@ -159,8 +159,7 @@ class AutoEncoderEvaluator:
         for signal in self.signals:
             serr = getattr(self, signal + '_err')
             setattr(self, signal + '_err_jets',
-                    [utils.DataTable(serr.loc[serr.index % 2 == i], name=serr.name + " jet " + str(i)) for i in
-                     range(2)])
+                    [DataTable(serr.loc[serr.index % 2 == i], name=serr.name + " jet " + str(i)) for i in range(2)])
         
         self.test_flavor = self.qcd_flavor.iloc[self.qcd_test_data.index]
         

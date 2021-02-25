@@ -1,13 +1,11 @@
 import module.utils as utils
-from module.AucGetter import AucGetter
-from module.DataHolder import DataHolder
 
 import os
 import json
 import glob
 import datetime
 import pandas as pd
-import tensorflow as tf
+
 from collections import OrderedDict
 from pathlib import Path
 
@@ -116,7 +114,7 @@ def get_last_summary_file_version(summary_path, filename):
     while version in id_set:
         version += 1
     
-    return version-1
+    return version - 1
 
 def get_latest_summary_file_path(summaries_path, file_name_base, version=None):
     if version is None:
@@ -124,38 +122,3 @@ def get_latest_summary_file_path(summaries_path, file_name_base, version=None):
 
     input_summary_path = summaries_path+"/{}v{}.summary".format(file_name_base, version)
     return input_summary_path
-
-def save_all_missing_AUCs(summary_path, signals_path, AUCs_path):
-    """
-    Saves values of AUCs for all signals for all summaries for which AUCs file does not exist yet.
-    The QCD path will be read from the corresponding summary file.
-    """
-    
-    signalDict = {}
-    for path in glob.glob(signals_path):
-        key = path.split("/")[-3]
-        signalDict[key] = path
-    
-    summaries = summary(summary_path=summary_path)
-
-    if not os.path.exists(AUCs_path):
-        Path(AUCs_path).mkdir(parents=True, exist_ok=False)
-    
-    for index, row in summaries.df.iterrows():
-        path = row.training_output_path
-        filename = path.split("/")[-1]
-        auc_path = AUCs_path + "/" + filename
-        
-        if not os.path.exists(auc_path):
-            tf.compat.v1.reset_default_graph()
-            
-            auc_getter = AucGetter(filename=filename, summary_path=summary_path)
-
-            data_holder = DataHolder(qcd=row.qcd_path, **signalDict)
-            data_holder.load()
-            
-            norm, err, recon = auc_getter.get_errs_recon(data_holder)
-            
-            ROCs = auc_getter.get_aucs(err)
-            AUCs = auc_getter.auc_metric(ROCs)
-            AUCs.to_csv(auc_path)

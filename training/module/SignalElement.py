@@ -30,4 +30,4 @@ class SignalElement(object):
          self.flavor) = data_loader.load_all_data(self._path, self._name,
                                                   include_hlf=self._hlf, include_eflow=self._eflow,
                                                   hlf_to_drop=self._hlf_to_drop
-        )
+                                                  )

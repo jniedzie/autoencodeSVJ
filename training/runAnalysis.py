@@ -1,7 +1,6 @@
 import module.utils as utils
-import module.evaluate as ev
-import module.Trainer as trainer
 import module.SummaryProcessor as summaryProcessor
+from module.DataLoader import  DataLoader
 
 import pandas as pd
 import numpy as np
@@ -157,19 +156,6 @@ def updataSignalEvals():
                              output_path=output_path)
 
 
-def get_training_info_dict(filepath):
-    if not filepath.endswith('.pkl'):
-        filepath += '.pkl'
-    if not os.path.exists(filepath):
-        print("Could not open file: ", filepath)
-        raise AttributeError
-    return trainer.PklFile(filepath).store.copy()
-
-def printTrainingInfo():
-    print("\nRunning printTrainingInfo\n")
-    trainingOutputPath = results_path+"/hlf_eflow3_5_v0.pkl"
-    trainingInfo = get_training_info_dict(trainingOutputPath)
-    print("Training info - val_loss: ", trainingInfo['metrics']['val_loss'][-1,1])
 
 
 def getLatestSummaryFilePath(efp_base, bottleneck_dim, version=None):
@@ -195,7 +181,7 @@ def drawROCcurve(efp_base, bottleneck_dim, version=None):
     elt.roc(xscale='log', metrics=["mae"])
 
 def addSampleAndPrintShape():
-    newData = utils.DataLoader(name="data")
+    newData = DataLoader(name="data")
     newData.add_sample(input_path+"qcd/base_3/data_0_data.h5")
     
     print("shape: ", newData.data['jet_features'].shape)

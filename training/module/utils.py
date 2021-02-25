@@ -18,25 +18,7 @@ plt.rcParams['figure.figsize'] = (10,10)
 plt.rcParams.update({'font.size': 18})
 
 
-def parse_globlist(glob_list, match_list):
-    if not hasattr(glob_list, "__iter__") or isinstance(glob_list, str):
-        glob_list = [glob_list]
-    
-    for i,x in enumerate(glob_list):
-        if isinstance(x, int):
-            glob_list[i] = match_list[x]
-        
-    assert all([isinstance(c, str) for c in glob_list])
 
-    match = set()
-    
-    if type(match_list[0]) is bytes:
-        match_list = [x.decode("utf-8") for x in match_list]
-    
-    for g in glob_list:
-        match.update(glob.fnmatch.filter(match_list, g))
-
-    return match
 
 
 delphes_jet_tags_dict = {
