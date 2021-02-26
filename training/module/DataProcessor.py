@@ -24,12 +24,15 @@ class DataProcessor():
         train_and_validation_data = DataTable(data_table.df.loc[train])
         test_data = DataTable(data_table.df.loc[test], name="test")
 
-        train, test = train_test_split(train_and_validation_data,
-                                       test_size=self.validation_fraction,
-                                       random_state=self.seed)
-        
-        train_data =  DataTable(train, name="train")
-        validation_data = DataTable(test, name="validation")
+        if self.validation_fraction > 0:
+            train, validation = train_test_split(train_and_validation_data,
+                                           test_size=self.validation_fraction,
+                                           random_state=self.seed)
+            train_data = DataTable(train, name="train")
+            validation_data = DataTable(test, name="validation")
+        else:
+            train_data = DataTable(train_and_validation_data, name="train")
+            validation_data = None
         
         return train_data, validation_data, test_data, train_idx, test_idx
 

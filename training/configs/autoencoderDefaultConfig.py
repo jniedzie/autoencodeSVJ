@@ -44,7 +44,7 @@ n_models = 5
 
 # ---------------------------------------------
 # Pick normalization type (definitions below):
-norm_name = "StandardScaler"
+norm_type = "StandardScaler"
 
 # Set parameters for the selected normalization
 normalizations = {
@@ -82,7 +82,7 @@ normalizations = {
     }
 }
 
-norm_args = normalizations[norm_name]
+norm_args = normalizations[norm_type]
 
 # ---------------------------------------------
 # Once the training is done, you can specify

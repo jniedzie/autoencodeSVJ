@@ -6,8 +6,9 @@ from module.DataLoader import DataLoader
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.metrics import classification_report
 
-import pickle
+import pickle, os
 import optparse
+from pathlib import Path
 
 
 parser = optparse.OptionParser("usage: %prog --method method")
@@ -30,8 +31,8 @@ i_rinv = int(i_sample / len(masses))
 qcd_path = "../../data/training_data/qcd/base_3/*.h5"
 
 # signal_path = "../../data/s_channel_delphes/h5_signal_no_MET_over_mt_cut/{}GeV_{:3.2f}/base_3/*.h5".format(masses[i_mass], rinvs[i_rinv])
-signal_path = "../../data/s_channel_delphes/h5_signal_all_cuts/{}GeV_{:3.2f}/base_3/*.h5".format(masses[i_mass], rinvs[i_rinv])
-model_output_path = "trainingResults/models/model_{}GeV_{:3.2f}.sav".format(masses[i_mass], rinvs[i_rinv])
+signal_path = "../../data/s_channel_delphes/h5_no_lepton_veto_fat_jets/{}GeV_{:3.2f}/base_3/*.h5".format(masses[i_mass], rinvs[i_rinv])
+model_output_path = "trainingResults_test/models/model_{}GeV_{:3.2f}.sav".format(masses[i_mass], rinvs[i_rinv])
 
 print("Signal path: ", signal_path)
 print("Model output path: ", model_output_path)
@@ -55,6 +56,7 @@ print("\n===================================")
 print("Fit done. Saving model")
 print("===================================\n")
 
+Path(os.path.dirname(model_output_path)).mkdir(parents=True, exist_ok=True)
 pickle.dump(bdt, open(model_output_path, 'wb'))
 
 Y_predicted = bdt.predict(X_test)

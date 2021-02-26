@@ -26,13 +26,13 @@ class Trainer(Logger):
         self._LOG_PREFIX = "train_shell :: "
         self.VERBOSE = verbose
 
-        self.config_file = utils.smartpath(name)
-        self.path = os.path.dirname(self.config_file)
+        self.pickle_file_path = utils.smartpath(name)
+        self.path = os.path.dirname(self.pickle_file_path)
 
-        if not self.config_file.endswith(".pkl"):
-            self.config_file += ".pkl"
+        if not self.pickle_file_path.endswith(".pkl"):
+            self.pickle_file_path += ".pkl"
             
-        self.config = PklFile(self.config_file)
+        self.config = PklFile(self.pickle_file_path)
         
         defaults = {
             'name': name,
@@ -43,40 +43,40 @@ class Trainer(Logger):
             'metrics': {},
         }
 
-        for k,v in list(defaults.items()):
+        for k, v in defaults.items():
             if k not in self.config:
                 self.config[k] = v
 
     def _throw(self, msg, exc=AttributeError):
-        self.close()
+        self._close()
         self.error(msg)
         raise exc
 
-    def close(self):
+    def _close(self):
         try:
             del self.config
         except:
             pass
 
     def __del__(self):
-        self.close()
+        self._close()
 
     ### ACTUAL WRAPPERS
 
     def load_model(self, model=None, force=False):
         
-        w_path = self.config_file.replace(".pkl", "_weights.h5")
+        weights_file_path = self.pickle_file_path.replace(".pkl", "_weights.h5")
         # if already trained
         if self.config['trained']:
             if self.config['model_json']:
                 if model is None:
                     model = model_from_json(self.config['model_json'])
-                    model.load_weights(w_path)
+                    model.load_weights(weights_file_path)
                     self.log("using saved model")
                 else:
                     if not force:
                         model = model_from_json(self.config['model_json'])
-                        model.load_weights(w_path)
+                        model.load_weights(weights_file_path)
                         self.error("IGNORING PASSED PARAMETER 'model'")
                         self.log("using saved model")
                     else:
@@ -105,6 +105,7 @@ class Trainer(Logger):
         force=False,
         use_callbacks=False,
         verbose=1,
+        output_path=None,
         
         batch_size=32,
         loss=None,
@@ -114,12 +115,10 @@ class Trainer(Logger):
         es_patience=10,
         lr_patience=9,
         lr_factor=0.5,
-        
-        output_path=None,
     ):
         callbacks = None
 
-        w_path = self.config_file.replace(".pkl", "_weights.h5")
+        weights_file_path = self.pickle_file_path.replace(".pkl", "_weights.h5")
         if use_callbacks:
             
             print("Saving training history in: ", (output_path+".csv"))
@@ -129,7 +128,7 @@ class Trainer(Logger):
                 ReduceLROnPlateau(monitor='val_loss', factor=lr_factor, patience=lr_patience, verbose=0),
                 CSVLogger((output_path+".csv"), append=True),
                 TerminateOnNaN(),
-                ModelCheckpoint(w_path, monitor='val_loss', verbose=self.VERBOSE, save_best_only=True, save_weights_only=True, mode='min')
+                ModelCheckpoint(weights_file_path, monitor='val_loss', verbose=self.VERBOSE, save_best_only=True, save_weights_only=True, mode='min')
             ]
         
         model = self.load_model(model, force)
@@ -209,8 +208,8 @@ class Trainer(Logger):
                 self.error(traceback.format_exc())
                 if all([len(v) == 0 for v in history]):
                     self._throw("quitting")
-                self.log("saving to path " + w_path)
-                model.save_weights(w_path)
+                self.log("saving to path " + weights_file_path)
+                model.save_weights(weights_file_path)
 
             if len(list(history.values())) == 0:
                 n_epochs_finished = 0

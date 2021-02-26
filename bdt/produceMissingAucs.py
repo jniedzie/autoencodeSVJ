@@ -7,11 +7,13 @@ from sklearn.metrics import roc_auc_score
 import pickle
 
 qcd_path = "../../data/backgrounds/qcd/h5_qcd/*.h5"
-out_file_name = "trainingResults/aucs.txt"
+out_file_name = "trainingResults_test/aucs.txt"
+# out_file_name = "trainingResults_test/bdt/aucs.txt"
 
 def get_auc_for_sample(mass, rinv):
-    signal_path = "../../data/s_channel_delphes/h5_signal_no_MET_over_mt_cut/{}GeV_{:3.2f}/base_3/*.h5".format(mass, rinv)
-    model_output_path = "trainingResults/models/model_{}GeV_{:3.2f}.sav".format(mass, rinv)
+    signal_path = "../../data/s_channel_delphes/h5_no_lepton_veto_fat_jets/{}GeV_{:3.2f}/base_3/*.h5".format(mass, rinv)
+    model_output_path = "trainingResults_test/models/model_{}GeV_{:3.2f}.sav".format(mass, rinv)
+    # model_output_path = "trainingResults_test/bdt/trainingRuns/model_{}GeV_{:3.2f}.sav".format(mass, rinv)
     
     data_loader = DataLoader()
     (_, _), (X_test, Y_test) = data_loader.BDT_load_all_data(qcd_path=qcd_path, signal_path=signal_path)
