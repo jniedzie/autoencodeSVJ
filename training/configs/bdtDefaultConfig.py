@@ -38,7 +38,7 @@ efp_base = 3
 
 # ---------------------------------------------
 # Number of models to train
-n_models = 1
+n_models = 2
 
 # ---------------------------------------------
 # Pick normalization type (definitions below):

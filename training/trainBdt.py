@@ -22,13 +22,17 @@ rinvs = [0.15, 0.30, 0.45, 0.60, 0.75]
 i_mass = i_sample % len(masses)
 i_rinv = int(i_sample / len(masses))
 
-signal_path = config.signals_base_path+"/{}GeV_{:3.2f}/base_3/*.h5".format(masses[i_mass], rinvs[i_rinv])
-model_output_path = config.results_path+"/model_{}GeV_{:3.2f}.sav".format(masses[i_mass], rinvs[i_rinv])
+signal_name = "{}GeV_{:3.2f}".format(masses[i_mass], rinvs[i_rinv])
+signal_path = config.signals_base_path+"/"+signal_name+"/base_3/*.h5"
+
 
 for i in range(config.n_models):
-    file_name = config.file_name
+    file_name = config.file_name + "_" + signal_name
     last_version = summaryProcessor.get_last_summary_file_version(config.summary_path, file_name)
+    
     file_name += "_v{}".format(last_version + 1)
+    model_output_path = config.results_path + "/" + file_name + ".weigths"
+    
     
     trainer = BdtTrainer(qcd_path=config.qcd_path,
                          signal_path=signal_path,

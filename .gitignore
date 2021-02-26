@@ -1,6 +1,11 @@
 preselection/._SVJselection.cpp
 preselection/jniedzie.cc
 
+bdt/trainingResults_test/
+preselection/input_file_list.txt
+training/configs/aeTestConfig.py
+training/runAll.sh
+
 training/trainingResults*/*
 training/trainingResults*/aucs/*
 training/trainingResults*/summary/*
