@@ -1,4 +1,5 @@
 from module.AutoEncoderTrainer import AutoEncoderTrainer
+import module.SummaryProcessor as summaryProcessor
 import importlib, argparse
 
 # ------------------------------------------------------------------------------------------------
@@ -13,12 +14,19 @@ args = parser.parse_args()
 config = importlib.import_module(args.config_path)
 
 for i in range(config.n_models):
-        
+    
+    file_name = config.file_name
+    last_version = summaryProcessor.get_last_summary_file_version(config.summary_path, file_name)
+    file_name += "_v{}".format(last_version + 1)
+    
     trainer = AutoEncoderTrainer(qcd_path=config.qcd_path,
                                  bottleneck_size=config.target_dim,
                                  training_params=config.training_params,
+                                 EFP_base=config.efp_base,
                                  norm_type=config.norm_type,
-                                 norm_args=config.norm_args
+                                 norm_args=config.norm_args,
+                                 hlf_to_drop= ['Energy', 'Flavor'],
+                                 output_file_name=file_name
                                  )
     
     trainer.run_training(training_output_path=config.results_path,

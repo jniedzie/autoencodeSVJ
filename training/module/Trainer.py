@@ -63,31 +63,31 @@ class Trainer(Logger):
 
     ### ACTUAL WRAPPERS
 
-    def load_model(self, model=None, force=False, custom_objects=None):
+    def load_model(self, model=None, force=False):
         
         w_path = self.config_file.replace(".pkl", "_weights.h5")
         # if already trained
         if self.config['trained']:
             if self.config['model_json']:
                 if model is None:
-                    model = model_from_json(self.config['model_json'], custom_objects=custom_objects)
+                    model = model_from_json(self.config['model_json'])
                     model.load_weights(w_path)
                     self.log("using saved model")
                 else:
                     if not force:
-                        model = model_from_json(self.config['model_json'], custom_objects=custom_objects)
+                        model = model_from_json(self.config['model_json'])
                         model.load_weights(w_path)
                         self.error("IGNORING PASSED PARAMETER 'model'")
                         self.log("using saved model")
                     else:
                         if isinstance(model, str):
-                            model = self.load_model(model, custom_objects=custom_objects)
+                            model = self.load_model(model)
                         self.log("using model passed as function argument")
             else:
                 if model is None:
                     self._throw("no model passed, and saved model not found!")
                 if isinstance(model, str):
-                    model = self.load_model(model, custom_objects=custom_objects)
+                    model = self.load_model(model)
                 self.log("using model passed as function argument")
         
         if model is None:
@@ -102,22 +102,20 @@ class Trainer(Logger):
         x_test=None,
         y_test=None,
         model=None,
-        epochs=10,
-        batch_size=32,
         force=False,
-        metrics=[],
-        loss=None,
-        loss_weights=None,
-        optimizer=None,
-        verbose=1,
         use_callbacks=False,
+        verbose=1,
+        
+        batch_size=32,
+        loss=None,
+        optimizer=None,
+        epochs=10,
         learning_rate=0.01,
-        custom_objects={},
-        compile_me=True,
         es_patience=10,
         lr_patience=9,
         lr_factor=0.5,
-            output_path=None
+        
+        output_path=None,
     ):
         callbacks = None
 
@@ -134,7 +132,7 @@ class Trainer(Logger):
                 ModelCheckpoint(w_path, monitor='val_loss', verbose=self.VERBOSE, save_best_only=True, save_weights_only=True, mode='min')
             ]
         
-        model = self.load_model(model, force, custom_objects)
+        model = self.load_model(model, force)
 
         if optimizer is None:
             if hasattr(model, "optimizer"):
@@ -143,6 +141,8 @@ class Trainer(Logger):
                 optimizer = getattr(keras.optimizers, "adam")(lr=learning_rate)
         elif isinstance(optimizer, str):
             optimizer = getattr(keras.optimizers, "Adam")(lr=learning_rate)
+
+        loss_weights = None
         if loss is None:
             if hasattr(model, "loss"):
                 loss = model.loss
@@ -158,14 +158,9 @@ class Trainer(Logger):
                 loss = [loss]
                 loss_weights = [1.]
 
-        if metrics is None:
-            if hasattr(model, "metrics"):
-                metrics = model.metrics
-            else:
-                metrics = []
-        if compile_me:
-            model.compile(
-                optimizer=optimizer, loss=loss, metrics=metrics, loss_weights=loss_weights)
+        metrics = model.metrics or []
+
+        model.compile(optimizer=optimizer, loss=loss, metrics=metrics, loss_weights=loss_weights)
 
         start = datetime.now()
 
@@ -193,8 +188,6 @@ class Trainer(Logger):
                     nhistory = model.fit(
                         x=x_train,
                         y=y_train,
-                        # steps_per_epoch=int(np.ceil(len(x_train)/batch_size)),
-                        # validation_steps=int(np.ceil(len(x_test)/batch_size)),
                         validation_data=(x_test, y_test),
                         initial_epoch=master_epoch_n,
                         epochs=master_epoch_n + 1,
@@ -228,13 +221,12 @@ class Trainer(Logger):
             nhistory = model.fit(
                 x=x_train,
                 y=y_train,
-
                 validation_data=(x_test, y_test),
                 initial_epoch=master_epoch_n,
                 epochs=master_epoch_n + epochs,
                 verbose=verbose,
                 callbacks=callbacks,
-                        batch_size=batch_size,
+                batch_size=batch_size,
             ).history
 
             for metric in nhistory:
@@ -254,7 +246,6 @@ class Trainer(Logger):
         self.config['model_json'] = str(js)
     
         # load the last model
-        best = self.load_model()
         hvalues = [hv[:n_epochs_finished] for hv in list(history.values())]
         hkeys = list(history.keys())
 

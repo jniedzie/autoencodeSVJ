@@ -29,18 +29,18 @@ def get_signals():
     return signals
 
 
-def get_evaluator(training_version):
-    summary_base_name = "hlf_eflow{}_{}_".format(config.efp_base, config.target_dim)
+def get_evaluator():
+    
     input_summary_path = summaryProcessor.get_latest_summary_file_path(summaries_path=config.summary_path,
-                                                                       file_name_base=summary_base_name,
+                                                                       file_name_base=config.file_name,
                                                                        version=config.best_model)
     
     signals = get_signals()
     return AutoEncoderEvaluator(input_summary_path, signals=signals)
 
 
-def get_losses(training_version):
-    evaluator = get_evaluator(training_version)
+def get_losses():
+    evaluator = get_evaluator()
     
     loss_qcd = evaluator.qcd_err.mae
     loss_signal = []
@@ -63,8 +63,8 @@ i_plot = 1
 loss_hist = canvas.add_subplot(n_rows, n_columns, i_plot)
 i_plot += 1
 
-loss_qcd, loss_signal = get_losses(config.best_model)
-    
+loss_qcd, loss_signal = get_losses()
+
 loss_hist.hist(loss_qcd, bins=numpy.linspace(0, 0.4, 100), label="qcd", histtype="step", density=True)
 loss_hist.hist(loss_signal, bins=numpy.linspace(0, 0.4, 100), label="signal", histtype="step", density=True)
 loss_hist.set_yscale("log")

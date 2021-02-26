@@ -16,10 +16,8 @@ parser.add_argument("-c", "--config", dest="config_path", default=None, required
 args = parser.parse_args()
 config = importlib.import_module(args.config_path)
 
-summary_base_name = "hlf_eflow{}_{}_".format(config.efp_base, config.target_dim)
-
 input_summary_path = summaryProcessor.get_latest_summary_file_path(summaries_path=config.summary_path,
-                                                                   file_name_base=summary_base_name,
+                                                                   file_name_base=config.file_name,
                                                                    version=config.best_model)
 
 # masses = [1500, 2000, 2500, 3000, 3500, 4000]

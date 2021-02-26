@@ -58,5 +58,5 @@ class Logger:
             for line in s.split('\n'):
                 out += prefix + str(line) + '\n'
         else:
-            out += prefix + str(line) + '\n'
+            out += prefix + str(s) + '\n'
         return out

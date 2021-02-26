@@ -94,3 +94,7 @@ best_model = 0
 # Statistical analysis parameters
 svj_jet_cut = 0.037
 n_events_per_class = 10000
+
+# ---------------------------------------------
+# Output file names
+file_name = "hlf_eflow_{}_bottle_{}".format(efp_base, target_dim)

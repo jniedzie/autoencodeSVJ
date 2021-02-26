@@ -14,6 +14,8 @@ class AutoEncoderTrainer:
                  qcd_path,
                  training_params,
                  bottleneck_size,
+                 output_file_name,
+                 EFP_base=None,
                  intermediate_architecture=(30, 30),
                  test_data_fraction=0.15,
                  validation_data_fraction=0.15,
@@ -27,19 +29,18 @@ class AutoEncoderTrainer:
         provided arguments. Normalizes the data as specified by norm_percentile.
         High-level features specified in hlf_to_drop will not be used for training.
         """
-
-        if hlf_to_drop is None:
-            hlf_to_drop = ['Energy', 'Flavor']
         
         self.seed = np.random.randint(0, 99999999)
         utils.set_random_seed(self.seed)
         
         self.qcd_path = qcd_path
         self.hlf_to_drop = hlf_to_drop
+        self.EFP_base = EFP_base
         
         self.training_params = training_params
         self.test_data_fraction = test_data_fraction
         self.validation_data_fraction = validation_data_fraction
+        self.output_file_name = output_file_name
         
         data_loader = DataLoader()
         
@@ -102,8 +103,7 @@ class AutoEncoderTrainer:
         specified in the constructor
         """
         
-        self.output_filename = self.get_filename(summaries_path=summaries_path)
-        self.training_output_path = training_output_path + self.output_filename
+        self.training_output_path = training_output_path + self.output_file_name
     
         print("\n\nTraining the model")
         print("Filename: ", self.training_output_path)
@@ -122,8 +122,8 @@ class AutoEncoderTrainer:
         
         trainer.train(
             x_train=self.train_data_normalized.data,
-            x_test=self.validation_data_normalized.data,
             y_train=self.train_data_normalized.data,
+            x_test=self.validation_data_normalized.data,
             y_test=self.validation_data_normalized.data,
             model=self.model,
             force=True,
@@ -146,7 +146,7 @@ class AutoEncoderTrainer:
             'hlf': True,
             'hlf_to_drop': tuple(self.hlf_to_drop),
             'eflow': True,
-            'eflow_base': self.get_EFP_base(),
+            'eflow_base': self.EFP_base,
             'test_split': self.test_data_fraction,
             'val_split': self.validation_data_fraction,
             'norm_type': self.norm_type,
@@ -164,28 +164,6 @@ class AutoEncoderTrainer:
             'end_time': str(self.end_timestamp),
         }
         summaryProcessor.dump_summary_json(self.training_params, summary_dict, output_path=path)
-        
-    def get_EFP_base(self):
-        """
-        Returns EFP base deduced from the structure of QCD samples
-        """
-        n_EFP_variables = len([x for x in self.qcd.columns if "eflow" in x])
-        EFP_base_lookup = {12: 3, 13: 3, 35: 4, 36: 4}
-        EFP_base = EFP_base_lookup[n_EFP_variables]
-        
-        return EFP_base
-
-    def get_filename(self, summaries_path):
-        """
-        Returns filename for given QCD sample, already with correct next version deduced
-        from contents of the provided summaries directory
-        """
-        
-        filename = "hlf_eflow{}_{}_".format(self.get_EFP_base(), self.bottleneck_size)
-        last_version = summaryProcessor.get_last_summary_file_version(summaries_path, filename)
-        filename += "v{}".format(last_version + 1)
-    
-        return filename
 
     def get_auto_encoder_model(self):
         """

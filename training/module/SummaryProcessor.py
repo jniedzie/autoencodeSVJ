@@ -98,7 +98,7 @@ def summary_match(search_path, verbose=True):
 
 
 def get_last_summary_file_version(summary_path, filename):
-    summary_search_path = summary_path + filename + "v*"
+    summary_search_path = summary_path + filename + "_v*"
     summary_files = summary_match(summary_search_path, verbose=False)
     
     existing_ids = []
@@ -120,5 +120,5 @@ def get_latest_summary_file_path(summaries_path, file_name_base, version=None):
     if version is None:
         version = get_last_summary_file_version(summaries_path, file_name_base)
 
-    input_summary_path = summaries_path+"/{}v{}.summary".format(file_name_base, version)
+    input_summary_path = summaries_path+"/{}_v{}.summary".format(file_name_base, version)
     return input_summary_path
