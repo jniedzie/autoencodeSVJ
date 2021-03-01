@@ -83,7 +83,7 @@ class AutoEncoderTrainer:
                                                               data_ranges=self.data_ranges,
                                                               means=self.means_train,
                                                               stds=self.stds_train)
-        
+
         self.validation_data_normalized = data_processor.normalize(data_table=validation_data,
                                                                    normalization_type=self.norm_type,
                                                                    norm_args=self.norm_args,
@@ -129,8 +129,8 @@ class AutoEncoderTrainer:
             force=True,
             use_callbacks=True,
             verbose=int(verbose),
-            output_path=self.training_output_path
-            ** self.training_params,
+            output_path=self.training_output_path,
+            **self.training_params,
         )
         
         self.end_timestamp = datetime.datetime.now()

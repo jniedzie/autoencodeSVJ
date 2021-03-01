@@ -38,11 +38,9 @@ class AucGetter(object):
         self.test_split = summary_data['test_split']
         self.validation_split = summary_data['val_split']
         self.qcd_path = summary_data['qcd_path']
-        self.target_dim = summary_data['target_dim']
-        self.input_dim = summary_data['input_dim']
         self.training_output_path = summary_data['training_output_path']
         self.norm_type = summary_data["norm_type"]
-        self.norm_ranges = np.asarray(summary_data["range"])
+        self.norm_ranges = np.asarray(summary_data["range"]) if "range" in summary_data.keys() else None
         self.norm_args = summary_data['norm_args']
         
     def get_test_dataset(self, data_holder, test_key='qcd'):

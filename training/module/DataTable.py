@@ -59,6 +59,10 @@ class DataTable(Logger):
         else:
             self.df = pd.DataFrame(self.data, columns=self.headers)
     
+    # def append(self, other_table):
+    #     self.df.append(other_table.df)
+    #     return self
+    
     def setup_scaler(self, norm_type, scaler_args):
         norm_type = getattr(self.NormTypes, norm_type)
         self.scaler = getattr(prep, norm_type.name)(**scaler_args)

@@ -157,9 +157,9 @@ class Trainer(Logger):
                 loss = [loss]
                 loss_weights = [1.]
 
-        metrics = model.metrics or []
-
-        model.compile(optimizer=optimizer, loss=loss, metrics=metrics, loss_weights=loss_weights)
+        if hasattr(model, "metrics"):
+            metrics = model.metrics or []
+            model.compile(optimizer=optimizer, loss=loss, metrics=metrics, loss_weights=loss_weights)
 
         start = datetime.now()
 
