@@ -8,6 +8,7 @@ import datetime
 import pandas as pd
 import pickle, os
 from pathlib import Path
+from module.DataTable import DataTable
 
 from sklearn.ensemble import AdaBoostClassifier
 
@@ -55,12 +56,12 @@ class BdtTrainer:
         print("Trainer scaler args: ", self.norm_args)
         
         self.X_train_normalized = self.data_processor.normalize(data_table=self.X_train,
-                                                           normalization_type=self.norm_type,
-                                                           norm_args=self.norm_args)
+                                                                normalization_type=self.norm_type,
+                                                                norm_args=self.norm_args)
 
         self.X_test_normalized = self.data_processor.normalize(data_table=self.X_test,
-                                                          normalization_type=self.norm_type,
-                                                          norm_args=self.norm_args)
+                                                               normalization_type=self.norm_type,
+                                                               norm_args=self.norm_args)
         
         # Build the model
         self.model = AdaBoostClassifier(algorithm='SAMME', n_estimators=800, learning_rate=0.5)
@@ -83,11 +84,13 @@ class BdtTrainer:
         (QCD_X_train, _, QCD_X_test, _, _) = self.data_processor.split_to_train_validate_test(data_table=QCD)
         (SVJ_X_train, _, SVJ_X_test, _, _) = self.data_processor.split_to_train_validate_test(data_table=SVJ)
     
-    
-        SVJ_Y_train, SVJ_Y_test = [pd.DataFrame(np.ones((len(elt.df), 1)), index=elt.index, columns=['tag']) for elt in
-                                   [SVJ_X_train, SVJ_X_test]]
-        QCD_Y_train, QCD_Y_test = [pd.DataFrame(np.zeros((len(elt.df), 1)), index=elt.index, columns=['tag']) for elt in
-                                   [QCD_X_train, QCD_X_test]]
+        SVJ_Y_train, SVJ_Y_test = [pd.DataFrame(np.ones((len(elt.df), 1)), index=elt.index, columns=['tag']) for elt in [SVJ_X_train, SVJ_X_test]]
+        QCD_Y_train, QCD_Y_test = [pd.DataFrame(np.zeros((len(elt.df), 1)), index=elt.index, columns=['tag']) for elt in [QCD_X_train, QCD_X_test]]
+
+        # SVJ_Y_train = DataTable(SVJ_Y_train)
+        # SVJ_Y_test = DataTable(SVJ_Y_test)
+        # QCD_Y_train = DataTable(QCD_Y_train)
+        # QCD_Y_test = DataTable(QCD_Y_test)
     
         self.X_train = SVJ_X_train.append(QCD_X_train)
         self.Y_train = SVJ_Y_train.append(QCD_Y_train)
@@ -121,15 +124,15 @@ class BdtTrainer:
         # trainer = Trainer(self.training_output_path, verbose=verbose)
         #
         # trainer.train(
-        #     x_train=self.train_data_normalized.data,
-        #     y_train=self.train_data_normalized.data,
-        #     x_test=self.validation_data_normalized.data,
-        #     y_test=self.validation_data_normalized.data,
+        #     x_train=self.X_train_normalized.data,
+        #     y_train=self.Y_train.data,
+        #     x_test=None,
+        #     y_test=None,
         #     model=self.model,
         #     force=True,
         #     use_callbacks=True,
         #     verbose=int(verbose),
-        #     output_path=self.training_output_path
+        #     output_path=self.training_output_path,
         #     ** self.training_params,
         # )
         
