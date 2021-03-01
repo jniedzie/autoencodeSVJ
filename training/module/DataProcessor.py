@@ -29,11 +29,11 @@ class DataProcessor():
                                            test_size=self.validation_fraction,
                                            random_state=self.seed)
             train_data = DataTable(train, name="train")
-            validation_data = DataTable(test, name="validation")
+            validation_data = DataTable(validation, name="validation")
         else:
             train_data = DataTable(train_and_validation_data, name="train")
             validation_data = None
-        
+  
         return train_data, validation_data, test_data, train_idx, test_idx
 
     def normalize(self, data_table, normalization_type, inverse=False,
