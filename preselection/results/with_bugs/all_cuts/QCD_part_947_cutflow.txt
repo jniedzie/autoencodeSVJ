@@ -1,2 +1,0 @@
-10000, 8520, 8520, 8520, 6609, 6566, 5688, 148, 148
-0 Passing Leptons, n Jets > 1, abs jet Etas < 2.4, abs DeltaEta < 1.5, Jet PT > 200, M_T > 1500, MET/M_T > 0.25, final selection

@@ -1,5 +1,0 @@
-/eos/project/d/dshep/genHepMC/mMediator-1500_mDark-20_rinv-0p45_alpha-0p1/HepMC-part1.root: 4355 5264 7747 7794 9658 
-/eos/project/d/dshep/genHepMC/mMediator-1500_mDark-20_rinv-0p45_alpha-0p1/HepMC-part2.root: 822 874 1162 2621 4091 5204 6933 8068 8845 
-/eos/project/d/dshep/genHepMC/mMediator-1500_mDark-20_rinv-0p45_alpha-0p1/HepMC-part3.root: 470 1470 4472 5128 5212 6986 
-/eos/project/d/dshep/genHepMC/mMediator-1500_mDark-20_rinv-0p45_alpha-0p1/HepMC-part4.root: 1103 2511 2646 2726 5408 5536 5542 9416 9763 
-/eos/project/d/dshep/genHepMC/mMediator-1500_mDark-20_rinv-0p45_alpha-0p1/HepMC-part5.root: 326 882 1304 2630 4041 4103 4170 4296 7478 7638 9530 
