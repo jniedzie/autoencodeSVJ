@@ -90,7 +90,7 @@ model_acceptance_fraction = 10  # take top N best performing models
 # print("The best model: ", best_name)
 
 
-AUC_file_name = "hlf_eflow{}_{}_v{}".format(config.efp_base, config.target_dim, config.best_model)
+AUC_file_name = "{}_v{}".format(config.file_name, config.best_model)
 
 print("AUCs: ", aucs[AUC_file_name].to_frame())
 

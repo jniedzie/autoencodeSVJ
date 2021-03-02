@@ -28,11 +28,12 @@ i_rinv = int(i_sample / len(masses))
 # model_output_path = "trainingResults/models/model_{}GeV_{:3.2f}.sav".format(masses[i_mass], rinvs[i_rinv])
 
 # qcd_path = "../../data/backgrounds/qcd/h5_qcd/*.h5"
-qcd_path = "../../data/training_data/qcd/base_3/*.h5"
+# qcd_path = "../../data/training_data/qcd/base_3/*.h5"
+qcd_path = "../../data/backgrounds/qcd/h5_no_lepton_veto_fat_jets/*.h5"
 
 # signal_path = "../../data/s_channel_delphes/h5_signal_no_MET_over_mt_cut/{}GeV_{:3.2f}/base_3/*.h5".format(masses[i_mass], rinvs[i_rinv])
 signal_path = "../../data/s_channel_delphes/h5_no_lepton_veto_fat_jets/{}GeV_{:3.2f}/base_3/*.h5".format(masses[i_mass], rinvs[i_rinv])
-model_output_path = "trainingResults_test/models/model_{}GeV_{:3.2f}.sav".format(masses[i_mass], rinvs[i_rinv])
+model_output_path = "trainingResults_noLeptonVeto_fatJets/models/model_{}GeV_{:3.2f}.sav".format(masses[i_mass], rinvs[i_rinv])
 
 print("Signal path: ", signal_path)
 print("Model output path: ", model_output_path)

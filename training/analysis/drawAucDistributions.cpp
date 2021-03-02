@@ -3,9 +3,9 @@
 #include "Result.hpp"
 #include "ResultsProcessor.hpp"
 
-string aucsPath =  "../trainingResults/aucs/";
-string resultsPath =  "../trainingResults/trainingRuns/";
-string filePattern = "hlf_eflow3_8_v";
+string aucsPath =  "../trainingResults_noLeptonVeto_fatJets/aucs/";
+string resultsPath =  "../trainingResults_noLeptonVeto_fatJets/trainingRuns/";
+string filePattern = "hlf_eflow_3_bottle_8_v";
 string plotsTitle = "";
 
 vector<double> r_invs = {0.15, 0.30, 0.45, 0.60, 0.75};
