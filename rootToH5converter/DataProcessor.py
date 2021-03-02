@@ -22,6 +22,7 @@ class DataProcessor:
             InputTypes.Delphes: {
                 # number of objects
                 "N_jets": "Jet_size",
+                "N_fat_jets": "FatJet_size",
                 "N_tracks": "EFlowTrack_size",
                 "N_neutral_hadrons": "EFlowNeutralHadron_size",
                 "N_photons": "Photon_size",
@@ -37,6 +38,14 @@ class DataProcessor:
                 "Jet_nCharged": "Jet/Jet.NCharged",
                 "Jet_nNeutral": "Jet/Jet.NNeutrals",
                 "Jet_flavor": "Jet/Jet.Flavor",
+                # fat jet features
+                "FatJet_eta": "FatJet/FatJet.Eta",
+                "FatJet_phi": "FatJet/FatJet.Phi",
+                "FatJet_pt": "FatJet/FatJet.PT",
+                "FatJet_mass": "FatJet/FatJet.Mass",
+                "FatJet_nCharged": "FatJet/FatJet.NCharged",
+                "FatJet_nNeutral": "FatJet/FatJet.NNeutrals",
+                "FatJet_flavor": "FatJet/FatJet.Flavor",
                 # tracks
                 "Track_eta": "EFlowTrack/EFlowTrack.Eta",
                 "Track_phi": "EFlowTrack/EFlowTrack.Phi",

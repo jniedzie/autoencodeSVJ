@@ -18,7 +18,7 @@ class OutputTypes(Enum):
 
 class Converter:
 
-    def __init__(self, input_path, store_n_jets, jet_delta_r, max_n_constituents, efp_degree):
+    def __init__(self, input_path, store_n_jets, jet_delta_r, max_n_constituents, efp_degree, use_fat_jets=False):
         """
         Reads input trees, recognizes input types, initializes EFP processor and prepares all arrays needed to
         store output variables.
@@ -43,6 +43,7 @@ class Converter:
         self.max_n_constituents = max_n_constituents if max_n_constituents > 0 else 100
         self.max_n_jets = store_n_jets
         self.EFP_size = 0
+        self.use_fat_jets = use_fat_jets
 
         # initialize EFP set
         if efp_degree >= 0:
@@ -70,10 +71,10 @@ class Converter:
         }
 
         self.output_labels = {
-            OutputTypes.EventFeatures: Event.get_features_names(),
-            OutputTypes.JetFeatures: Jet.get_feature_names(),
-            OutputTypes.JetConstituents: Jet.get_constituent_feature_names(),
-            OutputTypes.EPFs: [str(i) for i in range(self.EFP_size)]
+            OutputTypes.EventFeatures: np.string_(Event.get_features_names()),
+            OutputTypes.JetFeatures: np.string_(Jet.get_feature_names()),
+            OutputTypes.JetConstituents: np.string_(Jet.get_constituent_feature_names()),
+            OutputTypes.EPFs: np.string_([str(i) for i in range(self.EFP_size)])
         }
 
         self.save_outputs = {
@@ -142,7 +143,7 @@ class Converter:
                 print("Event: ", iEvent)
                 
                 # load event
-                event = Event(data_processor, iEvent, self.jet_delta_r)
+                event = Event(data_processor, iEvent, self.jet_delta_r, self.use_fat_jets)
                 event.print()
                 
                 # check event properties

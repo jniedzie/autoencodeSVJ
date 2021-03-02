@@ -21,6 +21,8 @@ parser.add_argument("-r", "--delta_r", dest="delta_r", type=float, default=0.5,
 parser.add_argument("-j", "--store_n_jets", dest="store_n_jets", type=int, default=2,
                     help="Number of jets to be stored (default: 2).")
 
+parser.add_argument("-f", "--use_fat_jets", dest="use_fat_jets", default=False, action='store_true',
+                    help="Should fat jets be stored instead of AK4 (default: False).")
 
 args = parser.parse_args()
 
@@ -37,7 +39,8 @@ converter = Converter(input_path = args.input_path,
                       store_n_jets= args.store_n_jets,
                       jet_delta_r = args.delta_r,
                       efp_degree=args.EFP_degree,
-                      max_n_constituents=args.max_constituents
+                      max_n_constituents=args.max_constituents,
+                      use_fat_jets=args.use_fat_jets
                       )
 
 converter.convert()

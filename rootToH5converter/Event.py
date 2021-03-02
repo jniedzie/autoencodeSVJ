@@ -4,7 +4,7 @@ from PhysObject import PhysObject
 
 
 class Event:
-    def __init__(self, data_processor, i_event, delta_r):
+    def __init__(self, data_processor, i_event, delta_r, use_fat_jets=False):
         """
         Reads/calculates event level features, loads jets, tracks, photons and neutral hadrons.
         Adds jet constituents to jets.
@@ -24,7 +24,7 @@ class Event:
         self.metPhi = data_processor.get_value_from_tree("MET_phi", i_event, i_object)
         self.metEta = data_processor.get_value_from_tree("MET_eta", i_event, i_object)
         
-        self.nJets = data_processor.get_value_from_tree("N_jets", i_event)
+        self.nJets = data_processor.get_value_from_tree("N_fat_jets" if use_fat_jets else "N_jets", i_event)
         self.nTracks = data_processor.get_value_from_tree("N_tracks", i_event)
         self.nNeutralHadrons = data_processor.get_value_from_tree("N_neutral_hadrons", i_event)
         self.nPhotons = data_processor.get_value_from_tree("N_photons", i_event)
@@ -43,7 +43,7 @@ class Event:
         
         # load jets from tree
         self.jets = []
-        self.fill_jets()
+        self.fill_jets(use_fat_jets=use_fat_jets)
 
         # calculate remaining event features
         self.Mjj = None
@@ -100,20 +100,22 @@ class Event:
                                 mass=self.data_processor.get_value_from_tree("Photon_mass", self.i_event, i_photon))
             self.photons.append(photon)
     
-    def fill_jets(self):
+    def fill_jets(self, use_fat_jets=False):
         if self.nJets is None:
             return
             
+        prefix = "Fat" if use_fat_jets else ""
+        
         for i_jet in range(0, self.nJets):
-            jet = Jet(eta=self.data_processor.get_value_from_tree("Jet_eta", self.i_event, i_jet),
-                      phi=self.data_processor.get_value_from_tree("Jet_phi", self.i_event, i_jet),
-                      pt=self.data_processor.get_value_from_tree("Jet_pt", self.i_event, i_jet),
-                      mass=self.data_processor.get_value_from_tree("Jet_mass", self.i_event, i_jet),
-                      flavor=self.data_processor.get_value_from_tree("Jet_flavor", self.i_event, i_jet),
-                      n_charged=self.data_processor.get_value_from_tree("Jet_nCharged", self.i_event, i_jet),
-                      n_neutral=self.data_processor.get_value_from_tree("Jet_nNeutral", self.i_event, i_jet),
-                      ch_hef=self.data_processor.get_value_from_tree("Jet_chHEF", self.i_event, i_jet),
-                      ne_hef=self.data_processor.get_value_from_tree("Jet_neHEF", self.i_event, i_jet))
+            jet = Jet(eta=self.data_processor.get_value_from_tree(prefix+"Jet_eta", self.i_event, i_jet),
+                      phi=self.data_processor.get_value_from_tree(prefix+"Jet_phi", self.i_event, i_jet),
+                      pt=self.data_processor.get_value_from_tree(prefix+"Jet_pt", self.i_event, i_jet),
+                      mass=self.data_processor.get_value_from_tree(prefix+"Jet_mass", self.i_event, i_jet),
+                      flavor=self.data_processor.get_value_from_tree(prefix+"Jet_flavor", self.i_event, i_jet),
+                      n_charged=self.data_processor.get_value_from_tree(prefix+"Jet_nCharged", self.i_event, i_jet),
+                      n_neutral=self.data_processor.get_value_from_tree(prefix+"Jet_nNeutral", self.i_event, i_jet),
+                      ch_hef=self.data_processor.get_value_from_tree(prefix+"Jet_chHEF", self.i_event, i_jet),
+                      ne_hef=self.data_processor.get_value_from_tree(prefix+"Jet_neHEF", self.i_event, i_jet))
             
             # check if tree contains links between tracks and jets
             jet_index = -1

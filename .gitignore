@@ -1,29 +1,31 @@
 preselection/._SVJselection.cpp
 preselection/jniedzie.cc
+preselection/SVJselection
+preselection/input_file_list.txt
+preselection/CMakeCache.txt
 
 bdt/trainingResults_test/
-preselection/input_file_list.txt
+bdt/trainingResults/aucs.txt
 
 training/configs/aeTestConfig.py
 training/configs/ae_noLeptonVeto_fatJets.py
-
 training/runAll.sh
 training/trainingResults*/*
 training/trainingResults*/aucs/*
 training/trainingResults*/summary/*
 training/trainingResults*/trainingRuns/*
-analysis/h5analysis/h5parser
-preselection/SVJselection
 training/analysis/drawAucDistributions
 
-bdt/trainingResults/aucs.txt
 analysis/h5analysis/test_data.txt
+analysis/h5analysis/h5parser
+
 rootToH5converter/data_0_selection.txt
 rootToH5converter/test_selections_delphes.txt
 rootToH5converter/test_selections_nanoAOD.txt
 rootToH5converter/output*.txt
+rootToH5converter/results/*
 
-preselection/CMakeCache.txt
+
 
 *CMakeFiles*
 *cmake_install.cmake
