@@ -1,1 +1,1 @@
-/eos/cms/store/cmst3/group/dehep/TOPGEN/Delphes/qcd_sqrtshatTeV_13TeV_PU20/qcd_sqrtshatTeV_13TeV_PU20_476.root
+/eos/project/d/dshep/DisappearingJet/qcd_highpT_13TeV/qcd_highpT_13TeV_476.root

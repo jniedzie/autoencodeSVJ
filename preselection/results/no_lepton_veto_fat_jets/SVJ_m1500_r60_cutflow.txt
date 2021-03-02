@@ -1,2 +1,2 @@
-50000, 50000, 10846, 10698, 7665, 7665, 948, 346, 346
-0 Passing Leptons, n Jets > 1, abs jet Etas < 2.4, abs DeltaEta < 1.5, Jet PT > 200, M_T > 1500, MET/M_T > 0.25, final selection
+50000, 50000, 50000, 10846, 10534, 7653, 7653, 946, 345, 345
+0 Passing Electrons, 0 Passing Muons, n Jets > 1, abs jet Etas < 2.4, abs DeltaEta < 1.5, Jet PT > 200, M_T > 1500, MET/M_T > 0.25, final selection
