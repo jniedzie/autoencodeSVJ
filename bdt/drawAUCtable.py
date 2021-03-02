@@ -9,8 +9,9 @@ import pickle
 import numpy as np
 import pandas as pd
 
-qcd_path = "../../data/backgrounds/qcd/h5_qcd/*.h5"
-aucs_file_name = "trainingResults/aucs.txt"
+# qcd_path = "../../data/backgrounds/qcd/h5_qcd/*.h5"
+qcd_path = "../../data/backgrounds/qcd/h5_no_lepton_veto_fat_jets/*.h5"
+aucs_file_name = "trainingResults_noLeptonVeto_fatJets/aucs.txt"
 
 matplotlib.rcParams.update({'font.size': 16})
 plt.rc('text', usetex=True)
