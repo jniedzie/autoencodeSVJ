@@ -9,6 +9,11 @@ import pandas as pd
 import pickle, os
 from pathlib import Path
 from module.DataTable import DataTable
+from datetime import datetime
+from module.PklFile import PklFile
+from collections import OrderedDict as odict
+import traceback
+from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TerminateOnNaN, ModelCheckpoint, CSVLogger
 
 from sklearn.ensemble import AdaBoostClassifier
 
@@ -117,9 +122,11 @@ class BdtTrainer:
             # for arg in self.training_params:
             #     print((arg, ":", self.training_params[arg]))
         
-        self.start_timestamp = datetime.datetime.now()
+        
 
-        self.model.fit(self.X_train_normalized, self.Y_train)
+        # self.model.fit(self.X_train_normalized, self.Y_train)
+        
+        self.train()
         
         # trainer = Trainer(self.training_output_path, verbose=verbose)
         #
@@ -135,9 +142,91 @@ class BdtTrainer:
         #     output_path=self.training_output_path,
         #     ** self.training_params,
         # )
+
+    def train(
+            self,
+            use_callbacks=False,
+            batch_size=32,
+            epochs=10,
+            output_path=None,
+            learning_rate=0.01,
+            es_patience=10,
+            lr_patience=9,
+            lr_factor=0.5,
+    ):
+        self.pickle_file_path = utils.smartpath(self.training_output_path)
+        self.config = PklFile(self.pickle_file_path)
+
+        defaults = {
+            'name': self.training_output_path,
+            'trained': False,
+            'model_json': '',
+            'batch_size': [],
+            'epoch_splits': [],
+            'metrics': {},
+        }
+
+        for k, v in defaults.items():
+            if k not in self.config:
+                self.config[k] = v
         
-        self.end_timestamp = datetime.datetime.now()
-        print("Training executed in: ", (self.end_timestamp - self.start_timestamp), " s")
+        # callbacks = None
+        #
+        # if use_callbacks:
+        #     print("Saving training history in: ", (output_path + ".csv"))
+        #
+        #     weights_file_path = self.pickle_file_path.replace(".pkl", "_weights.h5")
+        #
+        #     callbacks = [
+        #         EarlyStopping(monitor='val_loss', patience=es_patience, verbose=0),
+        #         ReduceLROnPlateau(monitor='val_loss', factor=lr_factor, patience=lr_patience, verbose=0),
+        #         CSVLogger((output_path + ".csv"), append=True),
+        #         TerminateOnNaN(),
+        #         ModelCheckpoint(weights_file_path, monitor='val_loss', verbose=True, save_best_only=True,
+        #                         save_weights_only=True, mode='min')
+        #     ]
+    
+        model = self.model
+    
+        self.start_timestamp = datetime.now()
+    
+        previous_epochs = self.config['epoch_splits']
+    
+        master_epoch_n = sum(previous_epochs)
+        finished_epoch_n = master_epoch_n + epochs
+    
+        # history = odict()
+    
+        # if not use_callbacks:
+        #     for epoch in range(epochs):
+        #         print("TRAINING EPOCH ", master_epoch_n, "/", finished_epoch_n)
+        #         self.model.fit(self.X_train_normalized, self.Y_train)
+        #         master_epoch_n += 1
+        #
+        # else:
+    
+        self.model.fit(self.X_train_normalized, self.Y_train)
+        master_epoch_n += epochs
+    
+        #
+    
+        print("trained epochs!")
+    
+        self.config['trained'] = True
+    
+        # load the last model
+        
+        self.end_timestamp = datetime.now()
+    
+        print("finished epoch N: {}".format(finished_epoch_n))
+        print("model saved")
+    
+        self.config['time'] = str(self.end_timestamp - self.start_timestamp)
+        self.config['epochs'] = epochs
+        self.config['batch_size'] = self.config['batch_size'] + [batch_size, ] * finished_epoch_n
+        self.config['epoch_splits'] = previous_epochs
+    
+        del self.config
         
     def save(self, summary_path, model_path):
         """

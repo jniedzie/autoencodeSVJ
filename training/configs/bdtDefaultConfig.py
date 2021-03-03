@@ -4,6 +4,9 @@
 # ------------------------------------------------------------------------------------------------
 
 
+# Model type
+model_type = "BDT"
+
 # ---------------------------------------------
 # Path to training data
 qcd_path = "../../data/training_data/qcd/base_3/*.h5"
@@ -35,6 +38,10 @@ training_params = {
 
 target_dim = 8
 efp_base = 3
+
+test_data_fraction=0.2
+validation_data_fraction=0.0
+
 
 # ---------------------------------------------
 # Number of models to train
