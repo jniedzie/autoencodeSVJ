@@ -10,6 +10,7 @@ bdt/trainingResults/aucs.txt
 training/configs/aeTestConfig.py
 training/configs/ae_noLeptonVeto_fatJets.py
 training/configs/ae_noLeptonVeto_fatJets_dr0p8.py
+training/configs/ae_allCuts_fatJets_dr0p8.py
 training/runAll.sh
 training/trainingResults*/*
 training/trainingResults*/aucs/*

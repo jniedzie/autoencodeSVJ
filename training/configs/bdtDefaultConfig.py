@@ -45,7 +45,7 @@ validation_data_fraction=0.0
 
 # ---------------------------------------------
 # Number of models to train
-n_models = 2
+n_models = 1
 
 # ---------------------------------------------
 # Pick normalization type (definitions below):

@@ -92,141 +92,42 @@ class BdtTrainer:
         SVJ_Y_train, SVJ_Y_test = [pd.DataFrame(np.ones((len(elt.df), 1)), index=elt.index, columns=['tag']) for elt in [SVJ_X_train, SVJ_X_test]]
         QCD_Y_train, QCD_Y_test = [pd.DataFrame(np.zeros((len(elt.df), 1)), index=elt.index, columns=['tag']) for elt in [QCD_X_train, QCD_X_test]]
 
-        # SVJ_Y_train = DataTable(SVJ_Y_train)
-        # SVJ_Y_test = DataTable(SVJ_Y_test)
-        # QCD_Y_train = DataTable(QCD_Y_train)
-        # QCD_Y_test = DataTable(QCD_Y_test)
-    
         self.X_train = SVJ_X_train.append(QCD_X_train)
         self.Y_train = SVJ_Y_train.append(QCD_Y_train)
     
         self.X_test = SVJ_X_test.append(QCD_X_test)
         self.Y_test = SVJ_Y_test.append(QCD_Y_test)
         
-        
-    def run_training(self, training_output_path, summaries_path, verbose=False):
+    def run_training(self, training_output_path):
         """
         Runs the training on data loaded and prepared in the constructor, according to training params
         specified in the constructor
         """
         
         self.training_output_path = training_output_path + self.output_file_name
+        self.config = PklFile(utils.smartpath(self.training_output_path))
     
         print("\n\nTraining the model")
         print("Filename: ", self.training_output_path)
-        
-        if verbose:
-            if hasattr(self.model, "summary"):
-                self.model.summary()
-            # print("\nTraining params:")
-            # for arg in self.training_params:
-            #     print((arg, ":", self.training_params[arg]))
-        
-        
 
-        # self.model.fit(self.X_train_normalized, self.Y_train)
-        
-        self.train()
-        
-        # trainer = Trainer(self.training_output_path, verbose=verbose)
-        #
-        # trainer.train(
-        #     x_train=self.X_train_normalized.data,
-        #     y_train=self.Y_train.data,
-        #     x_test=None,
-        #     y_test=None,
-        #     model=self.model,
-        #     force=True,
-        #     use_callbacks=True,
-        #     verbose=int(verbose),
-        #     output_path=self.training_output_path,
-        #     ** self.training_params,
-        # )
-
-    def train(
-            self,
-            use_callbacks=False,
-            batch_size=32,
-            epochs=10,
-            output_path=None,
-            learning_rate=0.01,
-            es_patience=10,
-            lr_patience=9,
-            lr_factor=0.5,
-    ):
-        self.pickle_file_path = utils.smartpath(self.training_output_path)
-        self.config = PklFile(self.pickle_file_path)
+        self.start_timestamp = datetime.now()
+        self.model.fit(self.X_train_normalized, self.Y_train)
+        self.end_timestamp = datetime.now()
 
         defaults = {
             'name': self.training_output_path,
-            'trained': False,
+            'trained': True,
             'model_json': '',
             'batch_size': [],
             'epoch_splits': [],
             'metrics': {},
+            'time': str(self.end_timestamp - self.start_timestamp),
         }
 
         for k, v in defaults.items():
-            if k not in self.config:
-                self.config[k] = v
+            self.config[k] = v
         
-        # callbacks = None
-        #
-        # if use_callbacks:
-        #     print("Saving training history in: ", (output_path + ".csv"))
-        #
-        #     weights_file_path = self.pickle_file_path.replace(".pkl", "_weights.h5")
-        #
-        #     callbacks = [
-        #         EarlyStopping(monitor='val_loss', patience=es_patience, verbose=0),
-        #         ReduceLROnPlateau(monitor='val_loss', factor=lr_factor, patience=lr_patience, verbose=0),
-        #         CSVLogger((output_path + ".csv"), append=True),
-        #         TerminateOnNaN(),
-        #         ModelCheckpoint(weights_file_path, monitor='val_loss', verbose=True, save_best_only=True,
-        #                         save_weights_only=True, mode='min')
-        #     ]
-    
-        model = self.model
-    
-        self.start_timestamp = datetime.now()
-    
-        previous_epochs = self.config['epoch_splits']
-    
-        master_epoch_n = sum(previous_epochs)
-        finished_epoch_n = master_epoch_n + epochs
-    
-        # history = odict()
-    
-        # if not use_callbacks:
-        #     for epoch in range(epochs):
-        #         print("TRAINING EPOCH ", master_epoch_n, "/", finished_epoch_n)
-        #         self.model.fit(self.X_train_normalized, self.Y_train)
-        #         master_epoch_n += 1
-        #
-        # else:
-    
-        self.model.fit(self.X_train_normalized, self.Y_train)
-        master_epoch_n += epochs
-    
-        #
-    
-        print("trained epochs!")
-    
-        self.config['trained'] = True
-    
-        # load the last model
-        
-        self.end_timestamp = datetime.now()
-    
-        print("finished epoch N: {}".format(finished_epoch_n))
         print("model saved")
-    
-        self.config['time'] = str(self.end_timestamp - self.start_timestamp)
-        self.config['epochs'] = epochs
-        self.config['batch_size'] = self.config['batch_size'] + [batch_size, ] * finished_epoch_n
-        self.config['epoch_splits'] = previous_epochs
-    
-        del self.config
         
     def save(self, summary_path, model_path):
         """

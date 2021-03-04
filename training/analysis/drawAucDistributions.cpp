@@ -5,7 +5,7 @@
 
 string aucsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8/aucs/";
 string resultsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8/trainingRuns/";
-string filePattern = "hlf_eflow_3_bottle_8_v";
+string filePattern = "hlf_eflow_3_bottle_7_v";
 string plotsTitle = "";
 
 vector<double> r_invs = {0.15, 0.30, 0.45, 0.60, 0.75};

@@ -47,35 +47,6 @@ class BdtEvaluator:
         utils.roc_auc_plot(qcd, others, metrics=metrics, figsize=figsize, figloc=figloc, *args, **kwargs)
         return
 
-    def load_data(self,
-                  signal_path,
-                  include_hlf=True,
-                  include_eflow=True,
-                  hlf_to_drop=['Energy', 'Flavor']):
-        
-        data_loader = DataLoader()
-    
-        (QCD, _, _, _) = data_loader.load_all_data(self.qcd_path, "QCD",
-                                                   include_hlf=include_hlf,
-                                                   include_eflow=include_eflow,
-                                                   hlf_to_drop=hlf_to_drop)
-    
-        (SVJ, _, _, _) = data_loader.load_all_data(signal_path, "SVJ",
-                                                   include_hlf=include_hlf,
-                                                   include_eflow=include_eflow,
-                                                   hlf_to_drop=hlf_to_drop)
-    
-        (_, _, QCD_X_test, _, _) = self.data_processor.split_to_train_validate_test(data_table=QCD)
-        (_, _, SVJ_X_test, _, _) = self.data_processor.split_to_train_validate_test(data_table=SVJ)
-
-        SVJ_Y_test = pd.DataFrame(np.ones((len(SVJ_X_test.df), 1)), index=SVJ_X_test.index, columns=['tag'])
-        QCD_Y_test = pd.DataFrame(np.zeros((len(QCD_X_test.df), 1)), index=QCD_X_test.index, columns=['tag'])
-    
-        X_test = SVJ_X_test.append(QCD_X_test)
-        Y_test = SVJ_Y_test.append(QCD_Y_test)
-        
-        return X_test, Y_test
-
     def get_data(self,
                  data_path,
                  is_background,
@@ -90,7 +61,6 @@ class BdtEvaluator:
                                                    include_eflow=include_eflow,
                                                    hlf_to_drop=hlf_to_drop)
     
-        
         (_, _, data_X_test, _, _) = self.data_processor.split_to_train_validate_test(data_table=data)
     
         if is_background:
@@ -115,9 +85,9 @@ class BdtEvaluator:
 
         AUC_file_path = AUCs_path + "/" + self.file_name + "_v{}".format(version)
 
-        # if os.path.exists(AUC_file_path):
-        #     print("File :", AUC_file_path, "\talready exists. Skipping...")
-        #     return
+        if os.path.exists(AUC_file_path):
+            print("File :", AUC_file_path, "\talready exists. Skipping...")
+            return
 
         if not os.path.exists(AUCs_path):
             Path(AUCs_path).mkdir(parents=True, exist_ok=False)

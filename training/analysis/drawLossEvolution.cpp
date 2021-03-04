@@ -11,9 +11,9 @@
 #include "Result.hpp"
 #include "ResultsProcessor.hpp"
 
-string aucsPath =  "../trainingResults_noLeptonVeto_fatJets/aucs/";
-string resultsPath =  "../trainingResults_noLeptonVeto_fatJets/trainingRuns/";
-string filePattern = "hlf_eflow_3_bottle_8_v";
+string aucsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8/aucs/";
+string resultsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8/trainingRuns/";
+string filePattern = "hlf_eflow_3_bottle_9_v";
 
 
 void drawGraph(const ModelStats &stats, string title)
