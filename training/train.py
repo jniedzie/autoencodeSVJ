@@ -11,7 +11,8 @@ import importlib, argparse
 parser = argparse.ArgumentParser(description="Argument parser")
 parser.add_argument("-c", "--config", dest="config_path", default=None, required=True, help="Path to the config file")
 args = parser.parse_args()
-config = importlib.import_module(args.config_path)
+config_path = args.config_path.strip(".py").replace("/", ".")
+config = importlib.import_module(config_path)
 
 for i in range(config.n_models):
     

@@ -12,7 +12,8 @@ parser = argparse.ArgumentParser(description="Argument parser")
 parser.add_argument("-c", "--config", dest="config_path", default=None, required=True, help="Path to the config file")
 parser.add_argument("-i", "--i_sample", dest="i_sample", default=0, type=int)
 args = parser.parse_args()
-config = importlib.import_module(args.config_path)
+config_path = args.config_path.strip(".py").replace("/", ".")
+config = importlib.import_module(config_path)
 
 i_sample = args.i_sample
 
@@ -44,10 +45,7 @@ for i in range(config.n_models):
                          output_file_name=file_name
                          )
     
-    trainer.run_training(training_output_path=config.results_path,
-                         summaries_path=config.summary_path,
-                         verbose=True
-                         )
+    trainer.run_training(training_output_path=config.results_path)
     
     trainer.save(summary_path=config.summary_path,
                  model_path=model_output_path)

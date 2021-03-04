@@ -13,7 +13,8 @@ import importlib, argparse
 parser = argparse.ArgumentParser(description="Argument parser")
 parser.add_argument("-c", "--config", dest="config_path", default=None, required=True, help="Path to the config file")
 args = parser.parse_args()
-config = importlib.import_module(args.config_path)
+config_path = args.config_path.strip(".py").replace("/", ".")
+config = importlib.import_module(config_path)
 
 # masses = [1500, 2000, 2500, 3000, 3500, 4000]
 masses = [2500]
