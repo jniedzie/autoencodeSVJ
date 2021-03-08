@@ -11,10 +11,49 @@
 #include "Result.hpp"
 #include "ResultsProcessor.hpp"
 
-string aucsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8/aucs/";
-string resultsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8/trainingRuns/";
-string filePattern = "hlf_eflow_3_bottle_9_v";
+// Bottleneck:
+//string aucsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8/aucs/";
+//string resultsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8/trainingRuns/";
+//string filePattern = "hlf_eflow_3_bottle_4_v";
+//string filePattern = "hlf_eflow_3_bottle_5_v";
+//string filePattern = "hlf_eflow_3_bottle_6_v";
+//string filePattern = "hlf_eflow_3_bottle_7_v";
+//string filePattern = "hlf_eflow_3_bottle_8_v";
+//string filePattern = "hlf_eflow_3_bottle_9_v";
+//string filePattern = "hlf_eflow_3_bottle_10_v";
 
+// Batch size:
+//string aucsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_batchSizes/aucs/";
+//string resultsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_batchSizes/trainingRuns/";
+//string filePattern = "hlf_eflow_3_bottle_7_bs_1_v";
+//string filePattern = "hlf_eflow_3_bottle_7_bs_8_v";
+//string filePattern = "hlf_eflow_3_bottle_7_bs_64_v";
+//string filePattern = "hlf_eflow_3_bottle_7_bs_256_v";
+//string filePattern = "hlf_eflow_3_bottle_7_bs_512_v";
+//string filePattern = "hlf_eflow_3_bottle_7_bs_999999_v";
+//string filePattern = "hlf_eflow_3_bottle_7_bs_999999_epochs_2000_v";
+
+// Optimizers:
+string aucsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_optimizers/aucs/";
+string resultsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_optimizers/trainingRuns/";
+//string filePattern = "hlf_eflow_3_bottle_6_optimizer_SGD_v";
+//string filePattern = "hlf_eflow_3_bottle_6_optimizer_RMSprop_v";
+//string filePattern = "hlf_eflow_3_bottle_6_optimizer_Adam_v";
+//string filePattern = "hlf_eflow_3_bottle_6_optimizer_Adadelta_v";
+//string filePattern = "hlf_eflow_3_bottle_6_optimizer_Adagrad_v";
+//string filePattern = "hlf_eflow_3_bottle_6_optimizer_Adamax_v";
+//string filePattern = "hlf_eflow_3_bottle_6_optimizer_Nadam_v";
+string filePattern = "hlf_eflow_3_bottle_6_optimizer_Ftrl_v";
+
+// Losses:
+//string aucsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_losses/aucs/";
+//string resultsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_losses/trainingRuns/";
+//string filePattern = "hlf_eflow_3_bottle_7_loss_mean_absolute_error_v";
+//string filePattern = "hlf_eflow_3_bottle_7_loss_mean_absolute_percentage_error_v";
+//string filePattern = "hlf_eflow_3_bottle_7_loss_mean_squared_error_v";
+//string filePattern = "hlf_eflow_3_bottle_7_loss_mean_squared_logarithmic_error_v";
+//string filePattern = "hlf_eflow_3_bottle_7_loss_huber_loss_v";
+//string filePattern = "hlf_eflow_3_bottle_7_loss_log_cosh_v";
 
 void drawGraph(const ModelStats &stats, string title)
 {
@@ -47,7 +86,7 @@ void drawGraph(const ModelStats &stats, string title)
   trainingLoss->GetXaxis()->SetTitle("Epoch");
   trainingLoss->GetYaxis()->SetTitle("Loss");
   
-  trainingLoss->GetXaxis()->SetLimits(0, 200);
+  trainingLoss->GetXaxis()->SetLimits(0, 400);
 //  trainingLoss->GetYaxis()->SetRangeUser(0, 0.15);
   
   TLegend *legend = new TLegend(0.5, 0.7, 0.9, 0.9);
