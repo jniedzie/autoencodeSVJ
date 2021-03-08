@@ -45,9 +45,9 @@ class AutoEncoderTrainer:
         data_loader = DataLoader()
         
         # Load QCD samples
-        (self.qcd, qcd_jets, qcd_event, qcd_flavor) = data_loader.load_all_data(qcd_path, "qcd background",
-                                                                                include_hlf=True, include_eflow=True,
-                                                                                hlf_to_drop=hlf_to_drop)
+        (self.qcd, _, _, _) = data_loader.load_all_data(qcd_path, "qcd background",
+                                                        include_hlf=True, include_eflow=True,
+                                                        hlf_to_drop=hlf_to_drop)
 
         data_processor = DataProcessor(validation_fraction=self.validation_data_fraction,
                                        test_fraction=self.test_data_fraction,

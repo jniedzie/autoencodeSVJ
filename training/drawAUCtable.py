@@ -78,19 +78,6 @@ aucs = pd.concat(auc_dict)
 aucs['mass_nu_ratio'] = list(zip(aucs.mass, aucs.nu))
 aucs = aucs.pivot('mass_nu_ratio', 'name', 'auc')
 
-summaries = summaryProcessor.summary(summary_path=config.summary_path)
-
-model_acceptance_fraction = 10  # take top N best performing models
-# take lowest 10% losses of all trainings
-# n_best = int(0.01 * model_acceptance_fraction * summaries.data.size)
-# best_ = summaries.sort_values('total_loss').head(n_best)
-# best_name = str(best_.filename.values[0])
-#
-# print("N best: ", n_best)
-# print("Best models: ", best_)
-# print("The best model: ", best_name)
-
-
 AUC_file_name = "{}_v{}".format(config.file_name, config.best_model)
 
 print("AUCs: ", aucs[AUC_file_name].to_frame())
