@@ -9,10 +9,10 @@ model_type = "BDT"
 
 # ---------------------------------------------
 # Path to training data
-qcd_path = "../../data/training_data/qcd/base_3/*.h5"
+qcd_path = "../../data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp4/*.h5"
 
 # Path to testing data
-signals_base_path = "../../data/s_channel_delphes/h5_no_lepton_veto_fat_jets/"
+signals_base_path = "../../data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp4/"
 input_path = signals_base_path+"/*/base_3/*.h5"
 
 # ---------------------------------------------
@@ -36,8 +36,7 @@ training_params = {
     'lr_factor': 0.5
 }
 
-target_dim = 8
-efp_base = 3
+efp_base = 4
 
 test_data_fraction=0.2
 validation_data_fraction=0.0
@@ -102,4 +101,4 @@ n_events_per_class = 10000
 
 # ---------------------------------------------
 # Output file names
-file_name = "hlf_eflow_{}_bottle_{}".format(efp_base, target_dim)
+file_name = "hlf_eflow_{}".format(efp_base)

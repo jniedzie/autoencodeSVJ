@@ -22,18 +22,10 @@ if config.model_type == "AutoEncoder":
         summary_path=config.summary_path
     )
 elif config.model_type == "BDT":
-
-    evaluator = BdtEvaluator(
-        file_name = config.file_name,
-        test_data_fraction=config.test_data_fraction,
-        validation_data_fraction=config.validation_data_fraction,
-        qcd_path=config.qcd_path,
-    )
-    
-    evaluator.save_AUCs(
+    BdtEvaluator.save_AUCs(
         signals_base_path=config.signals_base_path,
         AUCs_path=config.AUCs_path,
-        results_path=config.results_path
+        summary_path=config.summary_path
     )
 else:
     print("Unknown model type: ", config.model_type)
