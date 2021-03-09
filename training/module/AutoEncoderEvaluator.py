@@ -4,14 +4,11 @@ import module.SummaryProcessor as summaryProcessor
 from module.DataProcessor import DataProcessor
 from module.DataLoader import DataLoader
 from module.AucGetter import AucGetter
-from module.DataHolder import DataHolder
 
 import numpy as np
 import pandas as pd
 from collections import OrderedDict as odict
-from pathlib import Path
-import tensorflow as tf
-import glob, os
+import os
 
 class AutoEncoderEvaluator:
     

@@ -1,18 +1,13 @@
 import module.utils as utils
-from module.Trainer import Trainer
 import module.SummaryProcessor as summaryProcessor
 from module.DataProcessor import DataProcessor
 from module.DataLoader import DataLoader
-from module.AucGetter import AucGetter
-from module.DataHolder import DataHolder
 from sklearn.metrics import roc_auc_score
 
 import numpy as np
 import pandas as pd
-from collections import OrderedDict as odict
 from pathlib import Path
-import tensorflow as tf
-import glob, os
+import os
 import pickle
 
 class BdtEvaluator:
@@ -57,18 +52,21 @@ class BdtEvaluator:
         if not os.path.exists(AUCs_path):
             Path(AUCs_path).mkdir(parents=True, exist_ok=False)
 
+        auc_dict = {}
+        
         for index, row in summaries.df.iterrows():
             utils.set_random_seed(row.seed)
 
             path = row.training_output_path
-            model_path = path + ".weigths"
             filename = path.split("/")[-1]
-            auc_path = AUCs_path + "/" + filename
-            print(auc_path)
+            
+            auc_filename = "_".join(filename.split("_")[0:-3]) + "_" + filename.split("_")[-1]
+            auc_path = AUCs_path + "/" + auc_filename
+            print("Saving AUC's to path:", auc_path)
 
-            if os.path.exists(auc_path):
-                print("File :", auc_path, "\talready exists. Skipping...")
-                continue
+            # if os.path.exists(auc_path):
+            #     print("File :", auc_path, "\talready exists. Skipping...")
+            #     continue
 
             data_processor = DataProcessor(validation_fraction=row.val_split,
                                            test_fraction=row.test_split,
@@ -83,28 +81,25 @@ class BdtEvaluator:
                                                            hlf_to_drop=row.hlf_to_drop
                                                            )
 
-            signal_index = 0
+            signal_components = filename.split("_")
+            mass_index = [i for i, s in enumerate(signal_components) if 'GeV' in s][0]
+            
+            mass = int(signal_components[mass_index].strip("GeV"))
+            rinv = float(signal_components[mass_index+1])
+            
+            signal_name = "{}GeV_{:3.2f}".format(mass, rinv)
+            signal_path = signals_base_path + "/" + signal_name + "/base_3/*.h5"
 
-            with open(auc_path, "w") as out_file:
-                out_file.write(",name,auc,mass,nu\n")
-                
-                base_filename = auc_path.split("/")[-1]
-                signal_components = base_filename.split("_")
-                mass = int(signal_components[-3].strip("GeV"))
-                rinv = float(signal_components[-2])
+            model_path = path + ".weigths"
+            try:
+                print("Reading file: ", model_path)
+                model = open(model_path, 'rb')
+            except IOError:
+                print("Couldn't open file ", model_path, ". Skipping...")
+                continue
+            bdt = pickle.load(model)
             
-                signal_name = "{}GeV_{:3.2f}".format(mass, rinv)
-                signal_path = signals_base_path + "/" + signal_name + "/base_3/*.h5"
-                
-                try:
-                    print("Reading file: ", model_path)
-                    model = open(model_path, 'rb')
-                except IOError:
-                    print("Couldn't open file ", model_path, ". Skipping...")
-                    continue
-                bdt = pickle.load(model)
-            
-                svj_X_test, svj_Y_test = BdtEvaluator.get_data(data_path=signal_path,
+            svj_X_test, svj_Y_test = BdtEvaluator.get_data(data_path=signal_path,
                                                                is_background=False,
                                                                data_processor=data_processor,
                                                                include_hlf=row.hlf,
@@ -112,58 +107,25 @@ class BdtEvaluator:
                                                                hlf_to_drop=row.hlf_to_drop
                                                                )
             
-                X_test = qcd_X_test.append(svj_X_test)
-                Y_test = qcd_Y_test.append(svj_Y_test)
+            X_test = qcd_X_test.append(svj_X_test)
+            Y_test = qcd_Y_test.append(svj_Y_test)
             
-                model_auc = roc_auc_score(Y_test, bdt.decision_function(X_test))
-                print("Area under ROC curve: %.4f" % (model_auc))
+            model_auc = roc_auc_score(Y_test, bdt.decision_function(X_test))
+            print("Area under ROC curve: %.4f" % (model_auc))
             
-                out_file.write(
-                    "{},Zprime_{}GeV_{},{},{},{}\n".format(signal_index, mass, rinv, model_auc, mass, rinv))
-                signal_index += 1
-        
-        
-
-        # masses = [1500, 2000, 2500, 3000, 3500, 4000]
-        # rinvs = [0.15, 0.30, 0.45, 0.60, 0.75]
-        
-        # signal_index=0
-        #
-        # AUC_file_path = AUCs_path + "/" + self.file_name + "_v{}".format(version)
-        #
-        # if os.path.exists(AUC_file_path):
-        #     print("File :", AUC_file_path, "\talready exists. Skipping...")
-        #     return
-        #
-        # if not os.path.exists(AUCs_path):
-        #     Path(AUCs_path).mkdir(parents=True, exist_ok=False)
-        #
-        # with open(AUC_file_path, "w") as out_file:
-        #     out_file.write(",name,auc,mass,nu\n")
-        #     for mass in masses:
-        #         for rinv in rinvs:
-        #             signal_name = "{}GeV_{:3.2f}".format(mass, rinv)
-        #             signal_path = signals_base_path + "/" + signal_name + "/base_3/*.h5"
-        #             base_filename = self.file_name + "_{}_v{}".format(signal_name, version)
-        #             training_base_path = results_path + base_filename
-        #
-        #             print("Reading file: ", training_base_path, ".weigths")
-        #
-        #             try:
-        #                 model = open(training_base_path + ".weigths", 'rb')
-        #             except IOError:
-        #                 print("Couldn't open file ", training_base_path, ".weigths. Skipping...")
-        #                 continue
-        #             bdt = pickle.load(model)
-        #
-        #             svj_X_test, svj_Y_test = self.get_data(data_path=signal_path, is_background=False)
-        #
-        #             X_test = qcd_X_test.append(svj_X_test)
-        #             Y_test = qcd_Y_test.append(svj_Y_test)
-        #
-        #
-        #             model_auc = roc_auc_score(Y_test, bdt.decision_function(X_test))
-        #             print("Area under ROC curve: %.4f" % (model_auc))
-        #
-        #             out_file.write("{},Zprime_{}GeV_{},{},{},{}\n".format(signal_index, mass, rinv, model_auc, mass, rinv))
-        #             signal_index += 1
+            if auc_path not in auc_dict.keys():
+                auc_dict[auc_path] = []
+            
+            auc_dict[auc_path].append({"mass":mass, "rinv": rinv, "auc": model_auc})
+            
+            for path, values in auc_dict.items():
+    
+                with open(path, "w") as out_file:
+                    out_file.write(",name,auc,mass,nu\n")
+            
+                    for index, dict in enumerate(values):
+                        out_file.write(
+                        "{},Zprime_{}GeV_{},{},{},{}\n".format(index,
+                                                               dict["mass"], dict["rinv"], dict["auc"],
+                                                               dict["mass"], dict["rinv"]))
+                

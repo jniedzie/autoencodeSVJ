@@ -44,8 +44,6 @@ class AucGetter(object):
         self.norm_args = summary_data['norm_args']
         
     def get_test_dataset(self, data_holder, test_key='qcd'):
-        assert hasattr(data_holder, test_key), 'please pass a data_holder object instance with attribute \'{}\''.format(
-            test_key)
         
         utils.set_random_seed(self.seed)
         
@@ -55,7 +53,7 @@ class AucGetter(object):
                                        test_fraction=self.test_split,
                                        seed=self.seed)
         
-        train, validation, test, _, _ = data_processor.split_to_train_validate_test(data_table=qcd)
+        _, _, test, _, _ = data_processor.split_to_train_validate_test(data_table=qcd)
         
         return test
     
