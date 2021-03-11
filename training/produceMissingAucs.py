@@ -1,5 +1,6 @@
 from module.AutoEncoderEvaluator import AutoEncoderEvaluator
 from module.BdtEvaluator import BdtEvaluator
+from module.EvaluatorBase import EvaluatorBase
 import importlib, argparse
 
 # ------------------------------------------------------------------------------------------------
@@ -16,16 +17,36 @@ config = importlib.import_module(config_path)
 
 
 if config.model_type == "AutoEncoder":
-    AutoEncoderEvaluator.save_AUCs(
+    # AutoEncoderEvaluator.save_AUCs(
+    #     input_path=config.input_path,
+    #     AUCs_path=config.AUCs_path,
+    #     summary_path=config.summary_path
+    # )
+
+    evaluator = EvaluatorBase(model_type=EvaluatorBase.ModelTypes.AutoEncoder)
+
+    evaluator.save_aucs(
         input_path=config.input_path,
-        AUCs_path=config.AUCs_path,
-        summary_path=config.summary_path
-    )
-elif config.model_type == "BDT":
-    BdtEvaluator.save_AUCs(
         signals_base_path=config.signals_base_path,
         AUCs_path=config.AUCs_path,
         summary_path=config.summary_path
     )
+    
+elif config.model_type == "BDT":
+    # BdtEvaluator.save_AUCs(
+    #     signals_base_path=config.signals_base_path,
+    #     AUCs_path=config.AUCs_path,
+    #     summary_path=config.summary_path
+    # )
+
+    evaluator = EvaluatorBase(model_type=EvaluatorBase.ModelTypes.Bdt)
+
+    evaluator.save_aucs(
+        signals_base_path=config.signals_base_path,
+        AUCs_path=config.AUCs_path,
+        summary_path=config.summary_path,
+        input_path=config.input_path,
+        )
+    
 else:
     print("Unknown model type: ", config.model_type)
