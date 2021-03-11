@@ -15,14 +15,15 @@
 //string filePattern = "hlf_eflow_3_bottle_10_v";
 
 // Losses:
-//string aucsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_losses/aucs/";
-//string resultsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_losses/trainingRuns/";
-//string filePattern = "hlf_eflow_3_bottle_7_loss_mean_absolute_error_v";
-//string filePattern = "hlf_eflow_3_bottle_7_loss_mean_absolute_percentage_error_v";
-//string filePattern = "hlf_eflow_3_bottle_7_loss_mean_squared_error_v";
-//string filePattern = "hlf_eflow_3_bottle_7_loss_mean_squared_logarithmic_error_v";
-//string filePattern = "hlf_eflow_3_bottle_7_loss_huber_loss_v";
-//string filePattern = "hlf_eflow_3_bottle_7_loss_log_cosh_v";
+string aucsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_losses/aucs/";
+string resultsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_losses/trainingRuns/";
+//string filePattern = "hlf_eflow_4_bottle_6_loss_mean_absolute_error_v";
+//string filePattern = "hlf_eflow_4_bottle_6_loss_mean_absolute_percentage_error_v";
+//string filePattern = "hlf_eflow_4_bottle_6_loss_mean_squared_error_v";
+//string filePattern = "hlf_eflow_4_bottle_6_loss_mean_squared_logarithmic_error_v";
+//string filePattern = "hlf_eflow_4_bottle_6_loss_huber_loss_v";
+//string filePattern = "hlf_eflow_4_bottle_6_loss_log_cosh_v";
+string filePattern = "hlf_eflow_4_bottle_6_loss_cosine_similarity_v";
 
 
 // Batch size:
@@ -49,9 +50,9 @@
 //string filePattern = "hlf_eflow_3_bottle_6_optimizer_Ftrl_v";
 
 // Variables:
-string aucsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_efp4/aucs/";
-string resultsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_efp4/trainingRuns/";
-string filePattern = "hlf_eflow_4_bottle_6_v";
+//string aucsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_efp4/aucs/";
+//string resultsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_efp4/trainingRuns/";
+//string filePattern = "hlf_eflow_4_bottle_6_v";
 
 
 
@@ -93,7 +94,7 @@ void drawHistsForVariable(const vector<ModelStats> &stats, bool forMass)
   
   for(int i=0; i<(forMass ? masses.size() : r_invs.size()); i++){
     
-    TH1D *hist = getHistogramForVariable(stats, forMass ? masses[i] : r_invs[i], forMass);
+    TH1D *hist = getHistogramForVariable(stats, forMass ? masses[i] : 100*r_invs[i], forMass);
     
     if(i==0){
       hist->SetTitle(plotsTitle.c_str());

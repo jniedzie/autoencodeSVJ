@@ -34,8 +34,8 @@
 //string filePattern = "hlf_eflow_3_bottle_7_bs_999999_epochs_2000_v";
 
 // Optimizers:
-string aucsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_optimizers/aucs/";
-string resultsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_optimizers/trainingRuns/";
+//string aucsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_optimizers/aucs/";
+//string resultsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_optimizers/trainingRuns/";
 //string filePattern = "hlf_eflow_3_bottle_6_optimizer_SGD_v";
 //string filePattern = "hlf_eflow_3_bottle_6_optimizer_RMSprop_v";
 //string filePattern = "hlf_eflow_3_bottle_6_optimizer_Adam_v";
@@ -43,17 +43,18 @@ string resultsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_optimizers/
 //string filePattern = "hlf_eflow_3_bottle_6_optimizer_Adagrad_v";
 //string filePattern = "hlf_eflow_3_bottle_6_optimizer_Adamax_v";
 //string filePattern = "hlf_eflow_3_bottle_6_optimizer_Nadam_v";
-string filePattern = "hlf_eflow_3_bottle_6_optimizer_Ftrl_v";
+//string filePattern = "hlf_eflow_3_bottle_6_optimizer_Ftrl_v";
 
 // Losses:
-//string aucsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_losses/aucs/";
-//string resultsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_losses/trainingRuns/";
-//string filePattern = "hlf_eflow_3_bottle_7_loss_mean_absolute_error_v";
-//string filePattern = "hlf_eflow_3_bottle_7_loss_mean_absolute_percentage_error_v";
-//string filePattern = "hlf_eflow_3_bottle_7_loss_mean_squared_error_v";
-//string filePattern = "hlf_eflow_3_bottle_7_loss_mean_squared_logarithmic_error_v";
-//string filePattern = "hlf_eflow_3_bottle_7_loss_huber_loss_v";
-//string filePattern = "hlf_eflow_3_bottle_7_loss_log_cosh_v";
+string aucsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_losses/aucs/";
+string resultsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_losses/trainingRuns/";
+//string filePattern = "hlf_eflow_4_bottle_6_loss_mean_absolute_error_v";
+//string filePattern = "hlf_eflow_4_bottle_6_loss_mean_absolute_percentage_error_v";
+//string filePattern = "hlf_eflow_4_bottle_6_loss_mean_squared_error_v";
+//string filePattern = "hlf_eflow_4_bottle_6_loss_mean_squared_logarithmic_error_v";
+//string filePattern = "hlf_eflow_4_bottle_6_loss_huber_loss_v";
+//string filePattern = "hlf_eflow_4_bottle_6_loss_log_cosh_v";
+string filePattern = "hlf_eflow_4_bottle_6_loss_cosine_similarity_v";
 
 void drawGraph(const ModelStats &stats, string title)
 {
