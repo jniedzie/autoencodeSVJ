@@ -3,7 +3,6 @@ import module.utils as utils
 from module.DataProcessor import DataProcessor
 from module.DataHolder import DataHolder
 from module.DataLoader import DataLoader
-from module.DataTable import DataTable
 import glob, os
 from pathlib import Path
 from enum import Enum
@@ -15,6 +14,7 @@ from module.PklFile import PklFile
 from sklearn.metrics import roc_auc_score
 from keras.models import model_from_json
 import keras
+
 
 class EvaluatorBase:
     
@@ -124,9 +124,9 @@ class EvaluatorBase:
                              norm_args=summary.norm_args,
                              loss_function=summary.loss
                              )
-        self.save_ae_aucs_to_csv(aucs, auc_path)
+        self.save_aucs_to_csv(aucs, auc_path)
     
-    def fill_aucs_bdt(self, summary, AUCs_path, filename, data_processor, signals_base_path, auc_dict):
+    def fill_aucs_bdt(self, summary, AUCs_path, filename, data_processor, signals_base_path):
         # TODO: this should skip versions for which all auc were already stored
         # more difficult here because we are storing multiple results in the same file
         
@@ -172,34 +172,25 @@ class EvaluatorBase:
         Y_test = qcd_Y_test.append(svj_Y_test)
 
         model_auc = roc_auc_score(Y_test, bdt.decision_function(X_test))
-        print("Area under ROC curve: %.4f" % (model_auc))
-    
-        if auc_path not in auc_dict.keys():
-            auc_dict[auc_path] = []
-    
-        auc_dict[auc_path].append({"mass": mass, "rinv": rinv, "auc": model_auc})
-    
-    def save_aucs_to_csv(self, auc_dict):
-        for path, values in auc_dict.items():
         
-            with open(path, "w") as out_file:
+        print("Area under ROC curve: %.4f" % (model_auc))
+
+        write_header = False if os.path.exists(auc_path) else True
+
+        self.save_aucs_to_csv(aucs=[{"mass": mass, "rinv": rinv, "auc": model_auc}],
+                              path=auc_path, append=True, write_header=write_header)
+    
+    def save_aucs_to_csv(self, aucs, path, append=False, write_header=True):
+        # TODO: we could simplify what we store in the aucs file to m, r and auc only
+        
+        with open(path, "a" if append else "w") as out_file:
+            if write_header:
                 out_file.write(",name,auc,mass,nu\n")
             
-                for index, dict in enumerate(values):
-                    out_file.write(
-                        "{},Zprime_{}GeV_{},{},{},{}\n".format(index,
-                                                               dict["mass"], dict["rinv"], dict["auc"],
-                                                               dict["mass"], dict["rinv"]))
-
-    def save_ae_aucs_to_csv(self, aucs, path):
-        with open(path, "w") as out_file:
-            out_file.write(",name,auc,mass,nu\n")
-            
             for index, dict in enumerate(aucs):
-                out_file.write(
-                    "{},Zprime_{}GeV_{},{},{},{}\n".format(index,
-                                                            dict["mass"], dict["rinv"], dict["auc"],
-                                                            dict["mass"], dict["rinv"]))
+                out_file.write("{},Zprime_{}GeV_{},{},{},{}\n".format(index,
+                                                                      dict["mass"], dict["rinv"], dict["auc"],
+                                                                      dict["mass"], dict["rinv"]))
     
     def save_aucs(self, signals_base_path, AUCs_path, summary_path, input_path):
     
@@ -207,8 +198,6 @@ class EvaluatorBase:
 
         if not os.path.exists(AUCs_path):
             Path(AUCs_path).mkdir(parents=True, exist_ok=False)
-
-        auc_dict = {}
 
         for index, summary in summaries.df.iterrows():
             utils.set_random_seed(summary.seed)
@@ -218,7 +207,7 @@ class EvaluatorBase:
                                            test_fraction=summary.test_split,
                                            seed=summary.seed
                                            )
-    
+            
             if self.model_type is self.ModelTypes.Bdt:
                 
                 self.fill_aucs_bdt(summary=summary,
@@ -226,7 +215,6 @@ class EvaluatorBase:
                                    filename=filename,
                                    data_processor=data_processor,
                                    signals_base_path=signals_base_path,
-                                   auc_dict=auc_dict
                                    )
 
             elif self.model_type is self.ModelTypes.AutoEncoder:
@@ -237,6 +225,3 @@ class EvaluatorBase:
                                            data_processor=data_processor,
                                            input_path=input_path
                                            )
-
-        if self.model_type is self.ModelTypes.Bdt:
-            self.save_aucs_to_csv(auc_dict)
