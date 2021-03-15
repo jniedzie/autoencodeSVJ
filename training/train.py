@@ -1,6 +1,7 @@
-from module.AutoEncoderTrainer import AutoEncoderTrainer
 import module.SummaryProcessor as summaryProcessor
 import importlib, argparse
+
+from module.Trainer import Trainer
 
 # ------------------------------------------------------------------------------------------------
 # This script will run N auto-encoder trainings with hyper-parameters, input data specified,
@@ -19,22 +20,30 @@ for i in range(config.n_models):
     file_name = config.file_name
     last_version = summaryProcessor.get_last_summary_file_version(config.summary_path, file_name)
     file_name += "_v{}".format(last_version + 1)
+
+    trainer = None
+
+    if config.model_type == "AutoEncoder":
+        trainer = Trainer(model_type=Trainer.ModelTypes.AutoEncoder,
+                          qcd_path=config.qcd_path,
+                          bottleneck_size=config.target_dim,
+                          training_params=config.training_params,
+                          EFP_base=config.efp_base,
+                          norm_type=config.norm_type,
+                          norm_args=config.norm_args,
+                          hlf_to_drop= ['Energy', 'Flavor'],
+                          output_file_name=file_name,
+                          training_output_path=config.results_path
+                        )
+    elif config.model_type == "BDT":
+        trainer = Trainer(model_type=Trainer.ModelTypes.Bdt)
+    else:
+        print("Unrecognized model: ", config.model_type)
+        exit(0)
     
-    trainer = AutoEncoderTrainer(qcd_path=config.qcd_path,
-                                 bottleneck_size=config.target_dim,
-                                 training_params=config.training_params,
-                                 EFP_base=config.efp_base,
-                                 norm_type=config.norm_type,
-                                 norm_args=config.norm_args,
-                                 hlf_to_drop= ['Energy', 'Flavor'],
-                                 output_file_name=file_name
-                                 )
     
-    trainer.run_training(training_output_path=config.results_path,
-                         summaries_path=config.summary_path,
-                         verbose=True
-                         )
+    trainer.train(summaries_path=config.summary_path)
     
-    trainer.save_last_training_summary(path=config.summary_path)
+    
         
     print('model {} finished'.format(i))

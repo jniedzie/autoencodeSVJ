@@ -1,5 +1,5 @@
 import module.utils as utils
-from module.Trainer import Trainer
+from module.AutoEncoderTrainerHelper import AutoEncoderTrainerHelper
 from module.AutoEncoderBase import AutoEncoderBase
 import module.SummaryProcessor as summaryProcessor
 from module.DataProcessor import DataProcessor
@@ -118,7 +118,7 @@ class AutoEncoderTrainer:
         
         self.start_timestamp = datetime.datetime.now()
         
-        trainer = Trainer(self.training_output_path, verbose=verbose)
+        trainer = AutoEncoderTrainerHelper(self.training_output_path, verbose=verbose)
         
         trainer.train(
             x_train=self.train_data_normalized.data,

@@ -1,5 +1,5 @@
 import module.utils as utils
-from module.Trainer import Trainer
+from module.AutoEncoderTrainerHelper import AutoEncoderTrainerHelper
 import module.SummaryProcessor as summaryProcessor
 from module.DataProcessor import DataProcessor
 from module.DataLoader import DataLoader

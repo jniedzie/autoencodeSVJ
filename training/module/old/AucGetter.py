@@ -1,6 +1,6 @@
 import module.SummaryProcessor as summaryProcessor
 import module.utils as utils
-import module.Trainer as trainer
+import module.AutoEncoderTrainerHelper as trainer
 from module.DataProcessor import DataProcessor
 from module.DataHolder import DataHolder
 
@@ -24,7 +24,7 @@ class AucGetter(object):
         if not os.path.exists(self.training_output_path + ".pkl"):
             print("ERROR -- AucGetter requires .pkl file, but it was not found:", self.training_output_path, ".pkl")
         
-        self.trainer = trainer.Trainer(self.training_output_path)
+        self.trainer = trainer.AutoEncoderTrainerHelper(self.training_output_path)
     
     def set_variables_from_summary(self, path):
         name = summaryProcessor.summary_by_name(path)

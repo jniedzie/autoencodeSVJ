@@ -1,5 +1,5 @@
 import module.utils as utils
-from module.Trainer import Trainer
+from module.AutoEncoderTrainerHelper import AutoEncoderTrainerHelper
 import module.SummaryProcessor as summaryProcessor
 from module.DataProcessor import DataProcessor
 from module.DataLoader import DataLoader
@@ -33,7 +33,7 @@ class AutoEncoderEvaluator:
                                                       )
         
         self.find_pkl_file()
-        trainer = Trainer(self.training_output_path)
+        trainer = AutoEncoderTrainerHelper(self.training_output_path)
         self.model = trainer.load_model()
         
         # Set random seed to the same value as during the training
