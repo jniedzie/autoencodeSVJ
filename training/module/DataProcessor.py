@@ -6,10 +6,15 @@ import numpy as np
 
 class DataProcessor():
     
-    def __init__(self, validation_fraction=None, test_fraction=None, seed=None):
-        self.validation_fraction = validation_fraction
-        self.test_fraction = test_fraction
-        self.seed = seed
+    def __init__(self, validation_fraction=None, test_fraction=None, seed=None, summary=None):
+        if summary is None:
+            self.validation_fraction = validation_fraction
+            self.test_fraction = test_fraction
+            self.seed = seed
+        else:
+            self.validation_fraction = summary.val_split
+            self.test_fraction = summary.test_split
+            self.seed = summary.seed
 
     def split_to_train_validate_test(self, data_table, train_idx=None, test_idx=None):
         

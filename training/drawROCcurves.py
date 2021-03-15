@@ -1,6 +1,7 @@
 import module.SummaryProcessor as summaryProcessor
-from module.AutoEncoderEvaluator import AutoEncoderEvaluator
-from module.BdtEvaluator import BdtEvaluator
+from module.Evaluator import Evaluator
+# from module.AutoEncoderEvaluator import AutoEncoderEvaluator
+# from module.BdtEvaluator import BdtEvaluator
 import importlib, argparse
 
 # ------------------------------------------------------------------------------------------------
@@ -32,15 +33,21 @@ if config.model_type == "AutoEncoder":
                for rinv in rinvs}
     
     print("\n\nDraing ROC curves for summary: ", input_summary_path)
+
+    evaluator = Evaluator(model_type=Evaluator.ModelTypes.AutoEncoder,
+                          input_path=config.input_path
+                          )
+    evaluator.draw_roc_curves(summary_path=input_summary_path, signals=signals)
     
-    evaluator = AutoEncoderEvaluator(input_summary_path, signals=signals)
-    evaluator.draw_ROCs(xscale='log', metrics=["mae"])
+    # evaluator = AutoEncoderEvaluator(input_summary_path, signals=signals)
+    # evaluator.draw_ROCs(xscale='log', metrics=["mae"])
     
 elif config.model_type == "BDT":
-    evaluator = BdtEvaluator()
-    evaluator.draw_ROCs(summary_path=config.summary_path,
-                        signals_base_path=config.signals_base_path,
-                        metrics=["mae"],
-                        xscale='log')
+    pass
+    # evaluator = BdtEvaluator()
+    # evaluator.draw_ROCs(summary_path=config.summary_path,
+    #                     signals_base_path=config.signals_base_path,
+    #                     metrics=["mae"],
+    #                     xscale='log')
 else:
     print("Unknown model type: ", config.model_type)

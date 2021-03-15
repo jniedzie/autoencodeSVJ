@@ -15,14 +15,14 @@ class Evaluator:
         AutoEncoder = 0
         Bdt = 1
     
-    def __init__(self, model_type):
+    def __init__(self, model_type, **kwargs):
         self.model_type = model_type
         
         self.model_evaluator = None
         if model_type is self.ModelTypes.Bdt:
-            self.model_evaluator = EvaluatorBdt()
+            self.model_evaluator = EvaluatorBdt(**kwargs)
         elif model_type is self.ModelTypes.AutoEncoder:
-            self.model_evaluator = EvaluatorAutoEncoder()
+            self.model_evaluator = EvaluatorAutoEncoder(**kwargs)
         else:
             print("Unknown model type: ", model_type)
     
@@ -37,14 +37,31 @@ class Evaluator:
             utils.set_random_seed(summary.seed)
             filename = summary.training_output_path.split("/")[-1]
     
-            data_processor = DataProcessor(validation_fraction=summary.val_split,
-                                           test_fraction=summary.test_split,
-                                           seed=summary.seed
-                                           )
-                
+            data_processor = DataProcessor(summary=summary)
+            
             self.model_evaluator.save_aucs(summary=summary,
                                            AUCs_path=AUCs_path,
                                            filename=filename,
                                            data_processor=data_processor,
                                            **kwargs
                                            )
+
+    def draw_roc_curves(self, summary_path, signals, **kwargs):
+    
+        # TODO: this is an ugly hack, as we are only getting one summary here
+        # it should be implemented in a more readable way
+        summary = None
+        for _, s in summaryProcessor.summary(summary_path=summary_path).df.iterrows():
+            summary = s
+    
+        data_processor = DataProcessor(validation_fraction=summary.val_split,
+                                       test_fraction=summary.test_split,
+                                       seed=summary.seed
+                                       )
+        
+        self.model_evaluator.draw_roc_curves(summary=summary,
+                                             data_processor=data_processor,
+                                             signals=signals,
+                                             **kwargs
+                                             )
+        

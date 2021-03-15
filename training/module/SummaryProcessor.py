@@ -70,7 +70,12 @@ def load_summary(path):
 
 
 def summary(summary_path, defaults={'hlf_to_drop': ['Flavor', 'Energy']}):
-    files = glob.glob(os.path.join(summary_path, "*.summary"))
+    
+    if not summary_path.endswith(".summary"):
+        path = os.path.join(summary_path, "*.summary")
+    else:
+        path = summary_path
+    files = glob.glob(path)
     
     data = []
     for f in files:
