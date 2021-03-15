@@ -29,6 +29,8 @@ for i in range(config.n_models):
         file_name += "_v{}".format(last_version + 1)
         
         trainer = Trainer(model_type=Trainer.ModelTypes.AutoEncoder,
+                          validation_data_fraction=config.validation_data_fraction,
+                          test_data_fraction=config.test_data_fraction,
                           qcd_path=config.qcd_path,
                           bottleneck_size=config.target_dim,
                           training_params=config.training_params,
@@ -60,6 +62,8 @@ for i in range(config.n_models):
         model_output_path = config.results_path + "/" + file_name + ".weigths"
         
         trainer = Trainer(model_type=Trainer.ModelTypes.Bdt,
+                          validation_data_fraction=config.validation_data_fraction,
+                          test_data_fraction=config.test_data_fraction,
                           qcd_path=config.qcd_path,
                           signal_path=signal_path,
                           training_params=config.training_params,

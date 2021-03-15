@@ -13,6 +13,7 @@ from collections import OrderedDict as odict
 from module.DataLoader import DataLoader
 import matplotlib.pyplot as plt
 
+
 class EvaluatorAutoEncoder:
     def __init__(self, input_path):
         self.signal_dict = {}

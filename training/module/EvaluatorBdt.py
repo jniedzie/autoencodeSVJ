@@ -5,8 +5,6 @@ from sklearn.metrics import roc_auc_score, roc_curve
 import os
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from collections import OrderedDict as odict
 
 class EvaluatorBdt:
     def __init__(self):

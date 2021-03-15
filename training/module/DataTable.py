@@ -7,6 +7,7 @@ import chardet
 import glob
 from enum import Enum
 
+
 class DataTable(Logger):
     """
         wrapper for the pandas data table. Allows for quick variable plotting and train/test/splitting.

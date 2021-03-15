@@ -38,9 +38,8 @@ training_params = {
 
 efp_base = 4
 
-test_data_fraction=0.2
 validation_data_fraction=0.0
-
+test_data_fraction=0.2
 
 # ---------------------------------------------
 # Number of models to train

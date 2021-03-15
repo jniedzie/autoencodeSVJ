@@ -1,5 +1,6 @@
 from module.DataLoader import DataLoader
 
+
 class SignalElement(object):
     def __init__(self, path, name):
         self._hlf = None

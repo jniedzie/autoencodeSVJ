@@ -45,30 +45,6 @@ def dump_summary_json(*dicts, output_path):
     return summary_dict
 
 
-def summary_by_name(name):
-    if not name.endswith(".summary"):
-        name += ".summary"
-    
-    if os.path.exists(name):
-        return name
-    
-    matches = summary_match(name)
-    
-    if len(matches) == 0:
-        raise AttributeError
-    elif len(matches) > 1:
-        raise AttributeError
-    
-    return matches[0]
-
-
-def load_summary(path):
-    assert os.path.exists(path)
-    with open(path, 'r') as f:
-        summary = json.load(f)
-    return summary
-
-
 def summary(summary_path, defaults={'hlf_to_drop': ['Flavor', 'Energy']}):
     
     if not summary_path.endswith(".summary"):
@@ -94,7 +70,7 @@ def summary(summary_path, defaults={'hlf_to_drop': ['Flavor', 'Energy']}):
     return utils.DataTable(pd.DataFrame(data), name='summary')
     
 
-def summary_match(search_path, verbose=True):
+def __summary_match(search_path, verbose=True):
     ret = glob.glob(search_path)
     if verbose:
         print("Summary matches search_path: ", search_path, "\tglob path: ", ret)
@@ -104,7 +80,7 @@ def summary_match(search_path, verbose=True):
 
 def get_last_summary_file_version(summary_path, filename):
     summary_search_path = summary_path + filename + "_v*"
-    summary_files = summary_match(summary_search_path, verbose=False)
+    summary_files = __summary_match(summary_search_path, verbose=False)
     
     existing_ids = []
     

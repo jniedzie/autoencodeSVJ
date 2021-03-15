@@ -1,8 +1,6 @@
 import module.utils as utils
 import module.SummaryProcessor as summaryProcessor
-from module.DataProcessor import DataProcessor
 from module.DataLoader import DataLoader
-import numpy as np
 import datetime
 import keras
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TerminateOnNaN, ModelCheckpoint, CSVLogger
@@ -17,10 +15,12 @@ class TrainerAutoEncoder:
                  bottleneck_size,
                  output_file_name,
                  training_output_path,
+                 data_processor,
+                 seed,
+                 test_data_fraction,
+                 validation_data_fraction,
                  EFP_base=None,
                  intermediate_architecture=(30, 30),
-                 test_data_fraction=0.15,
-                 validation_data_fraction=0.15,
                  norm_type="",
                  norm_args=None,
                  hlf_to_drop=None,
@@ -32,8 +32,7 @@ class TrainerAutoEncoder:
         provided arguments. Normalizes the data as specified by norm_percentile.
         High-level features specified in hlf_to_drop will not be used for training.
         """
-        
-        self.seed = np.random.randint(0, 99999999)
+        self.seed = seed
         utils.set_random_seed(self.seed)
         
         self.qcd_path = qcd_path
@@ -53,10 +52,6 @@ class TrainerAutoEncoder:
         (self.qcd, _, _, _) = data_loader.load_all_data(qcd_path, "qcd background",
                                                         include_hlf=True, include_eflow=True,
                                                         hlf_to_drop=hlf_to_drop)
-        
-        data_processor = DataProcessor(validation_fraction=self.validation_data_fraction,
-                                       test_fraction=self.test_data_fraction,
-                                       seed=self.seed)
         
         (train_data,
          validation_data,

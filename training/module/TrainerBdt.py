@@ -1,6 +1,6 @@
 import module.utils as utils
 import module.SummaryProcessor as summaryProcessor
-from module.DataProcessor import DataProcessor
+
 from module.DataLoader import DataLoader
 import numpy as np
 import datetime
@@ -21,15 +21,16 @@ class TrainerBdt:
                  training_params,
                  output_file_name,
                  training_output_path,
+                 data_processor,
+                 seed,
+                 test_data_fraction,
+                 validation_data_fraction,
                  EFP_base=None,
-                 test_data_fraction=0.2,
-                 validation_data_fraction=0.0,
                  norm_type=None,
                  norm_args=None,
                  hlf_to_drop=None,
                  ):
-        self.seed = np.random.randint(0, 99999999)
-        
+        self.seed = seed
         utils.set_random_seed(self.seed)
         
         self.qcd_path = qcd_path
@@ -43,9 +44,7 @@ class TrainerBdt:
         self.output_file_name = output_file_name
         self.training_output_path = training_output_path
         
-        self.data_processor = DataProcessor(validation_fraction=self.validation_data_fraction,
-                                            test_fraction=self.test_data_fraction,
-                                            seed=self.seed)
+        self.data_processor = data_processor
         
         # Load and split the data
         self.__load_data()
@@ -57,11 +56,11 @@ class TrainerBdt:
         print("Trainer scaler: ", self.norm_type)
         print("Trainer scaler args: ", self.norm_args)
         
-        self.X_train_normalized = self.data_processor.normalize(data_table=self.X_train,
+        self.X_train_normalized = data_processor.normalize(data_table=self.X_train,
                                                                 normalization_type=self.norm_type,
                                                                 norm_args=self.norm_args)
         
-        self.X_test_normalized = self.data_processor.normalize(data_table=self.X_test,
+        self.X_test_normalized = data_processor.normalize(data_table=self.X_test,
                                                                normalization_type=self.norm_type,
                                                                norm_args=self.norm_args)
         
