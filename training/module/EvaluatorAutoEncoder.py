@@ -50,7 +50,9 @@ class EvaluatorAutoEncoder:
                                )
         utils.save_aucs_to_csv(aucs, auc_path)
 
-    def draw_roc_curves(self, summary, data_processor, signals, figsize=8, figloc=(0.3, 0.2), *args, **kwargs):
+    def draw_roc_curves(self, summary, data_processor, ax, colors, **kwargs):
+    
+        signals = kwargs["signals"]
     
         data_holder = DataHolder(qcd=summary.qcd_path, **self.signal_dict)
         data_holder.load()
@@ -99,17 +101,13 @@ class EvaluatorAutoEncoder:
 
         qcd_errors = errors[qcd_key]
 
-        self.__roc_auc_plot(qcd_errors, signals_errors, figsize=figsize, figloc=figloc, *args, **kwargs)
+        self.__roc_auc_plot(qcd_errors, signals_errors, ax, colors)
 
-    def __roc_auc_plot(self, background_errors, signal_errs, *args, **kwargs):
+    def __roc_auc_plot(self, background_errors, signal_errs, ax, colors):
     
         background_labels = [0] * len(background_errors)
         
-        fig, ax_begin, ax_end, plt_end, colors = self.__get_plot_params(1, *args, **kwargs)
-        ax = ax_begin(0)
-        
         i = 0
-        roc = []
         
         for name, signal_err in signal_errs.items():
             pred = signal_err + background_errors
@@ -120,13 +118,10 @@ class EvaluatorAutoEncoder:
             auc = roc_auc_score(y_true=true, y_score=pred)
             
             ax.plot(roc[0], roc[1], "-", c=colors[i % len(colors)], label='{}, AUC {:.4f}'.format(name, auc))
-            
+
             i += 1
     
-        ax.plot(roc[0], roc[0], '--', c='black')
-        ax_end("false positive rate", "true positive rate")
-        plt_end()
-        plt.show()
+        
 
     def __get_plot_params(self,
             n_plots,

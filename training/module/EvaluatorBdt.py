@@ -1,11 +1,12 @@
 from module.DataLoader import DataLoader
 import module.utils as utils
 import pickle
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score, roc_curve
 import os
 import numpy as np
 import pandas as pd
-
+import matplotlib.pyplot as plt
+from collections import OrderedDict as odict
 
 class EvaluatorBdt:
     def __init__(self):
@@ -61,6 +62,53 @@ class EvaluatorBdt:
         utils.save_aucs_to_csv(aucs=[{"mass": mass, "rinv": rinv, "auc": model_auc}],
                                path=auc_path, append=True, write_header=write_header)
 
+    def draw_roc_curves(self, summary, filename, data_processor, signals_base_path, ax, colors, *args, **kwargs):
+        
+     
+
+        signal_components = filename.split("_")
+        mass_index = [i for i, s in enumerate(signal_components) if 'GeV' in s][0]
+
+        mass = int(signal_components[mass_index].strip("GeV"))
+        if mass != 2000:
+            return
+        
+        rinv = float(signal_components[mass_index + 1])
+
+        signal_name = "{}GeV_{:3.2f}".format(mass, rinv)
+        signal_path = signals_base_path + "/" + signal_name + "/base_3/*.h5"
+
+        qcd_X_test, qcd_Y_test = self.__get_data(data_path=summary.qcd_path,
+                                                 is_background=True,
+                                                 data_processor=data_processor,
+                                                 summary=summary
+                                                 )
+    
+        svj_X_test, svj_Y_test = self.__get_data(data_path=signal_path,
+                                                 is_background=False,
+                                                 data_processor=data_processor,
+                                                 summary=summary
+                                                 )
+    
+        X_test = qcd_X_test.append(svj_X_test)
+        Y_test = qcd_Y_test.append(svj_Y_test)
+
+        model_path = summary.training_output_path + ".weigths"
+        try:
+            print("Reading file: ", model_path)
+            model = open(model_path, 'rb')
+        except IOError:
+            print("Couldn't open file ", model_path, ". Skipping...")
+            return
+        bdt = pickle.load(model)
+        
+        auc = roc_auc_score(y_true=Y_test, y_score=bdt.decision_function(X_test))
+        roc = roc_curve(y_true=Y_test, y_score=bdt.decision_function(X_test))
+
+        i=0
+        ax.plot(roc[0], roc[1], "-", c=colors[i % len(colors)], label='{}, AUC {:.4f}'.format(filename, auc))
+
+
     def __get_data(self, data_path, is_background, data_processor, summary):
     
         data_loader = DataLoader()
@@ -76,4 +124,59 @@ class EvaluatorBdt:
         data_Y_test = pd.DataFrame(fun((len(data_X_test.df), 1)), index=data_X_test.index, columns=['tag'])
     
         return data_X_test, data_Y_test
+
+    def __get_plot_params(self,
+                          n_plots,
+                          cols=4,
+                          figsize=20.,
+                          yscale='linear',
+                          xscale='linear',
+                          figloc='lower right',
+                          figname='Untitled',
+                          savename=None,
+                          ticksize=8,
+                          fontsize=5,
+                          colors=None
+                          ):
+        rows = n_plots / cols + bool(n_plots % cols)
+        if n_plots < cols:
+            cols = n_plots
+            rows = 1
     
+        if not isinstance(figsize, tuple):
+            figsize = (figsize, rows * float(figsize) / cols)
+    
+        fig = plt.figure(figsize=figsize)
+    
+        def on_axis_begin(i):
+            return plt.subplot(rows, cols, i + 1)
+    
+        def on_axis_end(xname, yname=''):
+            plt.xlabel(xname + " ({0}-scaled)".format(xscale))
+            plt.ylabel(yname + " ({0}-scaled)".format(yscale))
+            plt.xticks(size=ticksize)
+            plt.yticks(size=ticksize)
+            plt.xscale(xscale)
+            plt.yscale(yscale)
+            plt.gca().spines['left']._adjust_location()
+            plt.gca().spines['bottom']._adjust_location()
+    
+        def on_plot_end():
+            handles, labels = plt.gca().get_legend_handles_labels()
+            by_label = odict(list(zip(list(map(str, labels)), handles)))
+            plt.figlegend(list(by_label.values()), list(by_label.keys()), loc=figloc)
+            # plt.figlegend(handles, labels, loc=figloc)
+            plt.suptitle(figname)
+            plt.tight_layout(pad=0.01, w_pad=0.01, h_pad=0.01, rect=[0, 0.03, 1, 0.95])
+            if savename is None:
+                plt.show()
+            else:
+                plt.savefig(savename)
+    
+        if colors is None:
+            colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+        if len(colors) < n_plots:
+            print("too many plots for specified colors. overriding with RAINbow")
+            import matplotlib.cm as cm
+            colors = cm.rainbow(np.linspace(0, 1, n_plots))
+        return fig, on_axis_begin, on_axis_end, on_plot_end, colors

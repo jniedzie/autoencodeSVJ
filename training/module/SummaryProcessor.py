@@ -121,6 +121,11 @@ def get_last_summary_file_version(summary_path, filename):
     
     return version - 1
 
+
+def get_version(summary_path):
+    return int(os.path.basename(summary_path).rstrip('.summary').split('_')[-1].lstrip('v'))
+
+
 def get_latest_summary_file_path(summaries_path, file_name_base, version=None):
     if version is None:
         version = get_last_summary_file_version(summaries_path, file_name_base)

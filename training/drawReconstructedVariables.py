@@ -1,5 +1,5 @@
 import module.SummaryProcessor as summaryProcessor
-from module.AutoEncoderEvaluator import AutoEncoderEvaluator
+from module.old.AutoEncoderEvaluator import AutoEncoderEvaluator
 import matplotlib.pyplot as plt
 import numpy
 import pandas as pd
