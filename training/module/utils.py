@@ -32,6 +32,17 @@ delphes_jet_tags_dict = {
     9: "gluon"
 }
 
+def save_aucs_to_csv(aucs, path, append=False, write_header=True):
+    # TODO: we could simplify what we store in the aucs file to m, r and auc only
+    
+    with open(path, "a" if append else "w") as out_file:
+        if write_header:
+            out_file.write(",name,auc,mass,nu\n")
+        
+        for index, dict in enumerate(aucs):
+            out_file.write("{},Zprime_{}GeV_{},{},{},{}\n".format(index,
+                                                                  dict["mass"], dict["rinv"], dict["auc"],
+                                                                  dict["mass"], dict["rinv"]))
 
 def get_errors(true, pred, out_name="errors", functions=["mse", "mae"], names=[None, None], index=None):
     
