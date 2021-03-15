@@ -10,8 +10,6 @@ class DataHolder(object):
             path = kwargs[name]
             if name[0].isdigit():
                 name = 'Zprime_' + name
-            # name = name.replace('.', '')
-            # print('loading {} from path \'{}\'...'.format(name, path))
             setattr(self, name, SignalElement(path, name))
             self.KEYS[name] = getattr(self, name)
             self.KEYS[name] = getattr(self, name)

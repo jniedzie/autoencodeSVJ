@@ -7,7 +7,7 @@ import datetime
 import keras
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TerminateOnNaN, ModelCheckpoint, CSVLogger
 from module.PklFile import PklFile
-import os
+
 
 class TrainerAutoEncoder:
     
