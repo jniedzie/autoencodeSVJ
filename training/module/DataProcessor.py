@@ -54,7 +54,9 @@ class DataProcessor():
         elif normalization_type in ["RobustScaler", "MinMaxScaler", "StandardScaler", "MaxAbsScaler"]:
             if scaler is None:
                 data_table.setup_scaler(norm_type=normalization_type, scaler_args=norm_args)
-                return data_table.normalize(inverse=inverse)
+                normalized = data_table.normalize(inverse=inverse)
+                normalized.scaler = data_table.scaler
+                return normalized
             else:
                 return data_table.normalize(inverse=inverse, scaler=scaler)
         elif normalization_type == "CustomStandard":

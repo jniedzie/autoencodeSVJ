@@ -1,7 +1,4 @@
-import module.SummaryProcessor as summaryProcessor
 from module.Evaluator import Evaluator
-# from module.AutoEncoderEvaluator import AutoEncoderEvaluator
-# from module.BdtEvaluator import BdtEvaluator
 import importlib, argparse
 
 # ------------------------------------------------------------------------------------------------

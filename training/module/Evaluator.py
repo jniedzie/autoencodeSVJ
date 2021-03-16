@@ -162,7 +162,8 @@ class Evaluator:
 
     def get_signal_test_data(self, name, path, summary):
         utils.set_random_seed(summary.seed)
-        return self.model_evaluator.get_signal_test_data(name, path, summary)
+        data_processor = DataProcessor(summary=summary)
+        return self.model_evaluator.get_signal_test_data(name, path, summary, data_processor)
 
     def get_reconstruction(self, input_data, summary):
         utils.set_random_seed(summary.seed)

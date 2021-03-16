@@ -1,6 +1,5 @@
 import glob, os
 import tensorflow as tf
-from module.DataHolder import DataHolder
 from module.PklFile import PklFile
 import keras
 from keras.models import model_from_json
@@ -18,12 +17,26 @@ class EvaluatorAutoEncoder:
             key = path.split("/")[-3]
             self.signal_dict[key] = path
         
-    def get_qcd_test_data(self, summary, data_processor):
-        data_holder = DataHolder(qcd=summary.qcd_path, **self.signal_dict)
-        data_holder.load()
-        return self.__get_test_dataset(data_holder, data_processor)
+    def get_qcd_test_data(self, summary, data_processor, normalize=False):
+        data_loader = DataLoader()
+        (data, _, _, _) = data_loader.load_all_data(globstring=summary.qcd_path,
+                                                    name="QCD",
+                                                    include_hlf=summary.hlf,
+                                                    include_eflow=summary.eflow,
+                                                    hlf_to_drop=summary.hlf_to_drop,
+                                                    )
+    
+        (_, _, test) = data_processor.split_to_train_validate_test(data)
+
+        if normalize:
+            test = data_processor.normalize(data_table=test,
+                                            normalization_type=summary.norm_type,
+                                            norm_args=summary.norm_args)
         
-    def get_signal_test_data(self, name, path, summary):
+        return test
+    
+        
+    def get_signal_test_data(self, name, path, summary, data_processor, normalize=False, scaler=None):
         data_loader = DataLoader()
         (data, _, _, _) = data_loader.load_all_data(globstring=path,
                                                     name=name,
@@ -31,8 +44,15 @@ class EvaluatorAutoEncoder:
                                                     include_eflow=summary.eflow,
                                                     hlf_to_drop=summary.hlf_to_drop,
                                                     )
+        (_, _, test) = data_processor.split_to_train_validate_test(data)
         
-        return data
+        if normalize:
+            test = data_processor.normalize(data_table=test,
+                                            normalization_type=summary.norm_type,
+                                            norm_args=summary.norm_args,
+                                            scaler=scaler)
+        
+        return test
         
     def get_reconstruction(self, input_data, summary, data_processor):
     
@@ -76,16 +96,11 @@ class EvaluatorAutoEncoder:
     
         tf.compat.v1.reset_default_graph()
     
-        data_holder = DataHolder(qcd=summary.qcd_path, **self.signal_dict)
-        data_holder.load()
-    
         model = self.__load_model(summary.training_output_path)
     
-        aucs = self.__get_aucs(data_holder=data_holder,
+        aucs = self.__get_aucs(summary=summary,
                                data_processor=data_processor,
                                model=model,
-                               norm_type=summary.norm_type,
-                               norm_args=summary.norm_args,
                                loss_function=summary.loss
                                )
         
@@ -95,38 +110,18 @@ class EvaluatorAutoEncoder:
         return (aucs, auc_path, append, write_header)
 
     def draw_roc_curves(self, summary, data_processor, ax, colors, signals, **kwargs):
-    
-        data_holder = DataHolder(qcd=summary.qcd_path, **self.signal_dict)
-        data_holder.load()
 
         qcd_key = "qcd"
-        model = self.__load_model(summary.training_output_path)
+        all_data = {
+            qcd_key: self.get_qcd_test_data(summary, data_processor, normalize=True)
+        }
+
+        for name, path in signals.items():
+            all_data[name] = self.get_signal_test_data(name, path, summary, data_processor,
+                                                       normalize=True, scaler = all_data[qcd_key].scaler)
         
-        qcd_data = self.__get_test_dataset(data_holder, data_processor, qcd_key)
-        qcd_normed = data_processor.normalize(data_table=qcd_data, normalization_type=summary.norm_type, norm_args=summary.norm_args)
-
-        data_loader = DataLoader()
-        
-        all_data = {qcd_key: qcd_normed}
-
-        for signal in signals:
-            
-            (data, _, _, _) = data_loader.load_all_data(signals[signal],
-                                                        signal,
-                                                        include_hlf=summary.hlf,
-                                                        include_eflow=summary.eflow,
-                                                        hlf_to_drop=summary.hlf_to_drop,
-                                                        )
-            
-            data_norm = data_processor.normalize(data_table=data,
-                                                 normalization_type=summary.norm_type,
-                                                 norm_args=summary.norm_args,
-                                                 scaler=qcd_data.scaler)
-            
-            # put normalized signal in "data"
-            all_data[signal] = data_norm
-
         errors = {}
+        model = self.__load_model(summary.training_output_path)
 
         for key, data in all_data.items():
             recon = pd.DataFrame(model.predict(data.data), columns=data.columns, index=data.index, dtype="float64")
@@ -167,24 +162,19 @@ class EvaluatorAutoEncoder:
         model.load_weights(results_file_path + "_weights.h5")
         return model
 
-    def __get_test_dataset(self, data_holder, data_processor, test_key='qcd'):
-        qcd = getattr(data_holder, test_key).data
-        _, _, test = data_processor.split_to_train_validate_test(data_table=qcd)
-        return test
+    def __get_aucs(self, summary, data_processor, model, loss_function, test_key='qcd'):
+        
+        normed = {
+            test_key: self.get_qcd_test_data(summary, data_processor, normalize=True)
+        }
+    
+        for name, path in self.signal_dict.items():
+            if name == test_key: continue
 
-    def __get_aucs(self, data_holder, data_processor, model, loss_function, norm_type, norm_args=None, test_key='qcd'):
-        normed = {}
-    
-        test = self.__get_test_dataset(data_holder, data_processor, test_key)
-        normed[test_key] = data_processor.normalize(data_table=test, normalization_type=norm_type, norm_args=norm_args)
-        qcd_scaler = test.scaler
-    
-        for key in data_holder.KEYS:
-            if key == test_key: continue
-            data = getattr(data_holder, key).data
-            normed[key] = data_processor.normalize(data_table=data, normalization_type=norm_type, norm_args=norm_args,
-                                                   scaler=qcd_scaler)
-    
+            normed[name] = self.get_signal_test_data(name=name, path=path,
+                                                     summary=summary, data_processor=data_processor,
+                                                     normalize=True, scaler=normed[test_key].scaler)
+
         errors = {}
     
         for key, data in normed.items():

@@ -1,7 +1,9 @@
 import module.SummaryProcessor as summaryProcessor
+from module.Trainer import Trainer
+
 import importlib, argparse
 
-from module.Trainer import Trainer
+
 
 # ------------------------------------------------------------------------------------------------
 # This script will run N auto-encoder trainings with hyper-parameters, input data specified,
