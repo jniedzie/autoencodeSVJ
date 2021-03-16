@@ -17,9 +17,6 @@ class EvaluatorAutoEncoder:
             key = path.split("/")[-3]
             self.signal_dict[key] = path
         
-    def get_qcd_test_data(self):
-        pass
-        
     def get_aucs(self, summary, AUCs_path, filename, data_processor, **kwargs):
         
         auc_path = AUCs_path + "/" + filename
@@ -50,9 +47,7 @@ class EvaluatorAutoEncoder:
         
         return (aucs, auc_path, append, write_header)
 
-    def draw_roc_curves(self, summary, data_processor, ax, colors, **kwargs):
-    
-        signals = kwargs["signals"]
+    def draw_roc_curves(self, summary, data_processor, ax, colors, signals, **kwargs):
     
         data_holder = DataHolder(qcd=summary.qcd_path, **self.signal_dict)
         data_holder.load()
@@ -62,8 +57,6 @@ class EvaluatorAutoEncoder:
         
         qcd_data = self.__get_test_dataset(data_holder, data_processor, qcd_key)
         qcd_normed = data_processor.normalize(data_table=qcd_data, normalization_type=summary.norm_type, norm_args=summary.norm_args)
-
-        
 
         data_loader = DataLoader()
         
