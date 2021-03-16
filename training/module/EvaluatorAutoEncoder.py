@@ -8,6 +8,7 @@ from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
 import pandas as pd
 from module.DataLoader import DataLoader
+from module.DataTable import DataTable
 
 
 class EvaluatorAutoEncoder:
@@ -16,6 +17,32 @@ class EvaluatorAutoEncoder:
         for path in glob.glob(input_path):
             key = path.split("/")[-3]
             self.signal_dict[key] = path
+        
+    def get_qcd_test_data(self, summary, data_processor):
+        data_holder = DataHolder(qcd=summary.qcd_path, **self.signal_dict)
+        data_holder.load()
+        return self.__get_test_dataset(data_holder, data_processor)
+        
+    def get_reconstruction(self, input_data, summary, data_processor):
+    
+        input_data_normed = data_processor.normalize(data_table=input_data,
+                                              normalization_type=summary.norm_type,
+                                              norm_args=summary.norm_args)
+
+        model = self.__load_model(summary.training_output_path)
+        
+        reconstructed = DataTable(pd.DataFrame(model.predict(input_data_normed.data),
+                                       columns=input_data_normed.columns,
+                                       index=input_data_normed.index,
+                                       dtype="float64"))
+
+        reconstructed_denormed = data_processor.normalize(data_table=reconstructed,
+                                         normalization_type=summary.norm_type,
+                                         norm_args=summary.norm_args,
+                                         scaler=input_data.scaler,
+                                         inverse=True)
+        
+        return reconstructed_denormed
         
     def get_aucs(self, summary, AUCs_path, filename, data_processor, **kwargs):
         
