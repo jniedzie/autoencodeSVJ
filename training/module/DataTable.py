@@ -1,5 +1,3 @@
-from module.Logger import Logger
-
 import sklearn.preprocessing as prep
 import pandas as pd
 import numpy as np
@@ -8,7 +6,7 @@ import glob
 from enum import Enum
 
 
-class DataTable(Logger):
+class DataTable:
     """
         wrapper for the pandas data table. Allows for quick variable plotting and train/test/splitting.
     """
@@ -22,9 +20,8 @@ class DataTable(Logger):
     norm_types_dict = dict([(x.value, x.name) for x in NormTypes])
     table_count = 0
     
-    def __init__(self, data, headers=None, name=None, verbose=True):
+    def __init__(self, data, headers=None, name=None):
         
-        Logger.__init__(self, "data_table :: ", verbose)
         self.name = name or "untitled {}".format(DataTable.table_count)
         self.scaler = None
         DataTable.table_count += 1

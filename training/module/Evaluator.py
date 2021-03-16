@@ -11,6 +11,8 @@ from module.DataProcessor import DataProcessor
 from module.EvaluatorBdt import EvaluatorBdt
 from module.EvaluatorAutoEncoder import EvaluatorAutoEncoder
 
+plt.rcParams['figure.figsize'] = (10,10)
+plt.rcParams.update({'font.size': 18})
 
 class Evaluator:
     
@@ -39,15 +41,32 @@ class Evaluator:
         for _, summary in summaries.df.iterrows():
             
             filename = summary.training_output_path.split("/")[-1]
-    
+            utils.set_random_seed(summary.seed)
             data_processor = DataProcessor(summary=summary)
             
-            self.model_evaluator.save_aucs(summary=summary,
-                                           AUCs_path=AUCs_path,
-                                           filename=filename,
-                                           data_processor=data_processor,
-                                           **kwargs
-                                           )
+            auc_params = self.model_evaluator.get_aucs(summary=summary,
+                                                       AUCs_path=AUCs_path,
+                                                       filename=filename,
+                                                       data_processor=data_processor,
+                                                       **kwargs
+                                                       )
+            if auc_params is None:
+                continue
+            
+            (aucs, auc_path, append, write_header) = auc_params
+            self.__save_aucs_to_csv(aucs=aucs, path=auc_path, append=append, write_header=write_header)
+
+    def __save_aucs_to_csv(self, aucs, path, append=False, write_header=True):
+        # TODO: we could simplify what we store in the aucs file to m, r and auc only
+    
+        with open(path, "a" if append else "w") as out_file:
+            if write_header:
+                out_file.write(",name,auc,mass,nu\n")
+        
+            for index, dict in enumerate(aucs):
+                out_file.write("{},Zprime_{}GeV_{},{},{},{}\n".format(index,
+                                                                      dict["mass"], dict["rinv"], dict["auc"],
+                                                                      dict["mass"], dict["rinv"]))
 
     def draw_roc_curves(self, summary_path, summary_version, **kwargs):
 

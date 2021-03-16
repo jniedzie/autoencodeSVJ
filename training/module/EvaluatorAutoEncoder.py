@@ -1,17 +1,13 @@
 import glob, os
 import tensorflow as tf
 from module.DataHolder import DataHolder
-import module.utils as utils
 from module.PklFile import PklFile
 import keras
 from keras.models import model_from_json
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
 import pandas as pd
-import numpy as np
-from collections import OrderedDict as odict
 from module.DataLoader import DataLoader
-import matplotlib.pyplot as plt
 
 
 class EvaluatorAutoEncoder:
@@ -24,14 +20,13 @@ class EvaluatorAutoEncoder:
     def get_qcd_test_data(self):
         pass
         
-
-    def save_aucs(self, summary, AUCs_path, filename, data_processor):
+    def get_aucs(self, summary, AUCs_path, filename, data_processor, **kwargs):
         
         auc_path = AUCs_path + "/" + filename
     
         if os.path.exists(auc_path):
             print("File :", auc_path, "\talready exists. Skipping...")
-            return
+            return None
         else:
             print("Preparing: ", auc_path)
     
@@ -49,7 +44,11 @@ class EvaluatorAutoEncoder:
                                norm_args=summary.norm_args,
                                loss_function=summary.loss
                                )
-        utils.save_aucs_to_csv(aucs, auc_path)
+        
+        append = False
+        write_header = True
+        
+        return (aucs, auc_path, append, write_header)
 
     def draw_roc_curves(self, summary, data_processor, ax, colors, **kwargs):
     
@@ -121,65 +120,7 @@ class EvaluatorAutoEncoder:
             ax.plot(roc[0], roc[1], "-", c=colors[i % len(colors)], label='{}, AUC {:.4f}'.format(name, auc))
 
             i += 1
-    
         
-
-    def __get_plot_params(self,
-            n_plots,
-            cols=4,
-            figsize=20.,
-            yscale='linear',
-            xscale='linear',
-            figloc='lower right',
-            figname='Untitled',
-            savename=None,
-            ticksize=8,
-            fontsize=5,
-            colors=None
-    ):
-        rows = n_plots / cols + bool(n_plots % cols)
-        if n_plots < cols:
-            cols = n_plots
-            rows = 1
-    
-        if not isinstance(figsize, tuple):
-            figsize = (figsize, rows * float(figsize) / cols)
-    
-        fig = plt.figure(figsize=figsize)
-    
-        def on_axis_begin(i):
-            return plt.subplot(rows, cols, i + 1)
-    
-        def on_axis_end(xname, yname=''):
-            plt.xlabel(xname + " ({0}-scaled)".format(xscale))
-            plt.ylabel(yname + " ({0}-scaled)".format(yscale))
-            plt.xticks(size=ticksize)
-            plt.yticks(size=ticksize)
-            plt.xscale(xscale)
-            plt.yscale(yscale)
-            plt.gca().spines['left']._adjust_location()
-            plt.gca().spines['bottom']._adjust_location()
-    
-        def on_plot_end():
-            handles, labels = plt.gca().get_legend_handles_labels()
-            by_label = odict(list(zip(list(map(str, labels)), handles)))
-            plt.figlegend(list(by_label.values()), list(by_label.keys()), loc=figloc)
-            # plt.figlegend(handles, labels, loc=figloc)
-            plt.suptitle(figname)
-            plt.tight_layout(pad=0.01, w_pad=0.01, h_pad=0.01, rect=[0, 0.03, 1, 0.95])
-            if savename is None:
-                plt.show()
-            else:
-                plt.savefig(savename)
-    
-        if colors is None:
-            colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
-        if len(colors) < n_plots:
-            print("too many plots for specified colors. overriding with RAINbow")
-            import matplotlib.cm as cm
-            colors = cm.rainbow(np.linspace(0, 1, n_plots))
-        return fig, on_axis_begin, on_axis_end, on_plot_end, colors
-    
     def __load_model(self, results_file_path):
         config = PklFile(results_file_path + ".pkl")
         model = model_from_json(config['model_json'])

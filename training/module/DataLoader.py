@@ -1,26 +1,18 @@
-import module.utils as utils
-from module.Logger import Logger
 from module.DataTable import DataTable
 
 from collections import OrderedDict as odict
-from sklearn.model_selection import train_test_split
-import os
 import h5py
 import numpy as np
-import pandas as pd
-import chardet
+import os, glob, subprocess, chardet
 
 
-class DataLoader(Logger):
+class DataLoader:
     """
     data loader/handler/merger for h5 files with the general format of this repository
     """
     
-    def __init__(self, name="", verbose=True):
-        Logger.__init__(self)
+    def __init__(self, name=""):
         self.name = name
-        self._LOG_PREFIX = "data_loader :: "
-        self.VERBOSE = verbose
         self.samples = odict()
         self.sample_keys = None
         self.data = odict()
@@ -35,7 +27,7 @@ class DataLoader(Logger):
             - flavors: matrix of jet flavors to (later) split your data with
         """
     
-        files = utils.glob_in_repo(globstring)
+        files = self.__glob_in_repo(globstring)
     
         if len(files) == 0:
             print("\n\nERROR -- no files found in ", globstring, "\n\n")
@@ -51,7 +43,7 @@ class DataLoader(Logger):
         if not (include_hlf or include_eflow):
             raise AttributeError
     
-        data_loader = DataLoader(name, verbose=False)
+        data_loader = DataLoader(name)
         for f in files:
             data_loader.add_sample(f)
     
@@ -81,6 +73,21 @@ class DataLoader(Logger):
         flavors = data_loader.make_table('jet_features', name + ' jet flavor', 'stack').cfilter("Flavor")
     
         return data, jets, event, flavors
+
+    def __glob_in_repo(self, globstring):
+        info = {}
+        info['head'] = subprocess.Popen("git rev-parse --show-toplevel".split(), stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE).communicate()[0].decode("utf-8").strip('\n')
+        info['name'] = subprocess.Popen("git config --get remote.origin.url".split(), stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE).communicate()[0].decode("utf-8").strip('\n')
+    
+        repo_head = info['head']
+        files = glob.glob(os.path.abspath(globstring))
+    
+        if len(files) == 0:
+            files = glob.glob(os.path.join(repo_head, globstring))
+    
+        return files
 
     def all_modify(self, tables, hlf_to_drop=['Energy', 'Flavor']):
         if not isinstance(tables, list) or isinstance(tables, tuple):
@@ -131,14 +138,14 @@ class DataLoader(Logger):
         return tables
     
     def add_sample(self, sample_path):
-        filepath = utils.smartpath(sample_path)
+        filepath = os.path.abspath(sample_path)
         
         assert os.path.exists(filepath)
         
         if filepath not in self.samples:
             with h5py.File(filepath, mode="r") as f:
                 
-                self.log("Adding sample at path '{}'".format(filepath))
+                print("Adding sample at path '{}'".format(filepath))
                 self.samples[filepath] = f
                 
                 keys = set(f.keys())
@@ -186,14 +193,7 @@ class DataLoader(Logger):
                         name="{} {} {}".format(ret.name, prefix, i)
                     ) for i in range(data.shape[1])
                 ]
-                
-                # [
-                #     data_table(
-                #         data[:,i,:],
-                #         headers=labels,
-                #         name="{}_{}".format(name,i)
-                #     ) for i in range(data.shape[1])
-                # ]
+
             else:
                 prefix = 'jet' if key.startswith('jet') else 'var'
                 return DataTable(
@@ -244,55 +244,3 @@ class DataLoader(Logger):
                 self.data[key] = np.asarray(sample_file[key]['data'])
             else:
                 self.data[key] = np.concatenate([self.data[key], sample_file[key]['data']])
-
-
-    def BDT_load_all_data(self, qcd_path, signal_path,
-                          test_split=0.2, random_state=-1,
-                          include_hlf=True, include_eflow=True,
-                          hlf_to_drop=['Energy', 'Flavor']):
-        
-        """General-purpose data loader for BDT training, which separates classes and splits data into training/testing data.
-
-        Args:
-            SVJ_path (str): glob-style specification of .h5 files to load as SVJ signal
-            qcd_path (str): glob-style specification of .h5 files to load as qcd background
-            test_split (float): fraction of total data to use for testing
-            random_state (int): random seed, leave as -1 for random assignment
-            include_hlf (bool): true to include high-level features in loaded data, false for not
-            include_eflow (bool): true to include energy-flow basis features in loaded data, false for not
-            hlf_to_drop (list(str)): list of high-level features to drop from the final dataset. Defaults to dropping Energy and Flavor.
-
-        Returns:
-            tuple(pandas.DataFrame, pandas.DataFrame): X,Y training data, where X is the data samples for each jet, and Y is the
-                signal/background tag for each jet
-            tuple(pandas.DataFrame, pandas.DataFrame): X_test,Y_test testing data, where X are data samples for each jet and Y is the
-                signal/background tag for each jet
-        """
-    
-        if random_state < 0:
-            random_state = np.random.randint(0, 2 ** 32 - 1)
-    
-        # Load QCD samples
-        (QCD, _, _, _) = self.load_all_data(qcd_path, "QCD",
-                                                   include_hlf=include_hlf, include_eflow=include_eflow,
-                                                   hlf_to_drop=hlf_to_drop)
-    
-        (SVJ, _, _, _) = self.load_all_data(signal_path, "SVJ",
-                                                   include_hlf=include_hlf, include_eflow=include_eflow,
-                                                   hlf_to_drop=hlf_to_drop)
-    
-        SVJ_X_train, SVJ_X_test = train_test_split(SVJ.df, test_size=test_split, random_state=random_state)
-        QCD_X_train, QCD_X_test = train_test_split(QCD.df, test_size=test_split, random_state=random_state)
-    
-        SVJ_Y_train, SVJ_Y_test = [pd.DataFrame(np.ones((len(elt), 1)), index=elt.index, columns=['tag']) for elt in
-                                   [SVJ_X_train, SVJ_X_test]]
-        QCD_Y_train, QCD_Y_test = [pd.DataFrame(np.zeros((len(elt), 1)), index=elt.index, columns=['tag']) for elt in
-                                   [QCD_X_train, QCD_X_test]]
-    
-        X_train = SVJ_X_train.append(QCD_X_train)
-        Y_train = SVJ_Y_train.append(QCD_Y_train)
-    
-        X_test = SVJ_X_test.append(QCD_X_test)
-        Y_test = SVJ_Y_test.append(QCD_Y_test)
-    
-        return (X_train, Y_train), (X_test, Y_test)

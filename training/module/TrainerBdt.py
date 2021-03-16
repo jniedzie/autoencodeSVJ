@@ -1,15 +1,12 @@
 import module.utils as utils
-import module.SummaryProcessor as summaryProcessor
-
 from module.DataLoader import DataLoader
+
 import numpy as np
 import datetime
 import pandas as pd
 import pickle, os
 from pathlib import Path
-
 from datetime import datetime
-
 from sklearn.ensemble import AdaBoostClassifier
 
 
@@ -115,7 +112,7 @@ class TrainerBdt:
         
         print("model saved")
     
-    def save_summary(self, path):
+    def get_summary(self):
         """
         Dumps summary of the most recent training to a summary file.
         """
@@ -135,6 +132,5 @@ class TrainerBdt:
             'start_time': str(self.start_timestamp),
             'end_time': str(self.end_timestamp),
         }
-        summaryProcessor.dump_summary_json(self.training_params, summary_dict, output_path=path)
         
-
+        return summary_dict

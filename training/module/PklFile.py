@@ -1,5 +1,3 @@
-import module.utils as utils
-
 import collections
 import os
 import pickle
@@ -14,7 +12,7 @@ class PklFile(collections.MutableMapping):
         if not path.endswith(".pkl"):
             path += ".pkl"
         
-        self.path = utils.smartpath(path)
+        self.path = path
         self.store = {}
         
         if os.path.exists(self.path):

@@ -1,4 +1,4 @@
-import module.utils as utils
+from module.DataTable import DataTable
 
 import os
 import json
@@ -67,7 +67,7 @@ def summary(summary_path, defaults={'hlf_to_drop': ['Flavor', 'Energy']}):
         print("WARNING - no summary files found!!")
         return None
     
-    return utils.DataTable(pd.DataFrame(data), name='summary')
+    return DataTable(pd.DataFrame(data), name='summary')
     
 
 def __summary_match(search_path, verbose=True):

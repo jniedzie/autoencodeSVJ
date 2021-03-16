@@ -1,5 +1,4 @@
 from module.DataLoader import DataLoader
-import module.utils as utils
 import pickle
 from sklearn.metrics import roc_auc_score, roc_curve
 import os
@@ -10,7 +9,7 @@ class EvaluatorBdt:
     def __init__(self):
         pass
 
-    def save_aucs(self, summary, AUCs_path, filename, data_processor, signals_base_path):
+    def get_aucs(self, summary, AUCs_path, filename, data_processor, signals_base_path):
         # TODO: this should skip versions for which all auc were already stored
         # more difficult here because we are storing multiple results in the same file
     
@@ -39,7 +38,7 @@ class EvaluatorBdt:
             model = open(model_path, 'rb')
         except IOError:
             print("Couldn't open file ", model_path, ". Skipping...")
-            return
+            return None
         bdt = pickle.load(model)
     
         svj_X_test, svj_Y_test = self.__get_data(data_path=signal_path,
@@ -54,11 +53,12 @@ class EvaluatorBdt:
         model_auc = roc_auc_score(Y_test, bdt.decision_function(X_test))
     
         print("Area under ROC curve: %.4f" % (model_auc))
-    
+
+        aucs = [{"mass": mass, "rinv": rinv, "auc": model_auc}]
+        append = True
         write_header = False if os.path.exists(auc_path) else True
     
-        utils.save_aucs_to_csv(aucs=[{"mass": mass, "rinv": rinv, "auc": model_auc}],
-                               path=auc_path, append=True, write_header=write_header)
+        return (aucs, auc_path, append, write_header)
 
     def draw_roc_curves(self, summary, filename, data_processor, signals_base_path, ax, colors, *args, **kwargs):
         

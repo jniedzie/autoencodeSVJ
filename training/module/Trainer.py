@@ -4,6 +4,8 @@ import numpy as np
 from module.TrainerAutoEncoder import TrainerAutoEncoder
 from module.TrainerBdt import TrainerBdt
 from module.DataProcessor import DataProcessor
+import module.SummaryProcessor as summaryProcessor
+
 
 class Trainer:
     class ModelTypes(Enum):
@@ -36,8 +38,9 @@ class Trainer:
         else:
             print("Unknown model type: ", model_type)
             
-    
     def train(self, summaries_path):
         
         self.model_trainer.train()
-        self.model_trainer.save_summary(path=summaries_path)
+
+        summary_dict = self.model_trainer.get_summary()
+        summaryProcessor.dump_summary_json(summary_dict, output_path=summaries_path)
