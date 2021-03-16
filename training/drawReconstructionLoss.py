@@ -1,9 +1,11 @@
 import module.SummaryProcessor as summaryProcessor
-from module.AutoEncoderEvaluator import AutoEncoderEvaluator
+from module.EvaluatorAutoEncoder import EvaluatorAutoEncoder
+from module.DataProcessor import DataProcessor
 import matplotlib.pyplot as plt
 import numpy
 import pandas as pd
 import importlib, argparse
+import module.utils as utils
 
 # ------------------------------------------------------------------------------------------------
 # This script will draw reconstruction loss for a a mixture of all models found in the
@@ -21,36 +23,47 @@ masses = [2500]
 # rinvs = [0.15, 0.30, 0.45, 0.60, 0.75]
 rinvs = [0.45]
 
+
 def get_signals():
-    signals = {"signal_{}_{}".format(mass, rinv).replace(".", "p"):
-                   "{}{}GeV_{:1.2f}/base_3/*.h5".format(config.signals_base_path, mass, rinv)
+    
+    signals = {"{}, {}".format(mass, rinv): "{}{}GeV_{:1.2f}/base_3/*.h5".format(config.signals_base_path, mass, rinv)
                for mass in masses
                for rinv in rinvs}
-    
     return signals
 
 
 def get_evaluator():
+    summaries = summaryProcessor.get_summaries_from_path(config.summary_path)
     
-    input_summary_path = summaryProcessor.get_latest_summary_file_path(summaries_path=config.summary_path,
-                                                                       file_name_base=config.file_name,
-                                                                       version=config.best_model)
+    summary = None
     
-    signals = get_signals()
-    return AutoEncoderEvaluator(input_summary_path, signals=signals)
+    for _, s in summaries.df.iterrows():
+        version = summaryProcessor.get_version(s.summary_path)
+        if version != config.best_model:
+            continue
+        summary = s
+
+    utils.set_random_seed(summary.seed)
+    data_processor = DataProcessor(summary=summary)
+    evaluator = EvaluatorAutoEncoder(input_path=config.input_path)
+    
+    return evaluator, data_processor, summary
 
 
 def get_losses():
-    evaluator = get_evaluator()
+    evaluator, data_processor, summary = get_evaluator()
+
+    qcd_data = evaluator.get_qcd_test_data(summary=summary, data_processor=data_processor)
+    loss_qcd = evaluator.get_error(qcd_data, data_processor=data_processor, summary=summary)
     
-    loss_qcd = evaluator.qcd_err.mae
     loss_signal = []
+    signals = get_signals()
     
-    for signal in get_signals():
-        signal_mae_array = getattr(evaluator, "{}_err".format(signal)).mae
-        loss_signal.append(signal_mae_array)
-    
-    loss_signal = pd.concat(loss_signal)
+    for name, path in signals.items():
+        
+        signal_data = evaluator.get_signal_test_data(name, path, summary)
+        signal_loss = evaluator.get_error(signal_data, data_processor=data_processor, summary=summary)
+        loss_signal.append(signal_loss)
     
     return loss_qcd, loss_signal
 

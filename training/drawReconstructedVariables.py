@@ -4,7 +4,6 @@ from module.DataProcessor import DataProcessor
 from module.EvaluatorAutoEncoder import EvaluatorAutoEncoder
 import matplotlib.pyplot as plt
 import numpy
-import pandas as pd
 import importlib, argparse
 
 # ------------------------------------------------------------------------------------------------

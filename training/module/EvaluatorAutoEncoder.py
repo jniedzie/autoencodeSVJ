@@ -23,26 +23,46 @@ class EvaluatorAutoEncoder:
         data_holder.load()
         return self.__get_test_dataset(data_holder, data_processor)
         
+    def get_signal_test_data(self, name, path, summary):
+        data_loader = DataLoader()
+        (data, _, _, _) = data_loader.load_all_data(globstring=path,
+                                                    name=name,
+                                                    include_hlf=summary.hlf,
+                                                    include_eflow=summary.eflow,
+                                                    hlf_to_drop=summary.hlf_to_drop,
+                                                    )
+        
+        return data
+        
     def get_reconstruction(self, input_data, summary, data_processor):
     
         input_data_normed = data_processor.normalize(data_table=input_data,
-                                              normalization_type=summary.norm_type,
-                                              norm_args=summary.norm_args)
+                                                     normalization_type=summary.norm_type,
+                                                     norm_args=summary.norm_args)
 
         model = self.__load_model(summary.training_output_path)
         
         reconstructed = DataTable(pd.DataFrame(model.predict(input_data_normed.data),
-                                       columns=input_data_normed.columns,
-                                       index=input_data_normed.index,
-                                       dtype="float64"))
+                                               columns=input_data_normed.columns,
+                                               index=input_data_normed.index,
+                                               dtype="float64"))
 
         reconstructed_denormed = data_processor.normalize(data_table=reconstructed,
-                                         normalization_type=summary.norm_type,
-                                         norm_args=summary.norm_args,
-                                         scaler=input_data.scaler,
-                                         inverse=True)
+                                                          normalization_type=summary.norm_type,
+                                                          norm_args=summary.norm_args,
+                                                          scaler=input_data.scaler,
+                                                          inverse=True)
         
         return reconstructed_denormed
+        
+    def get_error(self, input_data, summary, data_processor):
+        recon = self.get_reconstruction(input_data, summary, data_processor)
+        
+        func = getattr(keras.losses, summary.loss)
+        losses = keras.backend.eval(func(input_data.data, recon))
+        error = keras.backend.eval(losses.tolist())
+        
+        return error
         
     def get_aucs(self, summary, AUCs_path, filename, data_processor, **kwargs):
         
