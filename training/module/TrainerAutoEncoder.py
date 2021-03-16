@@ -2,7 +2,8 @@ from module.DataLoader import DataLoader
 import datetime
 import keras
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TerminateOnNaN, ModelCheckpoint, CSVLogger
-from module.PklFile import PklFile
+from pathlib import Path
+import os, pickle
 
 
 class TrainerAutoEncoder:
@@ -78,8 +79,7 @@ class TrainerAutoEncoder:
         specified in the constructor
         """
         
-        self.pickle_file_path = self.training_output_path + ".pkl"
-        self.config = PklFile(self.pickle_file_path)
+        
     
         print("\n\nTraining the model")
         print("Filename: ", self.training_output_path)
@@ -106,8 +106,9 @@ class TrainerAutoEncoder:
             callbacks=callbacks
         )
         
-        self.config['trained'] = True
-        self.config['model_json'] = str(self.model.to_json())
+        pickle_output_path = self.training_output_path + ".pkl"
+        Path(os.path.dirname(pickle_output_path)).mkdir(parents=True, exist_ok=True)
+        pickle.dump(self.model.to_json(), open(pickle_output_path, 'wb'))
 
         print("\ntrained {} epochs!", self.training_params["epochs"], "\n")
         print("model saved")

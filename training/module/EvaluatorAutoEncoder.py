@@ -1,6 +1,5 @@
 import glob, os
 import tensorflow as tf
-from module.PklFile import PklFile
 import keras
 from keras.models import model_from_json
 from sklearn.metrics import roc_auc_score
@@ -8,7 +7,7 @@ from sklearn.metrics import roc_curve
 import pandas as pd
 from module.DataLoader import DataLoader
 from module.DataTable import DataTable
-
+import pickle
 
 class EvaluatorAutoEncoder:
     def __init__(self, input_path):
@@ -60,7 +59,7 @@ class EvaluatorAutoEncoder:
                                                      normalization_type=summary.norm_type,
                                                      norm_args=summary.norm_args)
 
-        model = self.__load_model(summary.training_output_path)
+        model = self.__load_model(summary)
         
         reconstructed = DataTable(pd.DataFrame(model.predict(input_data_normed.data),
                                                columns=input_data_normed.columns,
@@ -96,7 +95,7 @@ class EvaluatorAutoEncoder:
     
         tf.compat.v1.reset_default_graph()
     
-        model = self.__load_model(summary.training_output_path)
+        model = self.__load_model(summary)
     
         aucs = self.__get_aucs(summary=summary,
                                data_processor=data_processor,
@@ -121,7 +120,7 @@ class EvaluatorAutoEncoder:
                                                        normalize=True, scaler = all_data[qcd_key].scaler)
         
         errors = {}
-        model = self.__load_model(summary.training_output_path)
+        model = self.__load_model(summary)
 
         for key, data in all_data.items():
             recon = pd.DataFrame(model.predict(data.data), columns=data.columns, index=data.index, dtype="float64")
@@ -156,10 +155,20 @@ class EvaluatorAutoEncoder:
 
             i += 1
         
-    def __load_model(self, results_file_path):
-        config = PklFile(results_file_path + ".pkl")
-        model = model_from_json(config['model_json'])
-        model.load_weights(results_file_path + "_weights.h5")
+    def __load_model(self, summary):
+    
+        model_path = summary.training_output_path + ".pkl"
+        
+        try:
+            print("Reading file: ", model_path)
+            model_file = open(model_path, 'rb')
+        except IOError:
+            print("Couldn't open file ", model_path, ". Skipping...")
+            return None
+    
+        model = model_from_json(pickle.load(model_file))
+        model.load_weights(summary.training_output_path + "_weights.h5")
+        
         return model
 
     def __get_aucs(self, summary, data_processor, model, loss_function, test_key='qcd'):
