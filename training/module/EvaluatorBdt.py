@@ -7,7 +7,7 @@ import pandas as pd
 
 
 class EvaluatorBdt:
-    def __init__(self):
+    def __init__(self, **kwargs):
         pass
 
     def get_aucs(self, summary, AUCs_path, filename, data_processor, signals_base_path):

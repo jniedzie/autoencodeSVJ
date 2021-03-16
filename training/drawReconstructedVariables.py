@@ -1,7 +1,5 @@
 import module.SummaryProcessor as summaryProcessor
-import module.utils as utils
-from module.DataProcessor import DataProcessor
-from module.EvaluatorAutoEncoder import EvaluatorAutoEncoder
+from module.Evaluator import Evaluator
 import matplotlib.pyplot as plt
 import numpy
 import importlib, argparse
@@ -77,22 +75,26 @@ def draw_histogram_for_variable(input_data, reconstructed_data, variable_name, i
     hist.title.set_text(variable_name)
 
 
-summaries = summaryProcessor.get_summaries_from_path(config.summary_path)
+def get_summary():
 
-summary = None
-
-for _, s in summaries.df.iterrows():
-    version = summaryProcessor.get_version(s.summary_path)
-    if version != config.best_model:
-        continue
-    summary = s
+    summaries = summaryProcessor.get_summaries_from_path(config.summary_path)
     
-utils.set_random_seed(summary.seed)
-data_processor = DataProcessor(summary=summary)
-evaluator = EvaluatorAutoEncoder(input_path=config.input_path)
+    summary = None
+    
+    for _, s in summaries.df.iterrows():
+        version = summaryProcessor.get_version(s.summary_path)
+        if version != config.best_model:
+            continue
+        summary = s
+        
+    return summary
+    
+    
+evaluator = Evaluator(model_type=Evaluator.ModelTypes.AutoEncoder, input_path=config.input_path)
 
-qcd_data = evaluator.get_qcd_test_data(summary=summary, data_processor=data_processor)
-qcd_reconstructed = evaluator.get_reconstruction(input_data=qcd_data, summary=summary, data_processor=data_processor)
+summary = get_summary()
+qcd_data = evaluator.get_qcd_test_data(summary=summary)
+qcd_reconstructed = evaluator.get_reconstruction(input_data=qcd_data, summary=summary)
 
 
 for variable_name in bins:

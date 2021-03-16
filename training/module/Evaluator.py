@@ -154,3 +154,22 @@ class Evaluator:
             import matplotlib.cm as cm
             colors = cm.rainbow(np.linspace(0, 1, n_plots))
         return fig, on_axis_begin, on_axis_end, on_plot_end, colors
+
+    def get_qcd_test_data(self, summary):
+        utils.set_random_seed(summary.seed)
+        data_processor = DataProcessor(summary=summary)
+        return self.model_evaluator.get_qcd_test_data(summary, data_processor)
+
+    def get_signal_test_data(self, name, path, summary):
+        utils.set_random_seed(summary.seed)
+        return self.model_evaluator.get_signal_test_data(name, path, summary)
+
+    def get_reconstruction(self, input_data, summary):
+        utils.set_random_seed(summary.seed)
+        data_processor = DataProcessor(summary=summary)
+        return self.model_evaluator.get_reconstruction(input_data, summary, data_processor)
+
+    def get_error(self, input_data, summary):
+        utils.set_random_seed(summary.seed)
+        data_processor = DataProcessor(summary=summary)
+        return self.model_evaluator.get_error(input_data, summary, data_processor)
