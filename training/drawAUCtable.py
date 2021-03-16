@@ -4,7 +4,6 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import importlib, argparse
-import module.SummaryProcessor as summaryProcessor
 
 # ------------------------------------------------------------------------------------------------
 # This script will draw a table with AUCs (areas under ROC curve) values based on the CSV

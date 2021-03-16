@@ -33,7 +33,7 @@ class Evaluator:
     
     def save_aucs(self, summary_path, AUCs_path, **kwargs):
     
-        summaries = summaryProcessor.summary(summary_path=summary_path)
+        summaries = summaryProcessor.get_summaries_from_path(summary_path)
 
         if not os.path.exists(AUCs_path):
             Path(AUCs_path).mkdir(parents=True, exist_ok=False)
@@ -70,7 +70,7 @@ class Evaluator:
 
     def draw_roc_curves(self, summary_path, summary_version, **kwargs):
 
-        summaries = summaryProcessor.summary(summary_path=summary_path)
+        summaries = summaryProcessor.get_summaries_from_path(summary_path)
 
         plotting_args = {k: v for k, v in kwargs.items() if k not in ["signals", "signals_base_path"] }
 

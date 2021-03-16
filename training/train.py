@@ -17,8 +17,6 @@ config_path = args.config_path.strip(".py").replace("/", ".")
 config = importlib.import_module(config_path)
 
 for i in range(config.n_models):
-    
-   
 
     trainer = None
 
@@ -31,15 +29,15 @@ for i in range(config.n_models):
         trainer = Trainer(model_type=Trainer.ModelTypes.AutoEncoder,
                           validation_data_fraction=config.validation_data_fraction,
                           test_data_fraction=config.test_data_fraction,
+                          
                           qcd_path=config.qcd_path,
-                          bottleneck_size=config.target_dim,
+                          training_output_path=config.results_path+file_name,
+                          
                           training_params=config.training_params,
                           EFP_base=config.efp_base,
                           norm_type=config.norm_type,
                           norm_args=config.norm_args,
-                          hlf_to_drop= ['Energy', 'Flavor'],
-                          output_file_name=file_name,
-                          training_output_path=config.results_path
+                          hlf_to_drop= config.hlf_to_drop,
                           )
         
     elif config.model_type == "BDT":
@@ -64,15 +62,16 @@ for i in range(config.n_models):
         trainer = Trainer(model_type=Trainer.ModelTypes.Bdt,
                           validation_data_fraction=config.validation_data_fraction,
                           test_data_fraction=config.test_data_fraction,
+                          
                           qcd_path=config.qcd_path,
                           signal_path=signal_path,
+                          training_output_path=config.results_path+file_name,
+                          
                           training_params=config.training_params,
                           EFP_base=config.efp_base,
                           norm_type=config.norm_type,
                           norm_args=config.norm_args,
-                          hlf_to_drop=['Energy', 'Flavor'],
-                          output_file_name=file_name,
-                          training_output_path=config.results_path
+                          hlf_to_drop=config.hlf_to_drop,
                           )
     else:
         print("Unrecognized model: ", config.model_type)

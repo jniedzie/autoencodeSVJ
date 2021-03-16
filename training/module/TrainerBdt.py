@@ -1,4 +1,3 @@
-import module.utils as utils
 from module.DataLoader import DataLoader
 
 import numpy as np
@@ -16,19 +15,13 @@ class TrainerBdt:
                  qcd_path,
                  signal_path,
                  training_params,
-                 output_file_name,
                  training_output_path,
                  data_processor,
-                 seed,
-                 test_data_fraction,
-                 validation_data_fraction,
                  EFP_base=None,
                  norm_type=None,
                  norm_args=None,
                  hlf_to_drop=None,
                  ):
-        self.seed = seed
-        utils.set_random_seed(self.seed)
         
         self.qcd_path = qcd_path
         self.signal_path = signal_path
@@ -36,9 +29,6 @@ class TrainerBdt:
         self.EFP_base = EFP_base
         
         self.training_params = training_params
-        self.test_data_fraction = test_data_fraction
-        self.validation_data_fraction = validation_data_fraction
-        self.output_file_name = output_file_name
         self.training_output_path = training_output_path
         
         self.data_processor = data_processor
@@ -49,47 +39,44 @@ class TrainerBdt:
         # Normalize the input
         self.norm_type = norm_type
         self.norm_args = norm_args
-        
-        print("Trainer scaler: ", self.norm_type)
-        print("Trainer scaler args: ", self.norm_args)
-        
-        self.X_train_normalized = data_processor.normalize(data_table=self.X_train,
-                                                                normalization_type=self.norm_type,
-                                                                norm_args=self.norm_args)
-        
-        self.X_test_normalized = data_processor.normalize(data_table=self.X_test,
-                                                               normalization_type=self.norm_type,
-                                                               norm_args=self.norm_args)
-        
+        self.__normalize_data()
+  
         # Build the model
-        self.model = AdaBoostClassifier(algorithm='SAMME', n_estimators=800, learning_rate=0.5)
+        self.model = self.__get_model()
     
-    def __load_data(self, include_hlf=True, include_eflow=True, hlf_to_drop=['Energy', 'Flavor']):
+    def __load_data(self, include_hlf=True, include_eflow=True):
         data_loader = DataLoader()
         
         (QCD, _, _, _) = data_loader.load_all_data(self.qcd_path, "QCD",
                                                    include_hlf=include_hlf,
                                                    include_eflow=include_eflow,
-                                                   hlf_to_drop=hlf_to_drop)
+                                                   hlf_to_drop=self.hlf_to_drop)
         
         (SVJ, _, _, _) = data_loader.load_all_data(self.signal_path, "SVJ",
                                                    include_hlf=include_hlf,
                                                    include_eflow=include_eflow,
-                                                   hlf_to_drop=hlf_to_drop)
+                                                   hlf_to_drop=self.hlf_to_drop)
         
-        (QCD_X_train, _, QCD_X_test, _, _) = self.data_processor.split_to_train_validate_test(data_table=QCD)
-        (SVJ_X_train, _, SVJ_X_test, _, _) = self.data_processor.split_to_train_validate_test(data_table=SVJ)
+        (QCD_X_train, _, _) = self.data_processor.split_to_train_validate_test(data_table=QCD)
+        (SVJ_X_train, _, _) = self.data_processor.split_to_train_validate_test(data_table=SVJ)
         
-        SVJ_Y_train, SVJ_Y_test = [pd.DataFrame(np.ones((len(elt.df), 1)), index=elt.index, columns=['tag']) for elt in
-                                   [SVJ_X_train, SVJ_X_test]]
-        QCD_Y_train, QCD_Y_test = [pd.DataFrame(np.zeros((len(elt.df), 1)), index=elt.index, columns=['tag']) for elt in
-                                   [QCD_X_train, QCD_X_test]]
+        SVJ_Y_train = pd.DataFrame(np.ones((len(SVJ_X_train.df), 1)), index=SVJ_X_train.index, columns=['tag'])
+        QCD_Y_train = pd.DataFrame(np.zeros((len(QCD_X_train.df), 1)), index=QCD_X_train.index, columns=['tag'])
         
-        self.X_train = SVJ_X_train.append(QCD_X_train)
-        self.Y_train = SVJ_Y_train.append(QCD_Y_train)
-        
-        self.X_test = SVJ_X_test.append(QCD_X_test)
-        self.Y_test = SVJ_Y_test.append(QCD_Y_test)
+        self.train_data = SVJ_X_train.append(QCD_X_train)
+        self.train_labels = SVJ_Y_train.append(QCD_Y_train)
+    
+    def __normalize_data(self):
+        print("Trainer scaler: ", self.norm_type)
+        print("Trainer scaler args: ", self.norm_args)
+    
+        self.train_data_normalized = self.data_processor.normalize(data_table=self.train_data,
+                                                                   normalization_type=self.norm_type,
+                                                                   norm_args=self.norm_args)
+    
+    def __get_model(self):
+        model = AdaBoostClassifier(algorithm='SAMME', n_estimators=800, learning_rate=0.5)
+        return model
     
     def train(self):
         """
@@ -97,13 +84,11 @@ class TrainerBdt:
         specified in the constructor
         """
         
-        self.training_output_path = self.training_output_path + self.output_file_name
-        
         print("\n\nTraining the model")
         print("Filename: ", self.training_output_path)
         
         self.start_timestamp = datetime.now()
-        self.model.fit(self.X_train_normalized, self.Y_train)
+        self.model.fit(self.train_data_normalized, self.train_labels)
         self.end_timestamp = datetime.now()
 
         pickle_output_path = self.training_output_path + ".pkl"
@@ -124,11 +109,8 @@ class TrainerBdt:
             'hlf_to_drop': tuple(self.hlf_to_drop),
             'eflow': True,
             'eflow_base': self.EFP_base,
-            'test_split': self.test_data_fraction,
-            'val_split': self.validation_data_fraction,
             'norm_type': self.norm_type,
             'norm_args': self.norm_args,
-            'seed': self.seed,
             'start_time': str(self.start_timestamp),
             'end_time': str(self.end_timestamp),
         }

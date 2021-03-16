@@ -1,5 +1,3 @@
-import module.utils as utils
-
 from module.DataLoader import DataLoader
 import datetime
 import keras
@@ -12,15 +10,9 @@ class TrainerAutoEncoder:
     def __init__(self,
                  qcd_path,
                  training_params,
-                 bottleneck_size,
-                 output_file_name,
                  training_output_path,
                  data_processor,
-                 seed,
-                 test_data_fraction,
-                 validation_data_fraction,
                  EFP_base=None,
-                 intermediate_architecture=(30, 30),
                  norm_type="",
                  norm_args=None,
                  hlf_to_drop=None,
@@ -32,55 +24,53 @@ class TrainerAutoEncoder:
         provided arguments. Normalizes the data as specified by norm_percentile.
         High-level features specified in hlf_to_drop will not be used for training.
         """
-        self.seed = seed
-        utils.set_random_seed(self.seed)
-        
         self.qcd_path = qcd_path
         self.hlf_to_drop = hlf_to_drop
         self.EFP_base = EFP_base
         
         self.training_params = training_params
-        self.test_data_fraction = test_data_fraction
-        self.validation_data_fraction = validation_data_fraction
-        self.training_output_path = training_output_path + output_file_name
+        self.training_output_path = training_output_path
+        
+        self.data_processor = data_processor
         
         self.verbose = verbose
-        
-        data_loader = DataLoader()
-        
-        # Load QCD samples
-        (self.qcd, _, _, _) = data_loader.load_all_data(qcd_path, "qcd background",
-                                                        include_hlf=True, include_eflow=True,
-                                                        hlf_to_drop=hlf_to_drop)
-        
-        (train_data,
-         validation_data,
-         test_data, _, _) = data_processor.split_to_train_validate_test(data_table=self.qcd)
-        
-        train_data.output_file_prefix = "qcd training data"
-        validation_data.output_file_prefix = "qcd validation data"
+
+        # Load and split the data
+        self.__load_data()
         
         # Normalize the input
         self.norm_type = norm_type
         self.norm_args = norm_args
-        
-        print("Trainer scaler args: ", self.norm_args)
-        
-        self.train_data_normalized = data_processor.normalize(data_table=train_data,
-                                                              normalization_type=self.norm_type,
-                                                              norm_args=self.norm_args,
-                                                              )
-        
-        self.validation_data_normalized = data_processor.normalize(data_table=validation_data,
-                                                                   normalization_type=self.norm_type,
-                                                                   norm_args=self.norm_args
-                                                                   )
+        self.__normalize_data()
         
         # Build the model
         self.input_size = len(self.qcd.columns)
-        self.intermediate_architecture = intermediate_architecture
-        self.bottleneck_size = bottleneck_size
-        self.model = self.__get_auto_encoder_model()
+        self.model = self.__get_model()
+
+    def __load_data(self):
+        data_loader = DataLoader()
+    
+        # Load QCD samples
+        (self.qcd, _, _, _) = data_loader.load_all_data(self.qcd_path, "QCD",
+                                                        include_hlf=True,
+                                                        include_eflow=True,
+                                                        hlf_to_drop=self.hlf_to_drop)
+    
+        (self.train_data, self.validation_data, _) = self.data_processor.split_to_train_validate_test(data_table=self.qcd)
+
+    def __normalize_data(self):
+        print("Trainer scaler: ", self.norm_type)
+        print("Trainer scaler args: ", self.norm_args)
+    
+        self.train_data_normalized = self.data_processor.normalize(data_table=self.train_data,
+                                                                   normalization_type=self.norm_type,
+                                                                   norm_args=self.norm_args
+                                                                   )
+    
+        self.validation_data_normalized = self.data_processor.normalize(data_table=self.validation_data,
+                                                                        normalization_type=self.norm_type,
+                                                                        norm_args=self.norm_args
+                                                                        )
 
     def train(self):
         """
@@ -135,14 +125,10 @@ class TrainerAutoEncoder:
             'hlf_to_drop': tuple(self.hlf_to_drop),
             'eflow': True,
             'eflow_base': self.EFP_base,
-            'test_split': self.test_data_fraction,
-            'val_split': self.validation_data_fraction,
             'norm_type': self.norm_type,
             'norm_args': self.norm_args,
-            'target_dim': self.bottleneck_size,
             'input_dim': self.input_size,
             'arch': self.__get_architecture_summary(),
-            'seed': self.seed,
             'start_time': str(self.start_timestamp),
             'end_time': str(self.end_timestamp),
         }
@@ -155,12 +141,12 @@ class TrainerAutoEncoder:
         """
         Returns a tuple with number of nodes in each consecutive layer of the auto-encoder
         """
-        arch = (self.input_size,) + self.intermediate_architecture
-        arch += (self.bottleneck_size,)
-        arch += tuple(reversed(self.intermediate_architecture)) + (self.input_size,)
+        arch = (self.input_size,) + self.training_params["intermediate_architecture"]
+        arch += (self.training_params["bottleneck_size"],)
+        arch += tuple(reversed(self.training_params["intermediate_architecture"])) + (self.input_size,)
         return arch
 
-    def __get_auto_encoder_model(self):
+    def __get_model(self):
         """
         Builds an auto-encoder model as specified in object's fields: input_size,
         intermediate_architecture and bottleneck_size
@@ -169,12 +155,12 @@ class TrainerAutoEncoder:
         input_layer = keras.layers.Input(shape=(self.input_size,))
         layers = input_layer
     
-        for elt in self.intermediate_architecture:
+        for elt in self.training_params["intermediate_architecture"]:
             layers = keras.layers.Dense(units=elt, activation= "relu")(layers)
 
-        layers = keras.layers.Dense(units=self.bottleneck_size, activation="relu")(layers)
+        layers = keras.layers.Dense(units=self.training_params["bottleneck_size"], activation="relu")(layers)
         
-        for elt in reversed(self.intermediate_architecture):
+        for elt in reversed(self.training_params["intermediate_architecture"]):
             layers = keras.layers.Dense(units=elt, activation= "relu")(layers)
 
         layers = keras.layers.Dense(units=self.input_size, activation="linear")(layers)

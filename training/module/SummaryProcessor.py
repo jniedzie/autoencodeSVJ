@@ -45,22 +45,14 @@ def dump_summary_json(*dicts, output_path):
     return summary_dict
 
 
-def summary(summary_path, defaults={'hlf_to_drop': ['Flavor', 'Energy']}):
-    
-    if not summary_path.endswith(".summary"):
-        path = os.path.join(summary_path, "*.summary")
-    else:
-        path = summary_path
-    files = glob.glob(path)
+def get_summaries_from_path(path):
+    files = glob.glob(path + "/*.summary")
     
     data = []
     for f in files:
         with open(f) as to_read:
             d = json.load(to_read)
             d['time'] = datetime.datetime.fromtimestamp(os.path.getmtime(f))
-            for k, v in list(defaults.items()):
-                if k not in d:
-                    d[k] = v
             data.append(d)
     
     if len(data)==0:
@@ -70,17 +62,9 @@ def summary(summary_path, defaults={'hlf_to_drop': ['Flavor', 'Energy']}):
     return DataTable(pd.DataFrame(data), name='summary')
     
 
-def __summary_match(search_path, verbose=True):
-    ret = glob.glob(search_path)
-    if verbose:
-        print("Summary matches search_path: ", search_path, "\tglob path: ", ret)
-        print(("found {} matches with search '{}'".format(len(ret), search_path)))
-    return ret
-
-
 def get_last_summary_file_version(summary_path, filename):
     summary_search_path = summary_path + filename + "_v*"
-    summary_files = __summary_match(summary_search_path, verbose=False)
+    summary_files = glob.glob(summary_search_path)
     
     existing_ids = []
     

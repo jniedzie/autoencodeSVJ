@@ -116,7 +116,7 @@ class EvaluatorBdt:
                                                     include_eflow=summary.eflow,
                                                     hlf_to_drop=summary.hlf_to_drop)
     
-        (_, _, data_X_test, _, _) = data_processor.split_to_train_validate_test(data_table=data)
+        (_, _, data_X_test) = data_processor.split_to_train_validate_test(data_table=data)
     
         fun = np.zeros if is_background else np.ones
         data_Y_test = pd.DataFrame(fun((len(data_X_test.df), 1)), index=data_X_test.index, columns=['tag'])

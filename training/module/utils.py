@@ -1,10 +1,7 @@
-import os, glob, subprocess, random
+import os, random
 import numpy as np
 import tensorflow as tf
-import matplotlib.pyplot as plt
 
-plt.rcParams['figure.figsize'] = (10,10)
-plt.rcParams.update({'font.size': 18})
 
 def set_random_seed(seed_value):
     # 1. Set `PYTHONHASHSEED` environment variable at a fixed value

@@ -129,7 +129,7 @@ class EvaluatorAutoEncoder:
 
     def __get_test_dataset(self, data_holder, data_processor, test_key='qcd'):
         qcd = getattr(data_holder, test_key).data
-        _, _, test, _, _ = data_processor.split_to_train_validate_test(data_table=qcd)
+        _, _, test = data_processor.split_to_train_validate_test(data_table=qcd)
         return test
 
     def __get_aucs(self, data_holder, data_processor, model, loss_function, norm_type, norm_args=None, test_key='qcd'):
