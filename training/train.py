@@ -28,7 +28,9 @@ for i in range(config.n_models):
         last_version = summaryProcessor.get_last_summary_file_version(config.summary_path, file_name)
         file_name += "_v{}".format(last_version + 1)
         
-        trainer = Trainer(model_type=Trainer.ModelTypes.AutoEncoder,
+        trainer = Trainer(
+            # model_type=Trainer.ModelTypes.AutoEncoder,
+                          model_trainer_path=config.model_trainer_path,
                           validation_data_fraction=config.validation_data_fraction,
                           test_data_fraction=config.test_data_fraction,
                           
@@ -61,7 +63,7 @@ for i in range(config.n_models):
         file_name += "_v{}".format(last_version + 1)
         model_output_path = config.results_path + "/" + file_name + ".weigths"
         
-        trainer = Trainer(model_type=Trainer.ModelTypes.Bdt,
+        trainer = Trainer(model_trainer_path=config.model_trainer_path,
                           validation_data_fraction=config.validation_data_fraction,
                           test_data_fraction=config.test_data_fraction,
                           

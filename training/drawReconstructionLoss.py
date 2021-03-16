@@ -44,7 +44,8 @@ def get_summary():
 
 
 def get_losses():
-    evaluator = Evaluator(model_type=Evaluator.ModelTypes.AutoEncoder, input_path=config.input_path)
+    evaluator = Evaluator(model_evaluator_path=config.model_evaluator_path,
+                          input_path=config.input_path)
 
     summary = get_summary()
     qcd_data = evaluator.get_qcd_test_data(summary=summary)

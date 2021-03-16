@@ -6,6 +6,8 @@
 
 # Model type
 model_type = "BDT"
+model_trainer_path = "module/architectures/TrainerBdt.py"
+model_evaluator_path = "module/architectures/EvaluatorBdt.py"
 
 # ---------------------------------------------
 # Path to training data

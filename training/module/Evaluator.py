@@ -8,11 +8,10 @@ import numpy as np
 import module.SummaryProcessor as summaryProcessor
 import module.utils as utils
 from module.DataProcessor import DataProcessor
-from module.EvaluatorBdt import EvaluatorBdt
-from module.EvaluatorAutoEncoder import EvaluatorAutoEncoder
 
 plt.rcParams['figure.figsize'] = (10,10)
 plt.rcParams.update({'font.size': 18})
+
 
 class Evaluator:
     
@@ -20,16 +19,9 @@ class Evaluator:
         AutoEncoder = 0
         Bdt = 1
     
-    def __init__(self, model_type, **kwargs):
-        self.model_type = model_type
-        
-        self.model_evaluator = None
-        if model_type is self.ModelTypes.Bdt:
-            self.model_evaluator = EvaluatorBdt(**kwargs)
-        elif model_type is self.ModelTypes.AutoEncoder:
-            self.model_evaluator = EvaluatorAutoEncoder(**kwargs)
-        else:
-            print("Unknown model type: ", model_type)
+    def __init__(self, model_evaluator_path, **kwargs):
+        self.model_class = utils.import_class(model_evaluator_path)
+        self.model_evaluator = self.model_class(**kwargs)
     
     def save_aucs(self, summary_path, AUCs_path, **kwargs):
     

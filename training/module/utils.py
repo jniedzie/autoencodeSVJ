@@ -1,6 +1,7 @@
 import os, random
 import numpy as np
 import tensorflow as tf
+import importlib, sys
 
 
 def set_random_seed(seed_value):
@@ -20,3 +21,20 @@ def set_random_seed(seed_value):
     session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
     sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
     tf.compat.v1.keras.backend.set_session(sess)
+
+
+def import_class(class_path):
+    class_path = class_path.strip(".py").replace("/", ".")
+    model_module = importlib.import_module(class_path)
+    
+    model_class = None
+    
+    model_class_name = class_path.split(".")[-1]
+    
+    for x in dir(model_module):
+        if x == model_class_name:
+            model_class = getattr(model_module, x)
+
+    setattr(sys.modules[__name__], model_class.__name__, model_class)
+    
+    return model_class

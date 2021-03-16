@@ -1,11 +1,11 @@
-from enum import Enum
-import numpy as np
-
-from module.TrainerAutoEncoder import TrainerAutoEncoder
-from module.TrainerBdt import TrainerBdt
 from module.DataProcessor import DataProcessor
 import module.SummaryProcessor as summaryProcessor
 import module.utils as utils
+
+from enum import Enum
+import numpy as np
+import sys
+import importlib
 
 
 class Trainer:
@@ -18,8 +18,10 @@ class Trainer:
         ModelTypes.Bdt: "BDT",
     }
 
-    def __init__(self, model_type, validation_data_fraction, test_data_fraction , **kwargs):
-        self.model_type = model_type
+    def __init__(self, model_trainer_path, validation_data_fraction, test_data_fraction , **kwargs):
+    
+        self.model_class = utils.import_class(model_trainer_path)
+        
         self.seed = np.random.randint(0, 99999999)
         self.validation_data_fraction = validation_data_fraction
         self.test_data_fraction = test_data_fraction
@@ -29,15 +31,8 @@ class Trainer:
                                        seed=self.seed)
 
         utils.set_random_seed(self.seed)
-    
-        self.model_trainer = None
-        if model_type is self.ModelTypes.Bdt:
-            self.model_trainer = TrainerBdt(data_processor=data_processor, **kwargs)
-        elif model_type is self.ModelTypes.AutoEncoder:
-            self.model_trainer = TrainerAutoEncoder(data_processor=data_processor, **kwargs)
-        else:
-            print("Unknown model type: ", model_type)
-            
+        self.model_trainer = self.model_class(data_processor=data_processor, **kwargs)
+        
     def train(self, summaries_path):
         
         self.model_trainer.train()
@@ -49,7 +44,7 @@ class Trainer:
     def __get_summary(self):
         
         summary_dict = {
-            "model_type": self.ModelTypeNames[self.model_type],
+            "model_type": str(self.model_class),
             "seed": self.seed,
             'val_split': self.validation_data_fraction,
             'test_split': self.test_data_fraction,
