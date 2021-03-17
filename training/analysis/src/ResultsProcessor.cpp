@@ -85,13 +85,15 @@ vector<Epoch> ResultsProcessor::getEpochsFromFile(string inFilePath)
     }
     vector<string> lineByCommas = splitByComma(line);
     
-    if(lineByCommas.size() != 4) continue;
+    if(lineByCommas.size() != 6) continue;
     
     Epoch e;
     
-    e.trainingLoss = stod(lineByCommas[1]);
-    e.learningRate = stod(lineByCommas[2]);
-    e.validationLoss = stod(lineByCommas[3]);
+    e.accuracy = stod(lineByCommas[1]);
+    e.trainingLoss = stod(lineByCommas[2]);
+    e.learningRate = stod(lineByCommas[3]);
+    e.validationAccuracy = stod(lineByCommas[4]);
+    e.validationLoss = stod(lineByCommas[5]);
     
     epochs.push_back(e);
   }

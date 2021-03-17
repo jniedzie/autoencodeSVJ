@@ -3,23 +3,26 @@
 # some parameters.
 # ------------------------------------------------------------------------------------------------
 
-
 # Model type
-model_type = "BDT"
-model_trainer_path = "module/architectures/TrainerBdt.py"
-model_evaluator_path = "module/architectures/EvaluatorBdt.py"
+model_type = "AutoEncoder"
+model_trainer_path = "module/architectures/TrainerAutoEncoder.py"
+model_evaluator_path = "module/architectures/EvaluatorAutoEncoder.py"
 
 # ---------------------------------------------
 # Path to training data
+# qcd_path = "../../data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8/*.h5"
 qcd_path = "../../data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp4/*.h5"
 
 # Path to testing data
+# signals_base_path = "../../data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8/"
 signals_base_path = "../../data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp4/"
 input_path = signals_base_path+"/*/base_3/*.h5"
 
 # ---------------------------------------------
 # Output paths
-output_path = "trainingResults_test/bdt/"
+# output_path = "trainingResults_previous_default/"
+output_path = "trainingResults_new_default/"
+
 summary_path = output_path+"summary/"
 results_path = output_path+"trainingRuns/"
 AUCs_path = output_path+"aucs/"
@@ -28,31 +31,62 @@ stat_hists_path = output_path+"stat_hists.root"
 # ---------------------------------------------
 # Training parameters
 training_params = {
-    'batch_size': 32,
-    'loss': 'mse',
-    'optimizer': 'adam',
-    'epochs': 200,
+    # 'batch_size': 32,
+    'batch_size': 256, ##
+
+    # losses documentation
+    # https://keras.io/api/losses/regression_losses
+    # 'loss': 'mean_absolute_error',
+    # 'loss': 'mean_squared_error',
+    # 'loss': 'mean_absolute_percentage_error',
+    'loss': 'mean_squared_logarithmic_error', ##
+    # 'loss': 'cosine_similarity',
+    # 'loss': 'huber',
+    # 'loss': 'log_cosh',
+
+    # optimizers documentation
+    # https://keras.io/api/optimizers/
+    # 'optimizer': 'SGD',
+    # 'optimizer': 'RMSprop',
+    'optimizer': 'Adam',
+    # 'optimizer': 'Adadelta',
+    # 'optimizer': 'Adagrad',
+    # 'optimizer': 'Adamax',
+    # 'optimizer': 'Nadam',
+    # 'optimizer': 'Ftrl',
+
+    'metric': 'accuracy',
+
+    # 'epochs': 200,
+    'epochs': 400, ##
+    
     'learning_rate': 0.00051,
     'es_patience': 12,
     'lr_patience': 9,
-    'lr_factor': 0.5
+    'lr_factor': 0.5,
+    
+    # "bottleneck_size": 8,
+    "bottleneck_size": 6, ##
+    "intermediate_architecture": (30, 30),
+    
 }
 
 efp_base = 4
+
 include_hlf = True
 include_efp = True
 hlf_to_drop = ['Energy', 'Flavor']
 
-validation_data_fraction=0.0
-test_data_fraction=0.2
+validation_data_fraction = 0.15
+test_data_fraction = 0.15
 
 # ---------------------------------------------
 # Number of models to train
-n_models = 2
+n_models = 10
 
 # ---------------------------------------------
 # Pick normalization type (definitions below):
-norm_type = "None"
+norm_type = "StandardScaler"
 
 # Set parameters for the selected normalization
 normalizations = {
@@ -105,4 +139,5 @@ n_events_per_class = 10000
 
 # ---------------------------------------------
 # Output file names
-file_name = "hlf_eflow_{}".format(efp_base)
+# file_name = "hlf_eflow_{}_bottle_{}_default".format(efp_base, training_params["bottleneck_size"])
+file_name = "hlf_eflow_{}_bottle_{}_new_default".format(efp_base, training_params["bottleneck_size"])

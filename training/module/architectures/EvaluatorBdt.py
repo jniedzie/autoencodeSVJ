@@ -1,4 +1,5 @@
 from module.DataLoader import DataLoader
+
 import pickle
 from sklearn.metrics import roc_auc_score, roc_curve
 import os
@@ -10,7 +11,7 @@ class EvaluatorBdt:
     def __init__(self, **kwargs):
         pass
 
-    def get_aucs(self, summary, AUCs_path, filename, data_processor, signals_base_path):
+    def get_aucs(self, summary, AUCs_path, filename, data_processor, data_loader, signals_base_path):
         # TODO: this should skip versions for which all auc were already stored
         # more difficult here because we are storing multiple results in the same file
     
@@ -27,7 +28,8 @@ class EvaluatorBdt:
         if model is None:
             return None
         
-        self.__load_data(data_processor=data_processor, summary=summary, signal_path=signal_path)
+        self.__load_data(data_processor=data_processor, data_loader=data_loader,
+                         summary=summary, signal_path=signal_path)
     
         model_auc = roc_auc_score(self.Y_test, model.decision_function(self.X_test))
     
@@ -58,16 +60,18 @@ class EvaluatorBdt:
         i = 0
         ax.plot(roc[0], roc[1], "-", c=colors[i % len(colors)], label='{}, AUC {:.4f}'.format(filename, auc))
 
-    def __load_data(self, data_processor, summary, signal_path):
+    def __load_data(self, data_processor, data_loader, summary, signal_path):
         qcd_X_test, qcd_Y_test = self.__get_data(data_path=summary.qcd_path,
                                                  is_background=True,
                                                  data_processor=data_processor,
+                                                 data_loader=data_loader,
                                                  summary=summary
                                                  )
 
         svj_X_test, svj_Y_test = self.__get_data(data_path=signal_path,
                                                  is_background=False,
                                                  data_processor=data_processor,
+                                                 data_loader=data_loader,
                                                  summary=summary
                                                  )
 
@@ -94,15 +98,9 @@ class EvaluatorBdt:
         
         return pickle.load(model)
 
-    def __get_data(self, data_path, is_background, data_processor, summary):
+    def __get_data(self, data_path, is_background, data_processor, data_loader, summary):
     
-        data_loader = DataLoader()
-    
-        (data, _, _, _) = data_loader.load_all_data(data_path, "",
-                                                    include_hlf=summary.hlf,
-                                                    include_eflow=summary.eflow,
-                                                    hlf_to_drop=summary.hlf_to_drop)
-    
+        (data, _, _, _) = data_loader.load_all_data(data_path, "")
         (_, _, data_X_test) = data_processor.split_to_train_validate_test(data_table=data)
     
         fun = np.zeros if is_background else np.ones

@@ -1,4 +1,3 @@
-from module.DataLoader import DataLoader
 import datetime
 import keras
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TerminateOnNaN, ModelCheckpoint, CSVLogger
@@ -13,10 +12,10 @@ class TrainerAutoEncoder:
                  training_params,
                  training_output_path,
                  data_processor,
+                 data_loader,
                  EFP_base=None,
                  norm_type="",
                  norm_args=None,
-                 hlf_to_drop=None,
                  verbose=True
                  ):
         """
@@ -26,13 +25,13 @@ class TrainerAutoEncoder:
         High-level features specified in hlf_to_drop will not be used for training.
         """
         self.qcd_path = qcd_path
-        self.hlf_to_drop = hlf_to_drop
         self.EFP_base = EFP_base
         
         self.training_params = training_params
         self.training_output_path = training_output_path
         
         self.data_processor = data_processor
+        self.data_loader = data_loader
         
         self.verbose = verbose
 
@@ -49,14 +48,9 @@ class TrainerAutoEncoder:
         self.model = self.__get_model()
 
     def __load_data(self):
-        data_loader = DataLoader()
-    
+        
         # Load QCD samples
-        (self.qcd, _, _, _) = data_loader.load_all_data(self.qcd_path, "QCD",
-                                                        include_hlf=True,
-                                                        include_eflow=True,
-                                                        hlf_to_drop=self.hlf_to_drop)
-    
+        (self.qcd, _, _, _) = self.data_loader.load_all_data(self.qcd_path, "QCD")
         (self.train_data, self.validation_data, _) = self.data_processor.split_to_train_validate_test(data_table=self.qcd)
 
     def __normalize_data(self):
@@ -123,7 +117,6 @@ class TrainerAutoEncoder:
             'training_output_path': self.training_output_path,
             'qcd_path': self.qcd_path,
             'hlf': True,
-            'hlf_to_drop': tuple(self.hlf_to_drop),
             'eflow': True,
             'eflow_base': self.EFP_base,
             'norm_type': self.norm_type,

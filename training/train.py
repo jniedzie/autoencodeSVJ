@@ -29,20 +29,22 @@ for i in range(config.n_models):
         file_name += "_v{}".format(last_version + 1)
         
         trainer = Trainer(
-            # model_type=Trainer.ModelTypes.AutoEncoder,
-                          model_trainer_path=config.model_trainer_path,
-                          validation_data_fraction=config.validation_data_fraction,
-                          test_data_fraction=config.test_data_fraction,
-                          
-                          qcd_path=config.qcd_path,
-                          training_output_path=config.results_path+file_name,
-                          
-                          training_params=config.training_params,
-                          EFP_base=config.efp_base,
-                          norm_type=config.norm_type,
-                          norm_args=config.norm_args,
-                          hlf_to_drop= config.hlf_to_drop,
-                          )
+            # general settings of the training
+            model_trainer_path=config.model_trainer_path,
+            validation_data_fraction=config.validation_data_fraction,
+            test_data_fraction=config.test_data_fraction,
+            include_hlf=config.include_hlf,
+            include_efp=config.include_efp,
+            hlf_to_drop=config.hlf_to_drop,
+    
+            # parameters that will be passed to your TrainerXYZ
+            qcd_path=config.qcd_path,
+            training_output_path=config.results_path+file_name,
+            training_params=config.training_params,
+            EFP_base=config.efp_base,
+            norm_type=config.norm_type,
+            norm_args=config.norm_args,
+        )
         
     elif config.model_type == "BDT":
     
@@ -63,20 +65,24 @@ for i in range(config.n_models):
         file_name += "_v{}".format(last_version + 1)
         model_output_path = config.results_path + "/" + file_name + ".weigths"
         
-        trainer = Trainer(model_trainer_path=config.model_trainer_path,
-                          validation_data_fraction=config.validation_data_fraction,
-                          test_data_fraction=config.test_data_fraction,
-                          
-                          qcd_path=config.qcd_path,
-                          signal_path=signal_path,
-                          training_output_path=config.results_path+file_name,
-                          
-                          training_params=config.training_params,
-                          EFP_base=config.efp_base,
-                          norm_type=config.norm_type,
-                          norm_args=config.norm_args,
-                          hlf_to_drop=config.hlf_to_drop,
-                          )
+        trainer = Trainer(
+            # general settings of the training
+            model_trainer_path=config.model_trainer_path,
+            validation_data_fraction=config.validation_data_fraction,
+            test_data_fraction=config.test_data_fraction,
+            include_hlf=config.include_hlf,
+            include_efp=config.include_efp,
+            hlf_to_drop=config.hlf_to_drop,
+            
+            # parameters that will be passed to your TrainerXYZ
+            qcd_path=config.qcd_path,
+            signal_path=signal_path,
+            training_output_path=config.results_path+file_name,
+            training_params=config.training_params,
+            EFP_base=config.efp_base,
+            norm_type=config.norm_type,
+            norm_args=config.norm_args,
+        )
     else:
         print("Unrecognized model: ", config.model_type)
         exit(0)

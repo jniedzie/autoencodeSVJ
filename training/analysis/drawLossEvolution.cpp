@@ -11,6 +11,16 @@
 #include "Result.hpp"
 #include "ResultsProcessor.hpp"
 
+// new results
+string aucsPath =  "../trainingResults_previous_default/aucs/";
+string resultsPath =  "../trainingResults_previous_default/trainingRuns/";
+string filePattern = "hlf_eflow_3_bottle_8_default_v";
+
+//string aucsPath =  "../trainingResults_new_default/aucs/";
+//string resultsPath =  "../trainingResults_new_default/trainingRuns/";
+//string filePattern = "hlf_eflow_4_bottle_6_new_default_v";
+
+
 // Bottleneck:
 //string aucsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8/aucs/";
 //string resultsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8/trainingRuns/";
@@ -46,15 +56,15 @@
 //string filePattern = "hlf_eflow_3_bottle_6_optimizer_Ftrl_v";
 
 // Losses:
-string aucsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_losses/aucs/";
-string resultsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_losses/trainingRuns/";
+//string aucsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_losses/aucs/";
+//string resultsPath =  "../trainingResults_noLeptonVeto_fatJets_dr0p8_losses/trainingRuns/";
 //string filePattern = "hlf_eflow_4_bottle_6_loss_mean_absolute_error_v";
 //string filePattern = "hlf_eflow_4_bottle_6_loss_mean_absolute_percentage_error_v";
 //string filePattern = "hlf_eflow_4_bottle_6_loss_mean_squared_error_v";
 //string filePattern = "hlf_eflow_4_bottle_6_loss_mean_squared_logarithmic_error_v";
 //string filePattern = "hlf_eflow_4_bottle_6_loss_huber_loss_v";
 //string filePattern = "hlf_eflow_4_bottle_6_loss_log_cosh_v";
-string filePattern = "hlf_eflow_4_bottle_6_loss_cosine_similarity_v";
+//string filePattern = "hlf_eflow_4_bottle_6_loss_cosine_similarity_v";
 
 void drawGraph(const ModelStats &stats, string title)
 {

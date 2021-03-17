@@ -18,7 +18,16 @@ class DataLoader:
         self.data = odict()
         self.labels = odict()
 
-    def load_all_data(self, globstring, name, include_hlf=True, include_eflow=True, hlf_to_drop=['Energy', 'Flavor']):
+        self.include_hlf = None
+        self.include_eflow = None
+        self.hlf_to_drop = None
+
+    def set_params(self, include_hlf, include_eflow, hlf_to_drop):
+        self.include_hlf = include_hlf
+        self.include_eflow = include_eflow
+        self.hlf_to_drop = hlf_to_drop
+        
+    def load_all_data(self, globstring, name):
     
         """returns...
             - data: full data matrix wrt variables
@@ -34,25 +43,29 @@ class DataLoader:
             raise AttributeError
     
         to_include = []
-        if include_hlf:
+        if self.include_hlf:
             to_include.append("jet_features")
     
-        if include_eflow:
+        if self.include_eflow:
             to_include.append("jet_eflow_variables")
     
-        if not (include_hlf or include_eflow):
+        if not (self.include_hlf or self.include_eflow):
             raise AttributeError
     
         data_loader = DataLoader(name)
+        data_loader.set_params(include_hlf=self.include_hlf,
+                               include_eflow=self.include_eflow,
+                               hlf_to_drop=self.hlf_to_drop)
+        
         for f in files:
             data_loader.add_sample(f)
     
         train_modify = None
     
-        if include_hlf and include_eflow:
-            train_modify = lambda *args, **kwargs: self.all_modify(hlf_to_drop=hlf_to_drop, *args, **kwargs)
-        elif include_hlf:
-            train_modify = lambda *args, **kwargs: self.hlf_modify(hlf_to_drop=hlf_to_drop, *args, **kwargs)
+        if self.include_hlf and self.include_eflow:
+            train_modify = lambda *args, **kwargs: self.all_modify(*args, **kwargs)
+        elif self.include_hlf:
+            train_modify = lambda *args, **kwargs: self.hlf_modify(*args, **kwargs)
         else:
             train_modify = self.eflow_modify
     
@@ -89,11 +102,11 @@ class DataLoader:
     
         return files
 
-    def all_modify(self, tables, hlf_to_drop=['Energy', 'Flavor']):
+    def all_modify(self, tables):
         if not isinstance(tables, list) or isinstance(tables, tuple):
             tables = [tables]
         for i, table in enumerate(tables):
-            tables[i].cdrop(['0'] + hlf_to_drop, inplace=True)
+            tables[i].cdrop(['0'] + self.hlf_to_drop, inplace=True)
         
             newNames = dict()
         
@@ -116,11 +129,11 @@ class DataLoader:
             return tables[0]
         return tables
 
-    def hlf_modify(self, tables, hlf_to_drop=['Energy', 'Flavor']):
+    def hlf_modify(self, tables):
         if not isinstance(tables, list) or isinstance(tables, tuple):
             tables = [tables]
         for i, table in enumerate(tables):
-            tables[i].cdrop(hlf_to_drop, inplace=True)
+            tables[i].cdrop(self.hlf_to_drop, inplace=True)
         if len(tables) == 1:
             return tables[0]
         return tables

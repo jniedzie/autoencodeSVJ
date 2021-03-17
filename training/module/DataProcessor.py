@@ -41,6 +41,9 @@ class DataProcessor():
                   data_ranges=None, norm_args=None, means=None, stds=None,
                   scaler=None):
         
+        if not isinstance(data_table, DataTable):
+            data_table = DataTable(data_table)
+        
         if normalization_type == "Custom":
             if data_ranges is None:
                 print("Custom normalization selected, but no data ranges were provided!")

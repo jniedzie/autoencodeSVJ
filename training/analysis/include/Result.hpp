@@ -27,7 +27,7 @@ public:
   
   void print();
   
-  double trainingLoss, learningRate, validationLoss;
+  double trainingLoss, learningRate, validationLoss, accuracy, validationAccuracy;
 };
 
 #endif /* Result_hpp */

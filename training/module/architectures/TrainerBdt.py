@@ -1,5 +1,3 @@
-from module.DataLoader import DataLoader
-
 import numpy as np
 import datetime
 import pandas as pd
@@ -17,6 +15,7 @@ class TrainerBdt:
                  training_params,
                  training_output_path,
                  data_processor,
+                 data_loader,
                  EFP_base=None,
                  norm_type=None,
                  norm_args=None,
@@ -32,6 +31,7 @@ class TrainerBdt:
         self.training_output_path = training_output_path
         
         self.data_processor = data_processor
+        self.data_loader = data_loader
         
         # Load and split the data
         self.__load_data()
@@ -44,18 +44,10 @@ class TrainerBdt:
         # Build the model
         self.model = self.__get_model()
     
-    def __load_data(self, include_hlf=True, include_eflow=True):
-        data_loader = DataLoader()
+    def __load_data(self):
         
-        (QCD, _, _, _) = data_loader.load_all_data(self.qcd_path, "QCD",
-                                                   include_hlf=include_hlf,
-                                                   include_eflow=include_eflow,
-                                                   hlf_to_drop=self.hlf_to_drop)
-        
-        (SVJ, _, _, _) = data_loader.load_all_data(self.signal_path, "SVJ",
-                                                   include_hlf=include_hlf,
-                                                   include_eflow=include_eflow,
-                                                   hlf_to_drop=self.hlf_to_drop)
+        (QCD, _, _, _) = self.data_loader.load_all_data(self.qcd_path, "QCD")
+        (SVJ, _, _, _) = self.data_loader.load_all_data(self.signal_path, "SVJ")
         
         (QCD_X_train, _, _) = self.data_processor.split_to_train_validate_test(data_table=QCD)
         (SVJ_X_train, _, _) = self.data_processor.split_to_train_validate_test(data_table=SVJ)
@@ -101,13 +93,9 @@ class TrainerBdt:
         """
         Dumps summary of the most recent training to a summary file.
         """
-        
         summary_dict = {
             'training_output_path': self.training_output_path,
             'qcd_path': self.qcd_path,
-            'hlf': True,
-            'hlf_to_drop': tuple(self.hlf_to_drop),
-            'eflow': True,
             'eflow_base': self.EFP_base,
             'norm_type': self.norm_type,
             'norm_args': self.norm_args,

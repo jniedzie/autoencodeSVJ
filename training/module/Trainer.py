@@ -1,37 +1,36 @@
 from module.DataProcessor import DataProcessor
+from module.DataLoader import DataLoader
 import module.SummaryProcessor as summaryProcessor
 import module.utils as utils
 
-from enum import Enum
 import numpy as np
-import sys
-import importlib
 
 
 class Trainer:
-    class ModelTypes(Enum):
-        AutoEncoder = 0
-        Bdt = 1
 
-    ModelTypeNames = {
-        ModelTypes.AutoEncoder: "AutoEncoder",
-        ModelTypes.Bdt: "BDT",
-    }
-
-    def __init__(self, model_trainer_path, validation_data_fraction, test_data_fraction , **kwargs):
+    def __init__(self, model_trainer_path, validation_data_fraction, test_data_fraction,
+                 include_hlf, include_efp, hlf_to_drop, **kwargs):
     
         self.model_class = utils.import_class(model_trainer_path)
         
         self.seed = np.random.randint(0, 99999999)
         self.validation_data_fraction = validation_data_fraction
         self.test_data_fraction = test_data_fraction
+        self.include_hlf = include_hlf
+        self.include_efp = include_efp
+        self.hlf_to_drop = hlf_to_drop
 
         data_processor = DataProcessor(validation_fraction=validation_data_fraction,
                                        test_fraction=test_data_fraction,
                                        seed=self.seed)
 
+        data_loader = DataLoader()
+        data_loader.set_params(include_hlf=include_hlf, include_eflow=include_efp, hlf_to_drop=hlf_to_drop)
+
         utils.set_random_seed(self.seed)
-        self.model_trainer = self.model_class(data_processor=data_processor, **kwargs)
+        self.model_trainer = self.model_class(data_processor=data_processor,
+                                              data_loader=data_loader,
+                                              **kwargs)
         
     def train(self, summaries_path):
         
@@ -48,6 +47,9 @@ class Trainer:
             "seed": self.seed,
             'val_split': self.validation_data_fraction,
             'test_split': self.test_data_fraction,
+            'include_hlf': self.include_hlf,
+            'include_efp': self.include_efp,
+            'hlf_to_drop': tuple(self.hlf_to_drop),
         }
         
         return summary_dict

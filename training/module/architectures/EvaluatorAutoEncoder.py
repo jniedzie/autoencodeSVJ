@@ -5,9 +5,8 @@ from keras.models import model_from_json
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
 import pandas as pd
-from module.DataLoader import DataLoader
-from module.DataTable import DataTable
 import pickle
+
 
 class EvaluatorAutoEncoder:
     def __init__(self, input_path):
@@ -16,15 +15,9 @@ class EvaluatorAutoEncoder:
             key = path.split("/")[-3]
             self.signal_dict[key] = path
         
-    def get_qcd_test_data(self, summary, data_processor, normalize=False):
-        data_loader = DataLoader()
-        (data, _, _, _) = data_loader.load_all_data(globstring=summary.qcd_path,
-                                                    name="QCD",
-                                                    include_hlf=summary.hlf,
-                                                    include_eflow=summary.eflow,
-                                                    hlf_to_drop=summary.hlf_to_drop,
-                                                    )
-    
+    def get_qcd_test_data(self, summary, data_processor, data_loader, normalize=False):
+        
+        (data, _, _, _) = data_loader.load_all_data(globstring=summary.qcd_path, name="QCD")
         (_, _, test) = data_processor.split_to_train_validate_test(data)
 
         if normalize:
@@ -34,15 +27,9 @@ class EvaluatorAutoEncoder:
         
         return test
     
+    def get_signal_test_data(self, name, path, summary, data_processor, data_loader, normalize=False, scaler=None):
         
-    def get_signal_test_data(self, name, path, summary, data_processor, normalize=False, scaler=None):
-        data_loader = DataLoader()
-        (data, _, _, _) = data_loader.load_all_data(globstring=path,
-                                                    name=name,
-                                                    include_hlf=summary.hlf,
-                                                    include_eflow=summary.eflow,
-                                                    hlf_to_drop=summary.hlf_to_drop,
-                                                    )
+        (data, _, _, _) = data_loader.load_all_data(globstring=path, name=name)
         (_, _, test) = data_processor.split_to_train_validate_test(data)
         
         if normalize:
@@ -61,10 +48,10 @@ class EvaluatorAutoEncoder:
 
         model = self.__load_model(summary)
         
-        reconstructed = DataTable(pd.DataFrame(model.predict(input_data_normed.data),
-                                               columns=input_data_normed.columns,
-                                               index=input_data_normed.index,
-                                               dtype="float64"))
+        reconstructed = pd.DataFrame(model.predict(input_data_normed.data),
+                                     columns=input_data_normed.columns,
+                                     index=input_data_normed.index,
+                                     dtype="float64")
 
         reconstructed_denormed = data_processor.normalize(data_table=reconstructed,
                                                           normalization_type=summary.norm_type,
@@ -83,7 +70,7 @@ class EvaluatorAutoEncoder:
         
         return error
         
-    def get_aucs(self, summary, AUCs_path, filename, data_processor, **kwargs):
+    def get_aucs(self, summary, AUCs_path, filename, data_processor, data_loader, **kwargs):
         
         auc_path = AUCs_path + "/" + filename
     
@@ -99,6 +86,7 @@ class EvaluatorAutoEncoder:
     
         aucs = self.__get_aucs(summary=summary,
                                data_processor=data_processor,
+                               data_loader=data_loader,
                                model=model,
                                loss_function=summary.loss
                                )
@@ -108,15 +96,15 @@ class EvaluatorAutoEncoder:
         
         return (aucs, auc_path, append, write_header)
 
-    def draw_roc_curves(self, summary, data_processor, ax, colors, signals, **kwargs):
+    def draw_roc_curves(self, summary, data_processor, data_loader, ax, colors, signals, **kwargs):
 
         qcd_key = "qcd"
         all_data = {
-            qcd_key: self.get_qcd_test_data(summary, data_processor, normalize=True)
+            qcd_key: self.get_qcd_test_data(summary, data_processor, data_loader, normalize=True)
         }
 
         for name, path in signals.items():
-            all_data[name] = self.get_signal_test_data(name, path, summary, data_processor,
+            all_data[name] = self.get_signal_test_data(name, path, summary, data_processor, data_loader,
                                                        normalize=True, scaler = all_data[qcd_key].scaler)
         
         errors = {}
@@ -171,17 +159,18 @@ class EvaluatorAutoEncoder:
         
         return model
 
-    def __get_aucs(self, summary, data_processor, model, loss_function, test_key='qcd'):
+    def __get_aucs(self, summary, data_processor, data_loader, model, loss_function, test_key='qcd'):
         
         normed = {
-            test_key: self.get_qcd_test_data(summary, data_processor, normalize=True)
+            test_key: self.get_qcd_test_data(summary, data_processor, data_loader, normalize=True)
         }
     
         for name, path in self.signal_dict.items():
             if name == test_key: continue
 
             normed[name] = self.get_signal_test_data(name=name, path=path,
-                                                     summary=summary, data_processor=data_processor,
+                                                     summary=summary,
+                                                     data_processor=data_processor, data_loader= data_loader,
                                                      normalize=True, scaler=normed[test_key].scaler)
 
         errors = {}

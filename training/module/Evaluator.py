@@ -8,6 +8,7 @@ import numpy as np
 import module.SummaryProcessor as summaryProcessor
 import module.utils as utils
 from module.DataProcessor import DataProcessor
+from module.DataLoader import DataLoader
 
 plt.rcParams['figure.figsize'] = (10,10)
 plt.rcParams.update({'font.size': 18})
@@ -35,11 +36,13 @@ class Evaluator:
             filename = summary.training_output_path.split("/")[-1]
             utils.set_random_seed(summary.seed)
             data_processor = DataProcessor(summary=summary)
+            data_loader = self.__get_data_loader(summary)
             
             auc_params = self.model_evaluator.get_aucs(summary=summary,
                                                        AUCs_path=AUCs_path,
                                                        filename=filename,
                                                        data_processor=data_processor,
+                                                       data_loader=data_loader,
                                                        **kwargs
                                                        )
             if auc_params is None:
@@ -77,9 +80,11 @@ class Evaluator:
             utils.set_random_seed(summary.seed)
             kwargs["filename"] = summary.training_output_path.split("/")[-1]
             data_processor = DataProcessor(summary=summary)
-        
+            data_loader = self.__get_data_loader(summary)
+            
             self.model_evaluator.draw_roc_curves(summary=summary,
                                                  data_processor=data_processor,
+                                                 data_loader=data_loader,
                                                  ax=ax,
                                                  colors=colors,
                                                  **kwargs
@@ -150,19 +155,31 @@ class Evaluator:
     def get_qcd_test_data(self, summary):
         utils.set_random_seed(summary.seed)
         data_processor = DataProcessor(summary=summary)
-        return self.model_evaluator.get_qcd_test_data(summary, data_processor)
+        data_loader = self.__get_data_loader(summary)
+        return self.model_evaluator.get_qcd_test_data(summary, data_processor, data_loader)
 
     def get_signal_test_data(self, name, path, summary):
         utils.set_random_seed(summary.seed)
         data_processor = DataProcessor(summary=summary)
-        return self.model_evaluator.get_signal_test_data(name, path, summary, data_processor)
+        data_loader = self.__get_data_loader(summary)
+        return self.model_evaluator.get_signal_test_data(name, path, summary, data_processor, data_loader)
 
     def get_reconstruction(self, input_data, summary):
         utils.set_random_seed(summary.seed)
         data_processor = DataProcessor(summary=summary)
+        data_loader = self.__get_data_loader(summary)
         return self.model_evaluator.get_reconstruction(input_data, summary, data_processor)
 
     def get_error(self, input_data, summary):
         utils.set_random_seed(summary.seed)
         data_processor = DataProcessor(summary=summary)
+        data_loader = self.__get_data_loader(summary)
         return self.model_evaluator.get_error(input_data, summary, data_processor)
+    
+    def __get_data_loader(self, summary):
+        data_loader = DataLoader()
+        data_loader.set_params(include_hlf=summary.include_hlf,
+                               include_eflow=summary.include_efp,
+                               hlf_to_drop=summary.hlf_to_drop
+                               )
+        return data_loader
