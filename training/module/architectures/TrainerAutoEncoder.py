@@ -4,40 +4,42 @@ from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TerminateOnNaN, Mo
 
 class TrainerAutoEncoder:
     
-    def __init__(self,
-                 qcd_path,
-                 training_params,
-                 training_output_path,
-                 data_processor,
-                 data_loader,
-                 EFP_base=None,
-                 norm_type="",
-                 norm_args=None,
-                 verbose=True
-                 ):
+    def __init__(
+            self,
+            data_processor,
+            data_loader,
+            # Architecture specific arguments:
+            qcd_path,
+            training_params,
+            training_output_path,
+            EFP_base=None,
+            norm_type=None,
+            norm_args=None,
+            verbose=True
+    ):
         """
-        Creates auto-encoder trainer with random seed, provided training parameters and architecture.
-        Loads specified data, splits them into training, validation and test samples according to
-        provided arguments. Normalizes the data as specified by norm_percentile.
-        High-level features specified in hlf_to_drop will not be used for training.
+        Constructor of the specialized Trainer class.
+        data_processor and data_loader fields are mandatory and will be passed, ready to be used.
+        Names of the remaining arguments match keys of the "training_settings" dict from the config.
         """
-        self.qcd_path = qcd_path
-        self.EFP_base = EFP_base
-        
-        self.training_params = training_params
-        self.training_output_path = training_output_path
-        
+
+        # Save data processor and data loader for later use
         self.data_processor = data_processor
         self.data_loader = data_loader
-        
+
+        # Save other options passed from the config
+        self.qcd_path = qcd_path
+        self.training_params = training_params
+        self.training_output_path = training_output_path
+        self.EFP_base = EFP_base
+        self.norm_type = norm_type
+        self.norm_args = norm_args
         self.verbose = verbose
 
         # Load and split the data
         self.__load_data()
         
         # Normalize the input
-        self.norm_type = norm_type
-        self.norm_args = norm_args
         self.__normalize_data()
         
         # Build the model
@@ -46,32 +48,39 @@ class TrainerAutoEncoder:
 
     @property
     def model(self):
+        """
+        @mandatory
+        Property that should return the model
+        """
         return self.__model
 
     def __load_data(self):
-        
-        # Load QCD samples
+        """
+        Loading and splitting the data for the training, using data loader and data processor.
+        """
         (self.qcd, _, _, _) = self.data_loader.load_all_data(self.qcd_path, "QCD")
         (self.train_data, self.validation_data, _) = self.data_processor.split_to_train_validate_test(data_table=self.qcd)
 
     def __normalize_data(self):
+        """
+        Preparing normalized version of the training data
+        """
+        
         print("Trainer scaler: ", self.norm_type)
         print("Trainer scaler args: ", self.norm_args)
     
         self.train_data_normalized = self.data_processor.normalize(data_table=self.train_data,
                                                                    normalization_type=self.norm_type,
-                                                                   norm_args=self.norm_args
-                                                                   )
+                                                                   norm_args=self.norm_args)
     
         self.validation_data_normalized = self.data_processor.normalize(data_table=self.validation_data,
                                                                         normalization_type=self.norm_type,
-                                                                        norm_args=self.norm_args
-                                                                        )
+                                                                        norm_args=self.norm_args)
 
     def train(self):
         """
-        Runs the training on data loaded and prepared in the constructor, according to training params
-        specified in the constructor
+        @mandatory
+        Runs the training of the previously prepared model on the normalized data
         """
         
         print("Filename: ", self.training_output_path)
@@ -100,7 +109,9 @@ class TrainerAutoEncoder:
 
     def get_summary(self):
         """
-        Dumps summary of the most recent training to a summary file.
+        @mandatory
+        Add additional information to be stored in the summary file. Can return empty dict if
+        no additional information is needed.
         """
         summary_dict = {
             'training_output_path': self.training_output_path,
@@ -154,6 +165,9 @@ class TrainerAutoEncoder:
         return autoencoder
     
     def __get_callbacks(self):
+        """
+        Initializes and returns training callbacks
+        """
         callbacks = [
             EarlyStopping(monitor='val_loss',
                           patience=self.training_params["es_patience"],
