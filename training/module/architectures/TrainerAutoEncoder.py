@@ -1,8 +1,5 @@
-import datetime
 import keras
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TerminateOnNaN, ModelCheckpoint, CSVLogger
-from pathlib import Path
-import os, pickle
 
 
 class TrainerAutoEncoder:
@@ -45,7 +42,11 @@ class TrainerAutoEncoder:
         
         # Build the model
         self.input_size = len(self.qcd.columns)
-        self.model = self.__get_model()
+        self.__model = self.__get_model()
+
+    @property
+    def model(self):
+        return self.__model
 
     def __load_data(self):
         
@@ -73,24 +74,19 @@ class TrainerAutoEncoder:
         specified in the constructor
         """
         
-        
-    
-        print("\n\nTraining the model")
         print("Filename: ", self.training_output_path)
         print("Number of training samples: ", len(self.train_data_normalized.data))
         print("Number of validation samples: ", len(self.validation_data_normalized.data))
     
         if self.verbose:
-            self.model.summary()
+            self.__model.summary()
             print("\nTraining params:")
             for arg in self.training_params:
                 print((arg, ":", self.training_params[arg]))
     
-        self.start_timestamp = datetime.datetime.now()
-    
         callbacks = self.__get_callbacks()
 
-        self.model.fit(
+        self.__model.fit(
             x=self.train_data_normalized.data,
             y=self.train_data_normalized.data,
             validation_data=(self.validation_data_normalized.data, self.validation_data_normalized.data),
@@ -100,14 +96,7 @@ class TrainerAutoEncoder:
             callbacks=callbacks
         )
         
-        pickle_output_path = self.training_output_path + ".pkl"
-        Path(os.path.dirname(pickle_output_path)).mkdir(parents=True, exist_ok=True)
-        pickle.dump(self.model.to_json(), open(pickle_output_path, 'wb'))
-
         print("\ntrained {} epochs!", self.training_params["epochs"], "\n")
-        print("model saved")
-        self.end_timestamp = datetime.datetime.now()
-        print("Training executed in: ", (self.end_timestamp - self.start_timestamp), " s")
 
     def get_summary(self):
         """
@@ -123,8 +112,6 @@ class TrainerAutoEncoder:
             'norm_args': self.norm_args,
             'input_dim': self.input_size,
             'arch': self.__get_architecture_summary(),
-            'start_time': str(self.start_timestamp),
-            'end_time': str(self.end_timestamp),
         }
         
         summary_dict = {**summary_dict, **self.training_params}

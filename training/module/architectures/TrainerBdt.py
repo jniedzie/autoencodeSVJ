@@ -1,9 +1,5 @@
 import numpy as np
-import datetime
 import pandas as pd
-import pickle, os
-from pathlib import Path
-from datetime import datetime
 from sklearn.ensemble import AdaBoostClassifier
 
 
@@ -42,7 +38,11 @@ class TrainerBdt:
         self.__normalize_data()
   
         # Build the model
-        self.model = self.__get_model()
+        self.__model = self.__get_model()
+    
+    @property
+    def model(self):
+        return self.__model
     
     def __load_data(self):
         
@@ -75,19 +75,8 @@ class TrainerBdt:
         Runs the training on data loaded and prepared in the constructor, according to training params
         specified in the constructor
         """
-        
-        print("\n\nTraining the model")
         print("Filename: ", self.training_output_path)
-        
-        self.start_timestamp = datetime.now()
-        # self.model.fit(self.train_data_normalized, self.train_labels)
-        self.end_timestamp = datetime.now()
-
-        pickle_output_path = self.training_output_path + ".pkl"
-        Path(os.path.dirname(pickle_output_path)).mkdir(parents=True, exist_ok=True)
-        pickle.dump(self.model, open(pickle_output_path, 'wb'))
-        
-        print("model saved")
+        self.__model.fit(self.train_data_normalized, self.train_labels)
     
     def get_summary(self):
         """
@@ -99,8 +88,6 @@ class TrainerBdt:
             'eflow_base': self.EFP_base,
             'norm_type': self.norm_type,
             'norm_args': self.norm_args,
-            'start_time': str(self.start_timestamp),
-            'end_time': str(self.end_timestamp),
         }
         
         return summary_dict
