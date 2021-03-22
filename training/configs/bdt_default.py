@@ -37,17 +37,10 @@ stat_hists_path = output_path+"stat_hists.root"
 # ---------------------------------------------
 # Training parameters
 training_params = {
-    'batch_size': 32,
-    'loss': 'mse',
-    'optimizer': 'adam',
-    'epochs': 200,
-    'learning_rate': 0.00051,
-    'es_patience': 12,
-    'lr_patience': 9,
-    'lr_factor': 0.5
+    "algorithm": "SAMME",
+    "n_estimators": 800,
+    "learning_rate": 0.5,
 }
-
-
 
 # ---------------------------------------------
 # Number of models to train

@@ -67,7 +67,7 @@ class TrainerBdt:
                                                                    norm_args=self.norm_args)
     
     def __get_model(self):
-        model = AdaBoostClassifier(algorithm='SAMME', n_estimators=800, learning_rate=0.5)
+        model = AdaBoostClassifier(**self.training_params)
         return model
     
     def train(self):
@@ -80,7 +80,7 @@ class TrainerBdt:
         print("Filename: ", self.training_output_path)
         
         self.start_timestamp = datetime.now()
-        self.model.fit(self.train_data_normalized, self.train_labels)
+        # self.model.fit(self.train_data_normalized, self.train_labels)
         self.end_timestamp = datetime.now()
 
         pickle_output_path = self.training_output_path + ".pkl"
@@ -91,7 +91,7 @@ class TrainerBdt:
     
     def get_summary(self):
         """
-        Dumps summary of the most recent training to a summary file.
+        Add additional information to be stored in the summary file
         """
         summary_dict = {
             'training_output_path': self.training_output_path,
