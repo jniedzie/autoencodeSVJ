@@ -31,6 +31,7 @@ class EvaluatorAutoEncoder:
         
         (data, _, _, _) = data_loader.load_all_data(globstring=path, name=name)
         (_, _, test) = data_processor.split_to_train_validate_test(data)
+        test=data
         
         if normalize:
             test = data_processor.normalize(data_table=test,
@@ -40,11 +41,12 @@ class EvaluatorAutoEncoder:
         
         return test
         
-    def get_reconstruction(self, input_data, summary, data_processor):
+    def get_reconstruction(self, input_data, summary, data_processor, scaler):
     
         input_data_normed = data_processor.normalize(data_table=input_data,
                                                      normalization_type=summary.norm_type,
-                                                     norm_args=summary.norm_args)
+                                                     norm_args=summary.norm_args,
+                                                     scaler=scaler)
 
         model = self.__load_model(summary)
         
@@ -53,22 +55,25 @@ class EvaluatorAutoEncoder:
                                      index=input_data_normed.index,
                                      dtype="float64")
 
+        descaler = input_data.scaler if scaler is None else scaler
+
         reconstructed_denormed = data_processor.normalize(data_table=reconstructed,
                                                           normalization_type=summary.norm_type,
                                                           norm_args=summary.norm_args,
-                                                          scaler=input_data.scaler,
+                                                          scaler=descaler,
                                                           inverse=True)
         
         return reconstructed_denormed
         
-    def get_error(self, input_data, summary, data_processor):
-        recon = self.get_reconstruction(input_data, summary, data_processor)
+    def get_error(self, input_data, summary, data_processor, scaler):
+        recon = self.get_reconstruction(input_data, summary, data_processor, scaler)
+        
+        print("Calculating error using loss: ", summary.loss)
         
         func = getattr(keras.losses, summary.loss)
         losses = keras.backend.eval(func(input_data.data, recon))
-        error = keras.backend.eval(losses.tolist())
         
-        return error
+        return losses.tolist()
         
     def get_aucs(self, summary, AUCs_path, filename, data_processor, data_loader, **kwargs):
         
@@ -84,6 +89,10 @@ class EvaluatorAutoEncoder:
     
         model = self.__load_model(summary)
     
+        print("using summary: ", summary)
+        print("AUCs path:", auc_path)
+        print("filename: ", filename)
+    
         aucs = self.__get_aucs(summary=summary,
                                data_processor=data_processor,
                                data_loader=data_loader,
@@ -91,37 +100,39 @@ class EvaluatorAutoEncoder:
                                loss_function=summary.loss
                                )
         
+        print("aucs: ", aucs)
+        
         append = False
         write_header = True
         
         return (aucs, auc_path, append, write_header)
 
-    def draw_roc_curves(self, summary, data_processor, data_loader, ax, colors, signals, **kwargs):
+    def draw_roc_curves(self, summary, data_processor, data_loader, ax, colors, signals, test_key="qcd", **kwargs):
 
-        qcd_key = "qcd"
-        all_data = {
-            qcd_key: self.get_qcd_test_data(summary, data_processor, data_loader, normalize=True)
+        
+        normed = {
+            test_key: self.get_qcd_test_data(summary, data_processor, data_loader, normalize=True)
         }
 
         for name, path in signals.items():
-            all_data[name] = self.get_signal_test_data(name, path, summary, data_processor, data_loader,
-                                                       normalize=True, scaler = all_data[qcd_key].scaler)
+            normed[name] = self.get_signal_test_data(name, path, summary, data_processor, data_loader,
+                                                       normalize=True, scaler = normed[test_key].scaler)
         
         errors = {}
         model = self.__load_model(summary)
 
-        for key, data in all_data.items():
+        for key, data in normed.items():
             recon = pd.DataFrame(model.predict(data.data), columns=data.columns, index=data.index, dtype="float64")
             func = getattr(keras.losses, summary.loss)
             losses = keras.backend.eval(func(data.data, recon))
-            errors[key] = keras.backend.eval(losses.tolist())
+            errors[key] = losses.tolist()
 
         signals_errors = {}
         
         for signal in signals:
             signals_errors[signal] = errors[signal]
 
-        qcd_errors = errors[qcd_key]
+        qcd_errors = errors[test_key]
 
         self.__roc_auc_plot(qcd_errors, signals_errors, ax, colors)
 
@@ -179,7 +190,7 @@ class EvaluatorAutoEncoder:
             recon = pd.DataFrame(model.predict(data.data), columns=data.columns, index=data.index, dtype="float64")
             func = getattr(keras.losses, loss_function)
             losses = keras.backend.eval(func(data.data, recon))
-            errors[key] = keras.backend.eval(losses.tolist())
+            errors[key] = losses.tolist()
     
         background_errors = errors[test_key]
         background_labels = [0] * len(background_errors)

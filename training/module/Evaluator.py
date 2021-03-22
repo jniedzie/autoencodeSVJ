@@ -152,11 +152,11 @@ class Evaluator:
             colors = cm.rainbow(np.linspace(0, 1, n_plots))
         return fig, on_axis_begin, on_axis_end, on_plot_end, colors
 
-    def get_qcd_test_data(self, summary):
+    def get_qcd_test_data(self, summary, normalize=False):
         utils.set_random_seed(summary.seed)
         data_processor = DataProcessor(summary=summary)
         data_loader = self.__get_data_loader(summary)
-        return self.model_evaluator.get_qcd_test_data(summary, data_processor, data_loader)
+        return self.model_evaluator.get_qcd_test_data(summary, data_processor, data_loader, normalize=normalize)
 
     def get_signal_test_data(self, name, path, summary):
         utils.set_random_seed(summary.seed)
@@ -164,17 +164,15 @@ class Evaluator:
         data_loader = self.__get_data_loader(summary)
         return self.model_evaluator.get_signal_test_data(name, path, summary, data_processor, data_loader)
 
-    def get_reconstruction(self, input_data, summary):
+    def get_reconstruction(self, input_data, summary, scaler=None):
         utils.set_random_seed(summary.seed)
         data_processor = DataProcessor(summary=summary)
-        data_loader = self.__get_data_loader(summary)
-        return self.model_evaluator.get_reconstruction(input_data, summary, data_processor)
+        return self.model_evaluator.get_reconstruction(input_data, summary, data_processor,scaler)
 
-    def get_error(self, input_data, summary):
+    def get_error(self, input_data, summary, scaler=None):
         utils.set_random_seed(summary.seed)
         data_processor = DataProcessor(summary=summary)
-        data_loader = self.__get_data_loader(summary)
-        return self.model_evaluator.get_error(input_data, summary, data_processor)
+        return self.model_evaluator.get_error(input_data, summary, data_processor, scaler)
     
     def __get_data_loader(self, summary):
         data_loader = DataLoader()

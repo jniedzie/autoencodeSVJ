@@ -16,9 +16,10 @@ config_path = args.config_path.strip(".py").replace("/", ".")
 config = importlib.import_module(config_path)
 
 # masses = [1500, 2000, 2500, 3000, 3500, 4000]
-masses = [2500]
+# masses = [2500, 3000, 3500, 4000]
+masses = [1500]
 # rinvs = [0.15, 0.30, 0.45, 0.60, 0.75]
-rinvs = [0.45]
+rinvs = [0.30]
 
 
 def get_signals():
@@ -30,26 +31,31 @@ def get_signals():
 
 
 def get_summary():
-    summaries = summaryProcessor.get_summaries_from_path(config.summary_path)
+    summary_path = config.summary_path + config.file_name + "_v" + str(config.best_model) + ".summary"
+    print("Loading summary from path: ", summary_path)
+    summary = summaryProcessor.get_summary_from_path(summary_path)
     
-    summary = None
-    
-    for _, s in summaries.df.iterrows():
-        version = summaryProcessor.get_version(s.summary_path)
-        if version != config.best_model:
-            continue
+    for _, s in summary.df.iterrows():
         summary = s
-        
+    
     return summary
 
 
 def get_losses():
+    
+    print("Reading files for training: ", config.file_name)
+    
     evaluator = Evaluator(model_evaluator_path=config.model_evaluator_path,
                           input_path=config.input_path)
 
     summary = get_summary()
+    
+    print("Summary found: ", summary)
+    
     qcd_data = evaluator.get_qcd_test_data(summary=summary)
     qcd_loss = evaluator.get_error(qcd_data, summary=summary)
+    
+    scaler = qcd_data.scaler
     
     signals_losses = []
     signals = get_signals()
@@ -57,7 +63,7 @@ def get_losses():
     for name, path in signals.items():
         
         signal_data = evaluator.get_signal_test_data(name, path, summary)
-        signal_loss = evaluator.get_error(signal_data, summary=summary)
+        signal_loss = evaluator.get_error(signal_data, summary=summary, scaler=scaler)
         signals_losses.append(signal_loss)
     
     return qcd_loss, signals_losses

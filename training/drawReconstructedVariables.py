@@ -95,6 +95,7 @@ evaluator = Evaluator(model_evaluator_path="module/architectures/EvaluatorAutoEn
 
 summary = get_summary()
 qcd_data = evaluator.get_qcd_test_data(summary=summary)
+# qcd_reconstructed = evaluator.get_qcd_test_data(summary=summary, normalize=True)
 qcd_reconstructed = evaluator.get_reconstruction(input_data=qcd_data, summary=summary)
 
 

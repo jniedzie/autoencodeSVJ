@@ -60,7 +60,15 @@ def get_summaries_from_path(path):
         return None
     
     return DataTable(pd.DataFrame(data), name='summary')
+
+
+def get_summary_from_path(path):
     
+    with open(path) as to_read:
+        data = json.load(to_read)
+        data['time'] = datetime.datetime.fromtimestamp(os.path.getmtime(path))
+    
+    return DataTable(pd.DataFrame([data]), name='summary')
 
 def get_last_summary_file_version(summary_path, filename):
     summary_search_path = summary_path + filename + "_v*"
