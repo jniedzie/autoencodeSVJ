@@ -21,24 +21,12 @@ training_general_settings = {
 
 # ---------------------------------------------
 # Path to training data
-# efp_base = 4
 efp_base = 4
-qcd_path = None
-signals_base_path = None
-
-if efp_base == 3:
-    qcd_path = "../../data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8/*.h5"
-    signals_base_path = "../../data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8/"
-elif efp_base == 4:
-    qcd_path = "../../data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp4/*.h5"
-    signals_base_path = "../../data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp4/"
-else:
-    print("Invalid EFP base:", efp_base)
-    qcd_path = None
-    signals_base_path = None
+qcd_path = "../../data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8/base_{}/*.h5".format(efp_base)
+signals_base_path = "../../data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8/"
 
 # Path to testing data
-input_path = signals_base_path+"/*/base_3/*.h5"
+input_path = signals_base_path+"/*/base_{}/*.h5".format(efp_base)
 
 # ---------------------------------------------
 # Output paths

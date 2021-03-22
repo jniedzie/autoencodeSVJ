@@ -17,15 +17,14 @@ training_general_settings = {
     "hlf_to_drop": ['Energy', 'Flavor'],
 }
 
+efp_base = 4
+
 # ---------------------------------------------
 # Path to training data
-
-efp_base = 4
-qcd_path = "../../data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp4/*.h5"
+qcd_path = "../../data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8/base_{}/*.h5".format(efp_base)
 
 # Path to testing data
-signals_base_path = "../../data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp4/"
-input_path = signals_base_path+"/*/base_3/*.h5"
+signals_base_path = "../../data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8/"
 
 # ---------------------------------------------
 # Output paths

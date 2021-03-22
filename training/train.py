@@ -43,7 +43,7 @@ for i in range(config.n_models):
     if config.model_type == "BDT":
     
         signal_name = get_sigal_name_for_index(args.i_sample)
-        signal_path = config.signals_base_path + "/" + signal_name + "/base_3/*.h5"
+        signal_path = config.signals_base_path + "/" + signal_name + "/base_{}/*.h5".format(config.efp_base)
         training_setting["signal_path"] = signal_path
         
         file_name += "_" + signal_name
