@@ -6,11 +6,21 @@
 
 # Model type
 model_type = "BDT"
-model_trainer_path = "module/architectures/TrainerBdt.py"
 model_evaluator_path = "module/architectures/EvaluatorBdt.py"
+
+training_general_settings = {
+    "model_trainer_path": "module/architectures/TrainerBdt.py",
+    "validation_data_fraction": 0.0,
+    "test_data_fraction": 0.2,
+    "include_hlf": True,
+    "include_efp": True,
+    "hlf_to_drop": ['Energy', 'Flavor'],
+}
 
 # ---------------------------------------------
 # Path to training data
+
+efp_base = 4
 qcd_path = "../../data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp4/*.h5"
 
 # Path to testing data
@@ -38,13 +48,7 @@ training_params = {
     'lr_factor': 0.5
 }
 
-efp_base = 4
-include_hlf = True
-include_efp = True
-hlf_to_drop = ['Energy', 'Flavor']
 
-validation_data_fraction=0.0
-test_data_fraction=0.2
 
 # ---------------------------------------------
 # Number of models to train
@@ -56,10 +60,6 @@ norm_type = "None"
 
 # Set parameters for the selected normalization
 normalizations = {
-    # Custom implementation of robust scaler
-    "Custom": {
-        "norm_percentile": 25
-    },
     # https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html#sklearn.preprocessing.RobustScaler
     "RobustScaler": {
         "quantile_range": (0.25, 0.75),
@@ -82,15 +82,9 @@ normalizations = {
     "MaxAbsScaler": {
         "copy": True,
     },
-    # Custom implementation of the StandardScaler
-    "CustomStandard": {
-    },
     # Don't apply any scaling at all
-    "None": {
-    }
+    "None": {}
 }
-
-norm_args = normalizations[norm_type]
 
 # ---------------------------------------------
 # Once the training is done, you can specify
@@ -106,3 +100,13 @@ n_events_per_class = 10000
 # ---------------------------------------------
 # Output file names
 file_name = "hlf_eflow_{}".format(efp_base)
+
+# ---------------------------------------------
+# Build specific training settings dictionary (this will be passed to the specialized trainer class)
+training_settings = {
+    "qcd_path": qcd_path,
+    "training_params": training_params,
+    "EFP_base": efp_base,
+    "norm_type": norm_type,
+    "norm_args": normalizations[norm_type],
+}

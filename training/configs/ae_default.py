@@ -5,28 +5,54 @@
 
 # Model type
 model_type = "AutoEncoder"
-model_trainer_path = "module/architectures/TrainerAutoEncoder.py"
 model_evaluator_path = "module/architectures/EvaluatorAutoEncoder.py"
 
 # ---------------------------------------------
+# Build general training settings dictionary
+
+training_general_settings = {
+    "model_trainer_path": "module/architectures/TrainerAutoEncoder.py",
+    "validation_data_fraction": 0.15,
+    "test_data_fraction": 0.15,
+    "include_hlf": True,
+    "include_efp": True,
+    "hlf_to_drop": ['Energy', 'Flavor'],
+}
+
+# ---------------------------------------------
 # Path to training data
-# qcd_path = "../../data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8/*.h5"
-qcd_path = "../../data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp4/*.h5"
+# efp_base = 4
+efp_base = 4
+qcd_path = None
+signals_base_path = None
+
+if efp_base == 3:
+    qcd_path = "../../data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8/*.h5"
+    signals_base_path = "../../data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8/"
+elif efp_base == 4:
+    qcd_path = "../../data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp4/*.h5"
+    signals_base_path = "../../data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp4/"
+else:
+    print("Invalid EFP base:", efp_base)
+    qcd_path = None
+    signals_base_path = None
 
 # Path to testing data
-# signals_base_path = "../../data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8/"
-signals_base_path = "../../data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp4/"
 input_path = signals_base_path+"/*/base_3/*.h5"
 
 # ---------------------------------------------
 # Output paths
 # output_path = "trainingResults_previous_default/"
-output_path = "trainingResults_new_default/"
+# output_path = "trainingResults_new_default/"
+# output_path = "trainingResults_archs/"
+# output_path = "trainingResults_new_config/"
+output_path = "trainingResults_test/"
 
 summary_path = output_path+"summary/"
 results_path = output_path+"trainingRuns/"
 AUCs_path = output_path+"aucs/"
 stat_hists_path = output_path+"stat_hists.root"
+
 
 # ---------------------------------------------
 # Training parameters
@@ -36,10 +62,10 @@ training_params = {
 
     # losses documentation
     # https://keras.io/api/losses/regression_losses
-    # 'loss': 'mean_absolute_error',
+    'loss': 'mean_absolute_error',
     # 'loss': 'mean_squared_error',
     # 'loss': 'mean_absolute_percentage_error',
-    'loss': 'mean_squared_logarithmic_error', ##
+    # 'loss': 'mean_squared_logarithmic_error', ##
     # 'loss': 'cosine_similarity',
     # 'loss': 'huber',
     # 'loss': 'log_cosh',
@@ -58,31 +84,25 @@ training_params = {
     'metric': 'accuracy',
 
     # 'epochs': 200,
-    'epochs': 400, ##
+    'epochs': 2, ##
     
     'learning_rate': 0.00051,
     'es_patience': 12,
     'lr_patience': 9,
     'lr_factor': 0.5,
     
-    # "bottleneck_size": 8,
-    "bottleneck_size": 6, ##
+    # "bottleneck_size": 10, ##
+    "bottleneck_size": 8,
+    
     "intermediate_architecture": (30, 30),
     
 }
 
-efp_base = 4
 
-include_hlf = True
-include_efp = True
-hlf_to_drop = ['Energy', 'Flavor']
-
-validation_data_fraction = 0.15
-test_data_fraction = 0.15
 
 # ---------------------------------------------
 # Number of models to train
-n_models = 10
+n_models = 1
 
 # ---------------------------------------------
 # Pick normalization type (definitions below):
@@ -124,13 +144,12 @@ normalizations = {
     }
 }
 
-norm_args = normalizations[norm_type]
-
 # ---------------------------------------------
 # Once the training is done, you can specify
 # which model was the best and use it for
 # further tests/plotting
-best_model = 0
+best_model = 0 ## new
+# best_model = 9 ## old
 
 # ---------------------------------------------
 # Statistical analysis parameters
@@ -140,4 +159,30 @@ n_events_per_class = 10000
 # ---------------------------------------------
 # Output file names
 # file_name = "hlf_eflow_{}_bottle_{}_default".format(efp_base, training_params["bottleneck_size"])
-file_name = "hlf_eflow_{}_bottle_{}_new_default".format(efp_base, training_params["bottleneck_size"])
+
+arch_summary = str(training_params["intermediate_architecture"]).replace("(","").replace(")","").replace(",","_").replace(" ","_")
+
+# file_name = "hlf_eflow_{}_bottle_{}_arch_{}_loss_{}_batch_size_{}".format(efp_base,
+#                                                                           training_params["bottleneck_size"],
+#                                                                           arch_summary,
+#                                                                           training_params["loss"],
+#                                                                           training_params["batch_size"],
+#                                                                           )
+
+file_name = "hlf_bottle_{}_arch_{}_loss_{}_batch_size_{}".format(efp_base,
+                                                                          training_params["bottleneck_size"],
+                                                                          arch_summary,
+                                                                          training_params["loss"],
+                                                                          training_params["batch_size"],
+                                                                          )
+
+
+# ---------------------------------------------
+# Build specific training settings dictionary (this will be passed to the specialized trainer class)
+training_settings = {
+    "qcd_path": qcd_path,
+    "training_params": training_params,
+    "EFP_base": efp_base,
+    "norm_type": norm_type,
+    "norm_args": normalizations[norm_type],
+}

@@ -8,8 +8,16 @@ import numpy as np
 
 class Trainer:
 
-    def __init__(self, model_trainer_path, validation_data_fraction, test_data_fraction,
-                 include_hlf, include_efp, hlf_to_drop, **kwargs):
+    def __init__(self,
+                 # general settings of the training
+                 model_trainer_path,
+                 validation_data_fraction,
+                 test_data_fraction,
+                 include_hlf,
+                 include_efp,
+                 hlf_to_drop,
+                 # arguments that will be passed to the specialized trainer class
+                 **training_settings):
     
         self.model_class = utils.import_class(model_trainer_path)
         
@@ -30,7 +38,7 @@ class Trainer:
         utils.set_random_seed(self.seed)
         self.model_trainer = self.model_class(data_processor=data_processor,
                                               data_loader=data_loader,
-                                              **kwargs)
+                                              **training_settings)
         
     def train(self, summaries_path):
         
