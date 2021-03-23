@@ -114,7 +114,7 @@ class Converter:
                     self.trees[path] = file[key]
                 
                     if file[key]["JetPFCandsAK4_jetIdx"] is not None:
-                        self.input_types[path] = InputTypes.PFnanoAOD102X
+                        self.input_types[path] = InputTypes.PFnanoAOD106X
                     elif file[key]["JetPFCands_jetIdx"] is not None:
                         self.input_types[path] = InputTypes.PFnanoAOD102X
                     else:
