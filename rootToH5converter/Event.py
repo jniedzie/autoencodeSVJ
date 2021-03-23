@@ -120,12 +120,15 @@ class Event:
             # check if tree contains links between tracks and jets
             jet_index = -1
             track_jet_index = None
+            track_cand_index = None
             if self.data_processor.get_value_from_tree("Track_jet_index") is not None:
                 track_jet_index = self.data_processor.get_value_from_tree("Track_jet_index", self.i_event)
                 jet_index = i_jet
+            if self.data_processor.get_value_from_tree("Track_cand_index") is not None:
+                track_cand_index = self.data_processor.get_value_from_tree("Track_cand_index", self.i_event)
             
             # fill jet constituents
-            jet.fill_constituents(self.tracks, self.neutral_hadrons, self.photons, self.delta_r, jet_index, track_jet_index)
+            jet.fill_constituents(self.tracks, self.neutral_hadrons, self.photons, self.delta_r, jet_index, track_jet_index, track_cand_index)
             
             self.jets.append(jet)
     

@@ -148,7 +148,7 @@ class Jet:
     
         return axis2
 
-    def add_constituents(self, physObjects, pt_cut, delta_r, iJet=-1, track_jet_index=None):
+    def add_constituents(self, physObjects, pt_cut, delta_r, iJet=-1, track_jet_index=None, track_cand_index=None):
         """
         Adds constituents from physObjects collection, which pass the pt cut. If iJet and track_jet_index
         are not specified, it will add constituents within delta_r. Otherwise, it will check jet index for each
@@ -156,7 +156,7 @@ class Jet:
         """
         
         constituents = []
-        
+
         if iJet < 0:
             for i, object in enumerate(physObjects):
                 if object.pt > pt_cut:
@@ -167,21 +167,26 @@ class Jet:
                     if delta_eta ** 2. + delta_phi ** 2. < delta_r ** 2.:
                         constituents.append(vec)
         else:
-            for i, track in enumerate(physObjects):
-                jet_index = track_jet_index[i]
-                if jet_index == iJet:
-                    constituents.append(track.get_four_vector())
+            if track_cand_index is None:
+                for i, track in enumerate(physObjects):
+                    jet_index = track_jet_index[i]
+                    if jet_index == iJet:
+                        constituents.append(track.get_four_vector())
+            else:
+                cand_indices_for_jet = (track_jet_index == iJet)
+                cand_indices = track_cand_index[cand_indices_for_jet]
+                constituents = [track.get_four_vector() for itrack, track in enumerate(physObjects) if itrack in cand_indices]
 
         self.constituents.extend(constituents)
 
-    def fill_constituents(self, tracks, neutral_hadrons, photons, delta_r, iJet, track_jet_index):
+    def fill_constituents(self, tracks, neutral_hadrons, photons, delta_r, iJet, track_jet_index, track_cand_index):
         """
         Fills collection of jet constituents with tracks, neutral hadrons and photons. If iJet and track_jet_index
         are not specified, it will add constituents within delta_r. Otherwise, it will check jet index for each
         constituent and add it only if it's the same as provided jet index iJet.
         """
         
-        self.add_constituents(tracks, 0.1, delta_r, iJet, track_jet_index)
+        self.add_constituents(tracks, 0.1, delta_r, iJet, track_jet_index, track_cand_index)
         self.add_constituents(neutral_hadrons, 0.5, delta_r)
         self.add_constituents(photons, 0.2, delta_r)
 
