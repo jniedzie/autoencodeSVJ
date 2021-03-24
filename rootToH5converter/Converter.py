@@ -145,7 +145,7 @@ class Converter:
                 print("Event: ", iEvent)
                 
                 # load event
-                event = Event(data_processor, iEvent, self.jet_delta_r, self.use_fat_jets)
+                event = Event(input_type, data_processor, iEvent, self.jet_delta_r, self.use_fat_jets)
                 event.print()
                 
                 # check event properties

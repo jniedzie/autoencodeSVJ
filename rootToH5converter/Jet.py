@@ -23,7 +23,7 @@ class Jet:
         self.chargedHadronEnergyFraction = ch_hef
         self.neutralHadronEnergyFraction = ne_hef
     
-        if self.chargedHadronEnergyFraction is None:
+        if self.chargedHadronEnergyFraction is None and self.n_charged is not None and self.n_neutral is not None:
             # try to re-calculate charged and neutral energy fractions (for Delphes)
             n_total = self.n_charged + self.n_neutral
             self.chargedHadronEnergyFraction = self.n_charged / n_total if n_total > 0 else -1
