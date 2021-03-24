@@ -113,9 +113,9 @@ class Converter:
                 elif key.startswith("Events"):
                     self.trees[path] = file[key]
                 
-                    if file[key]["JetPFCandsAK4_jetIdx"] is not None:
+                    if "JetPFCandsAK4_jetIdx" in file[key].keys():
                         self.input_types[path] = InputTypes.PFnanoAOD106X
-                    elif file[key]["JetPFCands_jetIdx"] is not None:
+                    elif "JetPFCands_jetIdx" in file[key].keys():
                         self.input_types[path] = InputTypes.PFnanoAOD102X
                     else:
                         self.input_types[path] = InputTypes.nanoAOD
