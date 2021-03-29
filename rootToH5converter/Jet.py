@@ -28,6 +28,7 @@ class Jet:
             n_total = self.n_charged + self.n_neutral
             self.chargedHadronEnergyFraction = self.n_charged / n_total if n_total > 0 else -1
             self.neutralHadronEnergyFraction = self.n_neutral / n_total if n_total > 0 else -1
+        # else there will be nans in the h5
     
         self.constituents = []
         
