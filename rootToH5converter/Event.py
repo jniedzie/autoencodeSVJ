@@ -136,12 +136,8 @@ class Event:
                       ne_hef=self.data_processor.get_value_from_tree(prefix+"Jet_neHEF", self.i_event, i_jet))
 
             # check if tree contains links between tracks and jets
-            jet_index = -1
-            track_jet_index = None
-            track_cand_index = None
-            if self.data_processor.get_value_from_tree("Track_jet_index_"+jet_radius) is not None:
-                track_jet_index = self.data_processor.get_value_from_tree("Track_jet_index_"+jet_radius, self.i_event)
-                jet_index = i_jet
+            track_jet_index = self.data_processor.get_value_from_tree("Track_jet_index_"+jet_radius, self.i_event)
+            jet_index = -1 if track_jet_index is None else i_jet
             track_cand_index = self.data_processor.get_value_from_tree("Track_cand_index_"+jet_radius, self.i_event)
             
             # fill jet constituents
