@@ -1,10 +1,11 @@
 import numpy as np
 from Jet import Jet
 from PhysObject import PhysObject
+from DataProcessor import InputTypes
 
 
 class Event:
-    def __init__(self, data_processor, i_event, delta_r, use_fat_jets=False):
+    def __init__(self, input_type, data_processor, i_event, delta_r, use_fat_jets=False):
         """
         Reads/calculates event level features, loads jets, tracks, photons and neutral hadrons.
         Adds jet constituents to jets.
@@ -13,6 +14,7 @@ class Event:
         self.i_event = i_event
         self.delta_r = delta_r
         self.data_processor = data_processor
+        self.input_type = input_type
     
         # account for the fact that in Delphes MET is stored in an array with just one element
         i_object = None
@@ -25,13 +27,20 @@ class Event:
         self.metEta = data_processor.get_value_from_tree("MET_eta", i_event, i_object)
         
         self.nJets = data_processor.get_value_from_tree("N_fat_jets" if use_fat_jets else "N_jets", i_event)
-        self.nTracks = data_processor.get_value_from_tree("N_tracks", i_event)
+        if input_type == InputTypes.PFnanoAOD102X:
+            if use_fat_jets:
+                N_tracks_variable = "N_tracks_AK8"
+            else:
+                N_tracks_variable = "N_tracks_AK4"
+        else:
+            N_tracks_variable = "N_tracks"
+        self.nTracks = data_processor.get_value_from_tree(N_tracks_variable, i_event)
         self.nNeutralHadrons = data_processor.get_value_from_tree("N_neutral_hadrons", i_event)
         self.nPhotons = data_processor.get_value_from_tree("N_photons", i_event)
         
         # load tracks from tree
         self.tracks = []
-        self.fill_tracks()
+        self.fill_tracks(use_fat_jets)
         
         # load neutral hadrons from tree
         self.neutral_hadrons = []
@@ -67,15 +76,23 @@ class Event:
         print("nPhotons:", self.nPhotons)
         print("nNeutral hadrons:", self.nNeutralHadrons)
     
-    def fill_tracks(self):
+    def fill_tracks(self, use_fat_jets=False):
         if self.nTracks is None:
             return
             
+        if self.input_type == InputTypes.PFnanoAOD102X:
+            if use_fat_jets:
+                suffix = "_AK8"
+            else:
+                suffix = "_AK4"
+        else:
+            suffix = ""
+
         for i_track in range(0, self.nTracks):
-            track = PhysObject(eta=self.data_processor.get_value_from_tree("Track_eta", self.i_event, i_track),
-                               phi=self.data_processor.get_value_from_tree("Track_phi", self.i_event, i_track),
-                               pt=self.data_processor.get_value_from_tree("Track_pt", self.i_event, i_track),
-                               mass=self.data_processor.get_value_from_tree("Track_mass", self.i_event, i_track))
+            track = PhysObject(eta=self.data_processor.get_value_from_tree("Track_eta"+suffix, self.i_event, i_track),
+                               phi=self.data_processor.get_value_from_tree("Track_phi"+suffix, self.i_event, i_track),
+                               pt=self.data_processor.get_value_from_tree("Track_pt"+suffix, self.i_event, i_track),
+                               mass=self.data_processor.get_value_from_tree("Track_mass"+suffix, self.i_event, i_track))
             self.tracks.append(track)
     
     def fill_neutral_hadrons(self):
@@ -105,7 +122,8 @@ class Event:
             return
             
         prefix = "Fat" if use_fat_jets else ""
-        
+        jet_radius = "AK8" if use_fat_jets else "AK4"
+
         for i_jet in range(0, self.nJets):
             jet = Jet(eta=self.data_processor.get_value_from_tree(prefix+"Jet_eta", self.i_event, i_jet),
                       phi=self.data_processor.get_value_from_tree(prefix+"Jet_phi", self.i_event, i_jet),
@@ -116,16 +134,14 @@ class Event:
                       n_neutral=self.data_processor.get_value_from_tree(prefix+"Jet_nNeutral", self.i_event, i_jet),
                       ch_hef=self.data_processor.get_value_from_tree(prefix+"Jet_chHEF", self.i_event, i_jet),
                       ne_hef=self.data_processor.get_value_from_tree(prefix+"Jet_neHEF", self.i_event, i_jet))
-            
+
             # check if tree contains links between tracks and jets
-            jet_index = -1
-            track_jet_index = None
-            if self.data_processor.get_value_from_tree("Track_jet_index") is not None:
-                track_jet_index = self.data_processor.get_value_from_tree("Track_jet_index", self.i_event)
-                jet_index = i_jet
+            track_jet_index = self.data_processor.get_value_from_tree("Track_jet_index_"+jet_radius, self.i_event)
+            jet_index = -1 if track_jet_index is None else i_jet
+            track_cand_index = self.data_processor.get_value_from_tree("Track_cand_index_"+jet_radius, self.i_event)
             
             # fill jet constituents
-            jet.fill_constituents(self.tracks, self.neutral_hadrons, self.photons, self.delta_r, jet_index, track_jet_index)
+            jet.fill_constituents(self.tracks, self.neutral_hadrons, self.photons, self.delta_r, jet_index, track_jet_index, track_cand_index)
             
             self.jets.append(jet)
     

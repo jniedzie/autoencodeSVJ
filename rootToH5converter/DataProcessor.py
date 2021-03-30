@@ -4,7 +4,8 @@ from enum import Enum
 class InputTypes(Enum):
     Delphes = 0,
     nanoAOD = 1,
-    PFnanoAOD = 2
+    PFnanoAOD102X = 2,
+    PFnanoAOD106X = 3
 
 
 class DataProcessor:
@@ -62,6 +63,7 @@ class DataProcessor:
             InputTypes.nanoAOD: {
                 # number of objects
                 "N_jets": "nJet",
+                "N_fat_jets": "nFatJet",
                 "N_photons": "nPhoton",
                 # event features
                 "MET_pt": "MET_pt",
@@ -79,9 +81,50 @@ class DataProcessor:
                 "Photon_pt": "Photon_pt",
                 "Photon_mass": "Photon_mass",
             },
-            InputTypes.PFnanoAOD: {
+            InputTypes.PFnanoAOD102X: {
                 # number of objects
                 "N_jets": "nJet",
+                "N_fat_jets": "nFatJet",
+                "N_tracks_AK4": "nJetPFCands",
+                "N_tracks_AK8": "nFatJetPFCands",
+                "N_photons": "nPhoton",
+                # event features
+                "MET_pt": "MET_pt",
+                "MET_phi": "MET_phi",
+                # jet features
+                "Jet_eta": "Jet_eta",
+                "Jet_phi": "Jet_phi",
+                "Jet_pt": "Jet_pt",
+                "Jet_mass": "Jet_mass",
+                "Jet_chHEF": "Jet_chHEF",
+                "Jet_neHEF": "Jet_neHEF",
+                # fat jet features
+                "FatJet_eta": "FatJet_eta",
+                "FatJet_phi": "FatJet_phi",
+                "FatJet_pt": "FatJet_pt",
+                "FatJet_mass": "FatJet_mass",
+                # tracks for jets
+                "Track_eta_AK4": "JetPFCands_eta",
+                "Track_phi_AK4": "JetPFCands_phi",
+                "Track_pt_AK4": "JetPFCands_pt",
+                "Track_mass_AK4": "JetPFCands_mass",
+                "Track_jet_index_AK4": "JetPFCands_jetIdx",
+                # tracks for fat jets
+                "Track_eta_AK8": "FatJetPFCands_eta",
+                "Track_phi_AK8": "FatJetPFCands_phi",
+                "Track_pt_AK8": "FatJetPFCands_pt",
+                "Track_mass_AK8": "FatJetPFCands_mass",
+                "Track_jet_index_AK8": "FatJetPFCands_jetIdx",
+                # photons
+                "Photon_eta": "Photon_eta",
+                "Photon_phi": "Photon_phi",
+                "Photon_pt": "Photon_pt",
+                "Photon_mass": "Photon_mass",
+            },
+            InputTypes.PFnanoAOD106X: {
+                # number of objects
+                "N_jets": "nJet",
+                "N_fat_jets": "nFatJet",
                 "N_tracks": "nJetPFCands",
                 "N_photons": "nPhoton",
                 # event features
@@ -94,12 +137,20 @@ class DataProcessor:
                 "Jet_mass": "Jet_mass",
                 "Jet_chHEF": "Jet_chHEF",
                 "Jet_neHEF": "Jet_neHEF",
+                # fat jet features
+                "FatJet_eta": "FatJet_eta",
+                "FatJet_phi": "FatJet_phi",
+                "FatJet_pt": "FatJet_pt",
+                "FatJet_mass": "FatJet_mass",
                 # tracks
                 "Track_eta": "JetPFCands_eta",
                 "Track_phi": "JetPFCands_phi",
                 "Track_pt": "JetPFCands_pt",
                 "Track_mass": "JetPFCands_mass",
-                "Track_jet_index": "JetPFCands_jetIdx",
+                "Track_jet_index_AK4": "JetPFCandsAK4_jetIdx",
+                "Track_cand_index_AK4": "JetPFCandsAK4_candIdx",
+                "Track_jet_index_AK8": "JetPFCandsAK8_jetIdx",
+                "Track_cand_index_AK8": "JetPFCandsAK8_candIdx",
                 # photons
                 "Photon_eta": "Photon_eta",
                 "Photon_phi": "Photon_phi",
