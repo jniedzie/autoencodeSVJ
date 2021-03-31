@@ -5,6 +5,9 @@
 
 # Model type
 model_type = "AutoEncoder"
+
+train_on_signal = False
+
 model_evaluator_path = "module/architectures/EvaluatorAutoEncoder.py"
 
 # ---------------------------------------------
@@ -16,12 +19,12 @@ training_general_settings = {
     "test_data_fraction": 0.15,
     "include_hlf": True,
     "include_efp": True,
-    "hlf_to_drop": ['Energy', 'Flavor'],
+    "hlf_to_drop": ['Energy', 'Flavor', "ChargedFraction"],
 }
 
 # ---------------------------------------------
 # Path to training data
-efp_base = 4
+efp_base = 3
 qcd_path = "../../data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8/base_{}/*.h5".format(efp_base)
 signals_base_path = "../../data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8/"
 
@@ -30,23 +33,26 @@ input_path = signals_base_path+"/*/base_{}/*.h5".format(efp_base)
 
 # ---------------------------------------------
 # Output paths
-# output_path = "trainingResults_previous_default/"
-# output_path = "trainingResults_new_default/"
-# output_path = "trainingResults_archs/"
-# output_path = "trainingResults_new_config/"
-output_path = "trainingResults_test/"
+output_path = "trainingResults_archs/"
+# output_path = "trainingResults_batchSizes/"
+# output_path = "trainingResults_bottlenecks/"
+# output_path = "trainingResults_losses/"
+# output_path = "trainingResults_optimizers/"
+# output_path = "trainingResults_scalers/"
+# output_path = "trainingResults_test/"
 
 summary_path = output_path+"summary/"
 results_path = output_path+"trainingRuns/"
 AUCs_path = output_path+"aucs/"
+plots_path = output_path+"plots/"
 stat_hists_path = output_path+"stat_hists.root"
 
+output_file_suffix = "_noChargedFraction"
 
 # ---------------------------------------------
 # Training parameters
 training_params = {
-    # 'batch_size': 32,
-    'batch_size': 256, ##
+    'batch_size': 256,
 
     # losses documentation
     # https://keras.io/api/losses/regression_losses
@@ -71,26 +77,21 @@ training_params = {
 
     'metric': 'accuracy',
 
-    # 'epochs': 200,
-    'epochs': 2, ##
+    'epochs': 400,
     
     'learning_rate': 0.00051,
     'es_patience': 12,
     'lr_patience': 9,
     'lr_factor': 0.5,
     
-    # "bottleneck_size": 10, ##
-    "bottleneck_size": 8,
+    "bottleneck_size": 9,
     
-    "intermediate_architecture": (30, 30),
-    
+    "intermediate_architecture": (42, 42),
 }
-
-
 
 # ---------------------------------------------
 # Number of models to train
-n_models = 1
+n_models = 10
 
 # ---------------------------------------------
 # Pick normalization type (definitions below):
@@ -146,23 +147,17 @@ n_events_per_class = 10000
 
 # ---------------------------------------------
 # Output file names
-# file_name = "hlf_eflow_{}_bottle_{}_default".format(efp_base, training_params["bottleneck_size"])
-
 arch_summary = str(training_params["intermediate_architecture"]).replace("(","").replace(")","").replace(",","_").replace(" ","_")
 
-# file_name = "hlf_eflow_{}_bottle_{}_arch_{}_loss_{}_batch_size_{}".format(efp_base,
-#                                                                           training_params["bottleneck_size"],
-#                                                                           arch_summary,
-#                                                                           training_params["loss"],
-#                                                                           training_params["batch_size"],
-#                                                                           )
-
-file_name = "hlf_bottle_{}_arch_{}_loss_{}_batch_size_{}".format(efp_base,
-                                                                          training_params["bottleneck_size"],
-                                                                          arch_summary,
-                                                                          training_params["loss"],
-                                                                          training_params["batch_size"],
-                                                                          )
+file_name = "hlf_efp_{}_bottle_{}_arch_{}_loss_{}_optimizer_{}_batch_size_{}_scaler_{}{}".format(efp_base,
+                                                                                                 training_params["bottleneck_size"],
+                                                                                                 arch_summary,
+                                                                                                 training_params["loss"],
+                                                                                                 training_params["optimizer"],
+                                                                                                 training_params["batch_size"],
+                                                                                                 norm_type,
+                                                                                                 output_file_suffix
+                                                                                                 )
 
 
 # ---------------------------------------------
