@@ -40,7 +40,7 @@ for i in range(config.n_models):
 
     file_name = config.file_name
     
-    if config.model_type == "BDT":
+    if config.train_on_signal:
     
         signal_name = get_sigal_name_for_index(args.i_sample)
         signal_path = config.signals_base_path + "/" + signal_name + "/base_{}/*.h5".format(config.efp_base)
@@ -56,7 +56,7 @@ for i in range(config.n_models):
         **config.training_general_settings,
         **training_setting
     )
-    
+
     trainer.train(summaries_path=config.summary_path)
-    
+
     print('model {} finished'.format(i))

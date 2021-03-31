@@ -88,7 +88,7 @@ class EvaluatorBdt:
         return mass, rinv
 
     def __get_model(self, summary):
-        model_path = summary.training_output_path + ".weigths"
+        model_path = summary.training_output_path + ".pkl"
         try:
             print("Reading file: ", model_path)
             model = open(model_path, 'rb')
