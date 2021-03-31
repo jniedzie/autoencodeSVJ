@@ -14,7 +14,8 @@ class EvaluatorAutoEncoder:
         for path in glob.glob(input_path):
             key = path.split("/")[-3]
             self.signal_dict[key] = path
-        
+    
+    
     def get_qcd_test_data(self, summary, data_processor, data_loader, normalize=False):
         
         (data, _, _, _) = data_loader.load_all_data(globstring=summary.qcd_path, name="QCD")
@@ -27,19 +28,21 @@ class EvaluatorAutoEncoder:
         
         return test
     
-    def get_signal_test_data(self, name, path, summary, data_processor, data_loader, normalize=False, scaler=None):
+    
+    def get_signal_data(self, name, path, summary, data_processor, data_loader, normalize=False, scaler=None, test_data_only=True):
         
         (data, _, _, _) = data_loader.load_all_data(globstring=path, name=name)
-        (_, _, test) = data_processor.split_to_train_validate_test(data)
-        test=data
+        
+        if test_data_only:
+            (_, _, data) = data_processor.split_to_train_validate_test(data)
         
         if normalize:
-            test = data_processor.normalize(data_table=test,
+            data = data_processor.normalize(data_table=data,
                                             normalization_type=summary.norm_type,
                                             norm_args=summary.norm_args,
                                             scaler=scaler)
         
-        return test
+        return data
         
     def get_reconstruction(self, input_data, summary, data_processor, scaler):
     
@@ -115,8 +118,8 @@ class EvaluatorAutoEncoder:
         }
 
         for name, path in signals.items():
-            normed[name] = self.get_signal_test_data(name, path, summary, data_processor, data_loader,
-                                                       normalize=True, scaler = normed[test_key].scaler)
+            normed[name] = self.get_signal_data(name, path, summary, data_processor, data_loader,
+                                                normalize=True, scaler = normed[test_key].scaler)
         
         errors = {}
         model = self.__load_model(summary)
@@ -176,13 +179,32 @@ class EvaluatorAutoEncoder:
             test_key: self.get_qcd_test_data(summary, data_processor, data_loader, normalize=True)
         }
     
+        background_path_components = summary.qcd_path.split("/")
+        efp_base_path = None
+        
+        for element in background_path_components:
+            if "base" in element:
+                efp_base_path = element
+                break
+        
+    
         for name, path in self.signal_dict.items():
             if name == test_key: continue
 
-            normed[name] = self.get_signal_test_data(name=name, path=path,
-                                                     summary=summary,
-                                                     data_processor=data_processor, data_loader= data_loader,
-                                                     normalize=True, scaler=normed[test_key].scaler)
+            path_components = path.split("/")
+            new_path = ""
+            
+            for element in path_components:
+                if "base" in element:
+                    new_path += efp_base_path
+                else:
+                    new_path += element
+                new_path += "/"
+            
+            normed[name] = self.get_signal_data(name=name, path=new_path,
+                                                summary=summary,
+                                                data_processor=data_processor, data_loader= data_loader,
+                                                normalize=True, scaler=normed[test_key].scaler)
 
         errors = {}
     

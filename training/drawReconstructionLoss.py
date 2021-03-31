@@ -62,7 +62,7 @@ def get_losses():
     
     for name, path in signals.items():
         
-        signal_data = evaluator.get_signal_test_data(name, path, summary)
+        signal_data = evaluator.get_signal_data(name, path, summary)
         signal_loss = evaluator.get_error(signal_data, summary=summary, scaler=scaler)
         signals_losses.append(signal_loss)
     

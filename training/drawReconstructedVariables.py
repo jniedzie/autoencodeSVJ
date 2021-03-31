@@ -76,17 +76,13 @@ def draw_histogram_for_variable(input_data, reconstructed_data, variable_name, i
 
 
 def get_summary():
-
-    summaries = summaryProcessor.get_summaries_from_path(config.summary_path)
+    summary_path = config.summary_path + config.file_name + "_v" + str(config.best_model) + ".summary"
+    print("Loading summary from path: ", summary_path)
+    summary = summaryProcessor.get_summary_from_path(summary_path)
     
-    summary = None
-    
-    for _, s in summaries.df.iterrows():
-        version = summaryProcessor.get_version(s.summary_path)
-        if version != config.best_model:
-            continue
+    for _, s in summary.df.iterrows():
         summary = s
-        
+    
     return summary
     
     
