@@ -52,16 +52,12 @@ class Evaluator:
             self.__save_aucs_to_csv(aucs=aucs, path=auc_path, append=append, write_header=write_header)
 
     def __save_aucs_to_csv(self, aucs, path, append=False, write_header=True):
-        # TODO: we could simplify what we store in the aucs file to m, r and auc only
-    
         with open(path, "a" if append else "w") as out_file:
             if write_header:
-                out_file.write(",name,auc,mass,nu\n")
+                out_file.write("mass,rinv,auc\n")
         
-            for index, dict in enumerate(aucs):
-                out_file.write("{},Zprime_{}GeV_{},{},{},{}\n".format(index,
-                                                                      dict["mass"], dict["rinv"], dict["auc"],
-                                                                      dict["mass"], dict["rinv"]))
+            for element in aucs:
+                out_file.write("{},{},{}\n".format(element["mass"], element["rinv"], element["auc"]))
 
     def draw_roc_curves(self, summary_path, summary_version, **kwargs):
 
@@ -158,11 +154,12 @@ class Evaluator:
         data_loader = self.__get_data_loader(summary)
         return self.model_evaluator.get_qcd_test_data(summary, data_processor, data_loader, normalize=normalize)
 
-    def get_signal_test_data(self, name, path, summary):
+    def get_signal_data(self, name, path, summary, test_data_only):
         utils.set_random_seed(summary.seed)
         data_processor = DataProcessor(summary=summary)
         data_loader = self.__get_data_loader(summary)
-        return self.model_evaluator.get_signal_test_data(name, path, summary, data_processor, data_loader)
+        return self.model_evaluator.get_signal_data(name, path, summary, data_processor, data_loader,
+                                                    normalize=False, scaler=None, test_data_only=test_data_only)
 
     def get_reconstruction(self, input_data, summary, scaler=None):
         utils.set_random_seed(summary.seed)
