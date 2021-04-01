@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 from collections import OrderedDict as odict
 import numpy as np
 
+
+
 import module.SummaryProcessor as summaryProcessor
 import module.utils as utils
 from module.DataProcessor import DataProcessor
@@ -148,11 +150,11 @@ class Evaluator:
             colors = cm.rainbow(np.linspace(0, 1, n_plots))
         return fig, on_axis_begin, on_axis_end, on_plot_end, colors
 
-    def get_qcd_test_data(self, summary, normalize=False):
+    def get_qcd_data(self, summary, normalize=False, test_data_only=True):
         utils.set_random_seed(summary.seed)
         data_processor = DataProcessor(summary=summary)
         data_loader = self.__get_data_loader(summary)
-        return self.model_evaluator.get_qcd_test_data(summary, data_processor, data_loader, normalize=normalize)
+        return self.model_evaluator.get_qcd_data(summary, data_processor, data_loader, normalize, test_data_only)
 
     def get_signal_data(self, name, path, summary, test_data_only):
         utils.set_random_seed(summary.seed)

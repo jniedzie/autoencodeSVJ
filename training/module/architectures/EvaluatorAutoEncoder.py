@@ -15,19 +15,18 @@ class EvaluatorAutoEncoder:
             key = path.split("/")[-3]
             self.signal_dict[key] = path
     
-    
-    def get_qcd_test_data(self, summary, data_processor, data_loader, normalize=False):
+    def get_qcd_data(self, summary, data_processor, data_loader, normalize=False, test_data_only=True):
         
         (data, _, _, _) = data_loader.load_all_data(globstring=summary.qcd_path, name="QCD")
-        (_, _, test) = data_processor.split_to_train_validate_test(data)
+        if test_data_only:
+            (_, _, data) = data_processor.split_to_train_validate_test(data)
 
         if normalize:
-            test = data_processor.normalize(data_table=test,
+            data = data_processor.normalize(data_table=data,
                                             normalization_type=summary.norm_type,
                                             norm_args=summary.norm_args)
         
-        return test
-    
+        return data
     
     def get_signal_data(self, name, path, summary, data_processor, data_loader, normalize=False, scaler=None, test_data_only=True):
         

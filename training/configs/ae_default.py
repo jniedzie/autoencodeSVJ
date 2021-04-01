@@ -3,6 +3,8 @@
 # some parameters.
 # ------------------------------------------------------------------------------------------------
 
+from ROOT import kBlue, kGreen, kRed, kOrange
+
 # Model type
 model_type = "AutoEncoder"
 
@@ -25,15 +27,15 @@ training_general_settings = {
 # ---------------------------------------------
 # Path to training data
 efp_base = 3
-qcd_path = "../../data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8/base_{}/*.h5".format(efp_base)
-signals_base_path = "../../data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8/"
+qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8/base_{}/*.h5".format(efp_base)
+signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8/"
 
 # Path to testing data
 input_path = signals_base_path+"/*/base_{}/*.h5".format(efp_base)
 
 # ---------------------------------------------
 # Output paths
-output_path = "trainingResults_archs/"
+output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_archs/"
 # output_path = "trainingResults_batchSizes/"
 # output_path = "trainingResults_bottlenecks/"
 # output_path = "trainingResults_losses/"
@@ -134,11 +136,27 @@ normalizations = {
 }
 
 # ---------------------------------------------
-# Once the training is done, you can specify
-# which model was the best and use it for
-# further tests/plotting
-best_model = 0 ## new
-# best_model = 9 ## old
+# Once the training is done, you can specify which model was the best and use it for further tests/plotting
+best_model = 0
+
+# how many best models to include in the chi2 calculation
+fraction_of_models_for_avg_chi2 = 0.8
+
+# only files matching this pattern will be used for tests
+test_filename_pattern = "hlf_efp_3_bottle_9_arch_42__42_loss_mean_absolute_error_batch_size_256_noChargedFraction_v"
+
+# signal points for which tests will be done
+# masses = [1500, 2000, 2500, 3000, 3500, 4000]
+# masses = [2500, 3000, 3500, 4000]
+test_masses = [3000]
+# rinvs = [0.15, 0.30, 0.45, 0.60, 0.75]
+test_rinvs = [0.45]
+
+qcd_input_color = kGreen
+qcd_reco_color = kBlue
+signal_input_color = kRed
+signal_reco_color = kOrange
+
 
 # ---------------------------------------------
 # Statistical analysis parameters
