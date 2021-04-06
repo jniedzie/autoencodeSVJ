@@ -35,13 +35,9 @@ input_path = signals_base_path+"/*/base_{}/*.h5".format(efp_base)
 
 # ---------------------------------------------
 # Output paths
-output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_archs/"
-# output_path = "trainingResults_batchSizes/"
-# output_path = "trainingResults_bottlenecks/"
-# output_path = "trainingResults_losses/"
-# output_path = "trainingResults_optimizers/"
-# output_path = "trainingResults_scalers/"
-# output_path = "trainingResults_test/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_archs/"
+output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_vae/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_tf2/"
 
 summary_path = output_path+"summary/"
 results_path = output_path+"trainingRuns/"
@@ -49,7 +45,8 @@ AUCs_path = output_path+"aucs/"
 plots_path = output_path+"plots/"
 stat_hists_path = output_path+"stat_hists.root"
 
-output_file_suffix = "_noChargedFraction"
+# output_file_suffix = "_noChargedFraction"
+output_file_suffix = ""
 
 # ---------------------------------------------
 # Training parameters
@@ -79,7 +76,7 @@ training_params = {
 
     'metric': 'accuracy',
 
-    'epochs': 400,
+    'epochs': 10,
     
     'learning_rate': 0.00051,
     'es_patience': 12,
@@ -93,7 +90,7 @@ training_params = {
 
 # ---------------------------------------------
 # Number of models to train
-n_models = 10
+n_models = 1
 
 # ---------------------------------------------
 # Pick normalization type (definitions below):
@@ -143,7 +140,7 @@ best_model = 0
 fraction_of_models_for_avg_chi2 = 0.8
 
 # only files matching this pattern will be used for tests
-test_filename_pattern = "hlf_efp_3_bottle_9_arch_42__42_loss_mean_absolute_error_batch_size_256_noChargedFraction_v"
+test_filename_pattern = "hlf_efp_3_bottle_9_arch_42__42_loss_mean_absolute_error_optimizer_Adam_batch_size_256_scaler_StandardScaler_v"
 
 # signal points for which tests will be done
 # masses = [1500, 2000, 2500, 3000, 3500, 4000]

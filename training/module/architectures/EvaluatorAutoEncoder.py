@@ -7,6 +7,8 @@ from sklearn.metrics import roc_curve
 import pandas as pd
 import pickle
 
+from module.architectures.vaeHelpers import *
+
 
 class EvaluatorAutoEncoder:
     def __init__(self, input_path):
@@ -111,9 +113,8 @@ class EvaluatorAutoEncoder:
 
     def draw_roc_curves(self, summary, data_processor, data_loader, ax, colors, signals, test_key="qcd", **kwargs):
 
-        
         normed = {
-            test_key: self.get_qcd_test_data(summary, data_processor, data_loader, normalize=True)
+            test_key: self.get_qcd_data(summary, data_processor, data_loader, normalize=True, test_data_only=True)
         }
 
         for name, path in signals.items():
@@ -167,7 +168,15 @@ class EvaluatorAutoEncoder:
             print("Couldn't open file ", model_path, ". Skipping...")
             return None
     
-        model = model_from_json(pickle.load(model_file))
+        # model = model_from_json(pickle.load(model_file))
+
+        model = model_from_json(pickle.load(model_file),
+                                custom_objects={'loss': vae_loss,
+                                                'sampling': sampling}
+                                )
+
+        
+        
         model.load_weights(summary.training_output_path + "_weights.h5")
         
         return model
@@ -175,7 +184,7 @@ class EvaluatorAutoEncoder:
     def __get_aucs(self, summary, data_processor, data_loader, model, loss_function, test_key='qcd'):
         
         normed = {
-            test_key: self.get_qcd_test_data(summary, data_processor, data_loader, normalize=True)
+            test_key: self.get_qcd_data(summary, data_processor, data_loader, normalize=True, test_data_only=True)
         }
     
         background_path_components = summary.qcd_path.split("/")
