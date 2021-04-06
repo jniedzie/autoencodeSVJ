@@ -24,7 +24,7 @@ def set_random_seed(seed_value):
 
 
 def import_class(class_path):
-    class_path = class_path.strip(".py").replace("/", ".")
+    class_path = class_path.replace(".py", "").replace("/", ".")
     model_module = importlib.import_module(class_path)
     
     model_class = None

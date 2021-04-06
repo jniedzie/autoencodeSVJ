@@ -10,13 +10,13 @@ model_type = "AutoEncoder"
 
 train_on_signal = False
 
-model_evaluator_path = "module/architectures/EvaluatorAutoEncoder.py"
+model_evaluator_path = "module/architectures/EvaluatorVariationalAutoEncoder.py"
 
 # ---------------------------------------------
 # Build general training settings dictionary
 
 training_general_settings = {
-    "model_trainer_path": "module/architectures/TrainerAutoEncoder.py",
+    "model_trainer_path": "module/architectures/TrainerVariationalAutoEncoder.py",
     "validation_data_fraction": 0.15,
     "test_data_fraction": 0.15,
     "include_hlf": True,
@@ -35,11 +35,8 @@ input_path = signals_base_path+"/*/base_{}/*.h5".format(efp_base)
 
 # ---------------------------------------------
 # Output paths
-# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_archs/"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_vae/"
-# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_huge/"
 output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_test/"
-# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_tf2/"
 
 summary_path = output_path+"summary/"
 results_path = output_path+"trainingRuns/"
