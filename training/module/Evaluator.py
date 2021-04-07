@@ -32,6 +32,17 @@ class Evaluator:
         
         self.model_evaluator = self.model_class(**evaluation_setting)
     
+    def get_weights(self):
+        summaries = summaryProcessor.get_summaries_from_path(self.summary_path)
+    
+        weights = {}
+    
+        for _, summary in summaries.df.iterrows():
+            filename = summary.training_output_path.split("/")[-1]
+            weights[filename] = self.model_evaluator.get_weights(summary)
+    
+        return weights
+    
     def save_aucs(self):
     
         summaries = summaryProcessor.get_summaries_from_path(self.summary_path)

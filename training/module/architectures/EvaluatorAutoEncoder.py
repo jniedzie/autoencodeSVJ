@@ -20,6 +20,11 @@ class EvaluatorAutoEncoder:
             key = path.split("/")[-3]
             self.signal_dict[key] = path
     
+    def get_weights(self, summary):
+        model = self.__load_model(summary)
+        return model.get_weights()
+
+    
     def get_qcd_data(self, summary, data_processor, data_loader, normalize=False, test_data_only=True):
         
         (data, _, _, _) = data_loader.load_all_data(globstring=summary.qcd_path, name="QCD")

@@ -52,8 +52,7 @@ signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/
 # Training parameters
 training_params = {
     "algorithm": "SAMME",
-    # "n_estimators": 800,
-    "n_estimators": 1,
+    "n_estimators": 800,
     "learning_rate": 0.5,
 }
 
