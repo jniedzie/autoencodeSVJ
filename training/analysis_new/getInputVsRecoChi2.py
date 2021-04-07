@@ -7,13 +7,11 @@ import module.SummaryProcessor as summaryProcessor
 from module.Evaluator import Evaluator
 
 import importlib, argparse
-from pathlib import Path
-from ROOT import TH1D, kGreen, kBlue, TCanvas, gApplication, gStyle, TLegend, kRed, gPad, kOrange
 
 parser = argparse.ArgumentParser(description="Argument parser")
 parser.add_argument("-c", "--config", dest="config_path", default=None, required=True, help="Path to the config file")
 args = parser.parse_args()
-config_path = args.config_path.strip(".py").replace("/", ".")
+config_path = args.config_path.replace(".py", "").replace("../", "").replace("/", ".")
 config = importlib.import_module(config_path)
 
 
@@ -148,9 +146,7 @@ def print_summary(ok_count, high_count, very_high_count,
 
 
 def main():
-    evaluator = Evaluator(model_evaluator_path=config.model_evaluator_path,
-                          input_path=config.input_path)
-    
+    evaluator = Evaluator(**config.evaluation_general_settings, **config.evaluation_settings)
     summaries = summaryProcessor.get_summaries_from_path(config.summary_path)
 
     chi2_values = get_reconstruction_chi2s(summaries, evaluator)

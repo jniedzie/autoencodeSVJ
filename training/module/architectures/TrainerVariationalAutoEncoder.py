@@ -1,17 +1,21 @@
 from module.architectures.TrainerAutoEncoderBase import TrainerAutoEncoderBase
-from module.architectures.vaeHelpers import *
 
 from tensorflow.keras import layers
+import tensorflow as tf
 
 
 class TrainerVariationalAutoEncoder(TrainerAutoEncoderBase):
     
-    def __init__(self, **args):
+    def __init__(self, custom_objects, **args):
         """
         Constructor of the specialized Trainer class.
         data_processor and data_loader fields are mandatory and will be passed, ready to be used.
         Names of the remaining arguments match keys of the "training_settings" dict from the config.
         """
+        
+        self.sampling = custom_objects["sampling"]
+        self.vae_loss = custom_objects["loss"]
+        
         tf.compat.v1.disable_eager_execution()
         super(TrainerVariationalAutoEncoder, self).__init__(**args)
         self._model = self.__get_model()
@@ -59,7 +63,7 @@ class TrainerVariationalAutoEncoder(TrainerAutoEncoderBase):
 
         z_mean = layers.Dense(latent_dim)(last)
         z_log_var = layers.Dense(latent_dim)(last)
-        z = layers.Lambda(sampling, output_shape=(latent_dim,))([z_mean, z_log_var])
+        z = layers.Lambda(self.sampling, output_shape=(latent_dim,))([z_mean, z_log_var])
 
         encoder = tf.keras.models.Model(input_layer, [z_mean, z_log_var, z])
 
@@ -78,7 +82,7 @@ class TrainerVariationalAutoEncoder(TrainerAutoEncoderBase):
         vae_out = decoder(encoder(input_layer))
         model = tf.keras.Model(input_layer, vae_out)
         model.compile(optimizer=self.training_params["optimizer"],
-                            loss=vae_loss(z_log_var=z_log_var, z_mean=z_mean, reco_loss=self.training_params["loss"]),
+                            loss=self.vae_loss(z_log_var=z_log_var, z_mean=z_mean, reco_loss=self.training_params["loss"]),
                             metrics=[self.training_params["metric"]])
 
         return model

@@ -19,7 +19,6 @@ from pathlib import Path
 Path(config.output_path).mkdir(parents=True, exist_ok=True)
 Path(config.summary_path).mkdir(parents=True, exist_ok=True)
 Path(config.results_path).mkdir(parents=True, exist_ok=True)
-Path(config.AUCs_path).mkdir(parents=True, exist_ok=True)
 
 training_setting = config.training_settings
 

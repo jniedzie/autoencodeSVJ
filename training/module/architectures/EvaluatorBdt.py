@@ -8,10 +8,10 @@ import pandas as pd
 
 
 class EvaluatorBdt:
-    def __init__(self, **kwargs):
-        pass
+    def __init__(self, input_path):
+        self.signals_base_path = input_path
 
-    def get_aucs(self, summary, AUCs_path, filename, data_processor, data_loader, signals_base_path):
+    def get_aucs(self, summary, AUCs_path, filename, data_processor, data_loader):
         # TODO: this should skip versions for which all auc were already stored
         # more difficult here because we are storing multiple results in the same file
     
@@ -22,7 +22,7 @@ class EvaluatorBdt:
         mass, rinv = self.__get_mass_and_rinv_from_filename(filename)
     
         signal_name = "{}GeV_{:3.2f}".format(mass, rinv)
-        signal_path = signals_base_path + "/" + signal_name + "/base_3/*.h5"
+        signal_path = self.signals_base_path + "/" + signal_name + "/base_3/*.h5"
     
         model = self.__get_model(summary)
         if model is None:
@@ -41,14 +41,14 @@ class EvaluatorBdt:
     
         return (aucs, auc_path, append, write_header)
 
-    def draw_roc_curves(self, summary, filename, data_processor, signals_base_path, ax, colors):
+    def draw_roc_curves(self, summary, filename, data_processor, data_loader, ax, colors):
     
         mass, rinv = self.__get_mass_and_rinv_from_filename(filename)
     
         signal_name = "{}GeV_{:3.2f}".format(mass, rinv)
-        signal_path = signals_base_path + "/" + signal_name + "/base_3/*.h5"
+        signal_path = self.signals_base_path + "/" + signal_name + "/base_3/*.h5"
     
-        self.__load_data(data_processor=data_processor, summary=summary, signal_path=signal_path)
+        self.__load_data(data_processor=data_processor, data_loader=data_loader, summary=summary, signal_path=signal_path)
     
         model = self.__get_model(summary)
         if model is None:

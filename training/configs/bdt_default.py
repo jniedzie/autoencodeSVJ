@@ -10,7 +10,18 @@ model_type = "BDT"
 train_on_signal = True
 
 # ---------------------------------------------
-# General training settings
+# Output paths
+output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_test_bdt/"
+summary_path = output_path+"summary/"
+
+results_path = output_path+"trainingRuns/"
+plots_path = output_path+"plots/"
+stat_hists_path = output_path+"stat_hists.root"
+
+output_file_suffix = "_noChargedFraction"
+
+# ---------------------------------------------
+# General training/evaluation settings
 training_general_settings = {
     "model_trainer_path": "module/architectures/TrainerBdt.py",
     "validation_data_fraction": 0.0,
@@ -20,6 +31,12 @@ training_general_settings = {
     "hlf_to_drop": ["Energy", "Flavor", "ChargedFraction"],
 }
 
+evaluation_general_settings = {
+    "model_evaluator_path": "module/architectures/EvaluatorBdt.py",
+    "summary_path": summary_path,
+    "aucs_path": output_path+"aucs/",
+}
+
 # ---------------------------------------------
 # Number of models to train
 n_models = 1
@@ -27,24 +44,16 @@ n_models = 1
 # ---------------------------------------------
 # Input data paths
 efp_base = 3
-qcd_path = "../../data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8/base_{}/*.h5".format(efp_base)
-signals_base_path = "../../data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8/"
+qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8/base_{}/*.h5".format(efp_base)
+signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8/"
 
-# ---------------------------------------------
-# Output paths
-output_path = "trainingResults_bdt/"
-summary_path = output_path+"summary/"
-results_path = output_path+"trainingRuns/"
-AUCs_path = output_path+"aucs/"
-stat_hists_path = output_path+"stat_hists.root"
-
-output_file_suffix = "_noChargedFraction"
 
 # ---------------------------------------------
 # Training parameters
 training_params = {
     "algorithm": "SAMME",
-    "n_estimators": 800,
+    # "n_estimators": 800,
+    "n_estimators": 1,
     "learning_rate": 0.5,
 }
 
@@ -94,15 +103,12 @@ training_settings = {
     "norm_args": normalizations[norm_type],
 }
 
+evaluation_settings = {
+    "input_path": signals_base_path,
+}
 
 # ---------------------------------------------
-# Evaluation-related settings
-
-model_evaluator_path = "module/architectures/EvaluatorBdt.py"
-
-# ---------------------------------------------
-# Once the training is done, you can specify which model was the best and use it for
-# further tests/plotting
+# Once the training is done, you can specify which model was the best and use it for further tests/plotting
 best_model = 0
 
 # ---------------------------------------------

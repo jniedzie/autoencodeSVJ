@@ -109,9 +109,7 @@ def main():
     gStyle.SetOptStat(0)
     Path(config.plots_path).mkdir(parents=True, exist_ok=True)
     
-    evaluator = Evaluator(model_evaluator_path=config.model_evaluator_path,
-                          input_path=config.input_path)
-    
+    evaluator = Evaluator(**config.evaluation_general_settings, **config.evaluation_settings)
     summaries = summaryProcessor.get_summaries_from_path(config.summary_path)
 
     for _, summary in summaries.df.iterrows():

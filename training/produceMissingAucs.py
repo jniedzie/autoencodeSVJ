@@ -14,20 +14,5 @@ config_path = args.config_path.strip(".py").replace("/", ".")
 config = importlib.import_module(config_path)
 
 
-if config.model_type == "AutoEncoder":
-    evaluator = Evaluator(model_evaluator_path=config.model_evaluator_path,
-                          input_path=config.input_path
-                          )
-    evaluator.save_aucs(summary_path=config.summary_path,
-                        AUCs_path = config.AUCs_path
-                        )
-    
-elif config.model_type == "BDT":
-    evaluator = Evaluator(model_evaluator_path=config.model_evaluator_path)
-
-    evaluator.save_aucs(summary_path=config.summary_path,
-                        AUCs_path=config.AUCs_path,
-                        signals_base_path=config.signals_base_path
-                        )
-else:
-    print("Unknown model type: ", config.model_type)
+evaluator = Evaluator(**config.evaluation_general_settings, **config.evaluation_settings)
+evaluator.save_aucs()

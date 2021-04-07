@@ -1,10 +1,9 @@
 import os
 from pathlib import Path
-from enum import Enum
+
 import matplotlib.pyplot as plt
 from collections import OrderedDict as odict
 import numpy as np
-
 
 
 import module.SummaryProcessor as summaryProcessor
@@ -18,20 +17,27 @@ plt.rcParams.update({'font.size': 18})
 
 class Evaluator:
     
-    class ModelTypes(Enum):
-        AutoEncoder = 0
-        Bdt = 1
-    
-    def __init__(self, model_evaluator_path, **kwargs):
+    def __init__(self,
+                 # general settings of the evaluator
+                 model_evaluator_path,
+                 summary_path,
+                 aucs_path,
+                 # arguments that will be passed to the specialized evaluator class
+                 **evaluation_setting):
+        
         self.model_class = utils.import_class(model_evaluator_path)
-        self.model_evaluator = self.model_class(**kwargs)
+        
+        self.summary_path = summary_path
+        self.aucs_path = aucs_path
+        
+        self.model_evaluator = self.model_class(**evaluation_setting)
     
-    def save_aucs(self, summary_path, AUCs_path, **kwargs):
+    def save_aucs(self):
     
-        summaries = summaryProcessor.get_summaries_from_path(summary_path)
+        summaries = summaryProcessor.get_summaries_from_path(self.summary_path)
 
-        if not os.path.exists(AUCs_path):
-            Path(AUCs_path).mkdir(parents=True, exist_ok=False)
+        if not os.path.exists(self.aucs_path):
+            Path(self.aucs_path).mkdir(parents=True, exist_ok=False)
 
         for _, summary in summaries.df.iterrows():
             
@@ -41,11 +47,10 @@ class Evaluator:
             data_loader = self.__get_data_loader(summary)
             
             auc_params = self.model_evaluator.get_aucs(summary=summary,
-                                                       AUCs_path=AUCs_path,
+                                                       AUCs_path=self.aucs_path,
                                                        filename=filename,
                                                        data_processor=data_processor,
                                                        data_loader=data_loader,
-                                                       **kwargs
                                                        )
             if auc_params is None:
                 continue
@@ -61,9 +66,9 @@ class Evaluator:
             for element in aucs:
                 out_file.write("{},{},{}\n".format(element["mass"], element["rinv"], element["auc"]))
 
-    def draw_roc_curves(self, summary_path, summary_version, **kwargs):
+    def draw_roc_curves(self, summary_version, **kwargs):
 
-        summaries = summaryProcessor.get_summaries_from_path(summary_path)
+        summaries = summaryProcessor.get_summaries_from_path(self.summary_path)
 
         plotting_args = {k: v for k, v in kwargs.items() if k not in ["signals", "signals_base_path"] }
 
@@ -76,16 +81,16 @@ class Evaluator:
                 continue
 
             utils.set_random_seed(summary.seed)
-            kwargs["filename"] = summary.training_output_path.split("/")[-1]
+            filename = summary.training_output_path.split("/")[-1]
             data_processor = DataProcessor(summary=summary)
             data_loader = self.__get_data_loader(summary)
             
             self.model_evaluator.draw_roc_curves(summary=summary,
+                                                 filename=filename,
                                                  data_processor=data_processor,
                                                  data_loader=data_loader,
                                                  ax=ax,
-                                                 colors=colors,
-                                                 **kwargs
+                                                 colors=colors
                                                  )
 
         x = [i for i in np.arange(0, 1.1, 0.1)]

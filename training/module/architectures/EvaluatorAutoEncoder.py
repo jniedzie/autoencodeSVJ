@@ -11,7 +11,10 @@ from module.architectures.vaeHelpers import *
 
 
 class EvaluatorAutoEncoder:
-    def __init__(self, input_path):
+    def __init__(self, input_path, custom_objects):
+        
+        self.custom_objects = custom_objects
+        
         self.signal_dict = {}
         for path in glob.glob(input_path):
             key = path.split("/")[-3]
@@ -79,7 +82,7 @@ class EvaluatorAutoEncoder:
         
         return losses.tolist()
         
-    def get_aucs(self, summary, AUCs_path, filename, data_processor, data_loader, **kwargs):
+    def get_aucs(self, summary, AUCs_path, filename, data_processor, data_loader):
         
         auc_path = AUCs_path + "/" + filename
     
@@ -168,15 +171,8 @@ class EvaluatorAutoEncoder:
             print("Couldn't open file ", model_path, ". Skipping...")
             return None
     
-        # model = model_from_json(pickle.load(model_file))
-
-        model = model_from_json(pickle.load(model_file),
-                                custom_objects={'loss': vae_loss,
-                                                'sampling': sampling}
-                                )
-
-        
-        
+        model = model_from_json(pickle.load(model_file), custom_objects=self.custom_objects)
+    
         model.load_weights(summary.training_output_path + "_weights.h5")
         
         return model

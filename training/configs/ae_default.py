@@ -13,7 +13,19 @@ train_on_signal = False
 model_evaluator_path = "module/architectures/EvaluatorAutoEncoder.py"
 
 # ---------------------------------------------
-# Build general training settings dictionary
+# Output paths
+output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_test_ae/"
+summary_path = output_path+"summary/"
+
+results_path = output_path+"trainingRuns/"
+plots_path = output_path+"plots/"
+stat_hists_path = output_path+"stat_hists.root"
+
+# output_file_suffix = "_noChargedFraction"
+output_file_suffix = ""
+
+# ---------------------------------------------
+# Build general training/evaluation settings dictionary
 
 training_general_settings = {
     "model_trainer_path": "module/architectures/TrainerAutoEncoder.py",
@@ -24,6 +36,13 @@ training_general_settings = {
     "hlf_to_drop": ['Energy', 'Flavor', "ChargedFraction"],
 }
 
+evaluation_general_settings = {
+    "model_evaluator_path": "module/architectures/EvaluatorAutoEncoder.py",
+    "summary_path": summary_path,
+    "aucs_path": output_path+"aucs/",
+}
+
+
 # ---------------------------------------------
 # Path to training data
 efp_base = 3
@@ -33,22 +52,7 @@ signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/
 # Path to testing data
 input_path = signals_base_path+"/*/base_{}/*.h5".format(efp_base)
 
-# ---------------------------------------------
-# Output paths
-# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_archs/"
-# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_vae/"
-# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_huge/"
-output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_test/"
-# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_tf2/"
 
-summary_path = output_path+"summary/"
-results_path = output_path+"trainingRuns/"
-AUCs_path = output_path+"aucs/"
-plots_path = output_path+"plots/"
-stat_hists_path = output_path+"stat_hists.root"
-
-# output_file_suffix = "_noChargedFraction"
-output_file_suffix = ""
 
 # ---------------------------------------------
 # Training parameters
@@ -142,7 +146,7 @@ best_model = 0
 fraction_of_models_for_avg_chi2 = 0.8
 
 # only files matching this pattern will be used for tests
-test_filename_pattern = "hlf_efp_3_bottle_9_arch_42__42_loss_mean_absolute_error_optimizer_Adam_batch_size_256_scaler_StandardScaler_v"
+test_filename_pattern = "_v"
 
 # signal points for which tests will be done
 # masses = [1500, 2000, 2500, 3000, 3500, 4000]
@@ -178,11 +182,16 @@ file_name = "hlf_efp_{}_bottle_{}_arch_{}_loss_{}_optimizer_{}_batch_size_{}_sca
 
 
 # ---------------------------------------------
-# Build specific training settings dictionary (this will be passed to the specialized trainer class)
+# Build specific training/evaluation settings dictionary (this will be passed to the specialized trainer class)
 training_settings = {
     "qcd_path": qcd_path,
     "training_params": training_params,
     "EFP_base": efp_base,
     "norm_type": norm_type,
     "norm_args": normalizations[norm_type],
+}
+
+evaluation_settings = {
+    "input_path": input_path,
+    "custom_objects": {}
 }

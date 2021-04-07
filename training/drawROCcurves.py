@@ -21,21 +21,14 @@ signals = {"{}, {}".format(mass, rinv): "{}{}GeV_{:1.2f}/base_3/*.h5".format(con
            for mass in masses
            for rinv in rinvs}
 
+evaluator = Evaluator(**config.evaluation_general_settings, **config.evaluation_settings)
+
 if config.model_type == "AutoEncoder":
 
-    evaluator = Evaluator(model_evaluator_path=config.model_evaluator_path,
-                          input_path=config.input_path)
-    evaluator.draw_roc_curves(summary_path=config.summary_path,
-                              summary_version=config.best_model,
-                              signals=signals,
-                              xscale='linear')
+    evaluator.draw_roc_curves(summary_version=config.best_model, signals=signals, xscale='linear')
     
 elif config.model_type == "BDT":
-    evaluator = Evaluator(model_evaluator_path=config.model_evaluator_path)
     
-    evaluator.draw_roc_curves(summary_path=config.summary_path,
-                              summary_version=config.best_model,
-                              signals_base_path=config.signals_base_path,
-                              xscale='linear')
+    evaluator.draw_roc_curves(summary_version=config.best_model, xscale='linear')
 else:
     print("Unknown model type: ", config.model_type)

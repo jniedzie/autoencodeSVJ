@@ -4,13 +4,25 @@
 # ------------------------------------------------------------------------------------------------
 
 from ROOT import kBlue, kGreen, kRed, kOrange
+import tensorflow as tf
 
 # Model type
 model_type = "AutoEncoder"
 
 train_on_signal = False
 
-model_evaluator_path = "module/architectures/EvaluatorVariationalAutoEncoder.py"
+# ---------------------------------------------
+# Output paths
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_vae/"
+output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_test_vae/"
+summary_path = output_path+"summary/"
+
+results_path = output_path+"trainingRuns/"
+plots_path = output_path+"plots/"
+stat_hists_path = output_path+"stat_hists.root"
+
+# output_file_suffix = "_noChargedFraction"
+output_file_suffix = ""
 
 # ---------------------------------------------
 # Build general training settings dictionary
@@ -24,6 +36,12 @@ training_general_settings = {
     "hlf_to_drop": ['Energy', 'Flavor', "ChargedFraction"],
 }
 
+evaluation_general_settings = {
+    "model_evaluator_path": "module/architectures/EvaluatorAutoEncoder.py",
+    "summary_path": summary_path,
+    "aucs_path": output_path+"aucs/",
+}
+
 # ---------------------------------------------
 # Path to training data
 efp_base = 3
@@ -33,19 +51,7 @@ signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/
 # Path to testing data
 input_path = signals_base_path+"/*/base_{}/*.h5".format(efp_base)
 
-# ---------------------------------------------
-# Output paths
-# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_vae/"
-output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_test/"
 
-summary_path = output_path+"summary/"
-results_path = output_path+"trainingRuns/"
-AUCs_path = output_path+"aucs/"
-plots_path = output_path+"plots/"
-stat_hists_path = output_path+"stat_hists.root"
-
-# output_file_suffix = "_noChargedFraction"
-output_file_suffix = ""
 
 # ---------------------------------------------
 # Training parameters
@@ -173,6 +179,28 @@ file_name = "hlf_efp_{}_bottle_{}_arch_{}_loss_{}_optimizer_{}_batch_size_{}_sca
                                                                                                  output_file_suffix
                                                                                                  )
 
+# ---------------------------------------------
+# Custom objects
+
+
+def sampling(inputs):
+    z_mean, z_log_var = inputs
+    batch = tf.shape(z_mean)[0]
+    dim = tf.shape(z_mean)[1]
+    epsilon = tf.keras.backend.random_normal(shape=(batch, dim))
+    return z_mean + tf.exp(0.5 * z_log_var) * epsilon
+
+
+def vae_loss(z_log_var, z_mean, reco_loss):
+    def loss(x, x_decoded_mean):
+        reconstruction_loss = getattr(tf.keras.losses, reco_loss)(x, x_decoded_mean)
+        kl_loss = - 0.5 * tf.keras.backend.mean(1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var), axis=-1)
+        return reconstruction_loss + kl_loss
+    
+    return loss
+
+
+custom_objects={'loss': vae_loss,'sampling': sampling}
 
 # ---------------------------------------------
 # Build specific training settings dictionary (this will be passed to the specialized trainer class)
@@ -182,4 +210,10 @@ training_settings = {
     "EFP_base": efp_base,
     "norm_type": norm_type,
     "norm_args": normalizations[norm_type],
+    "custom_objects": custom_objects,
+}
+
+evaluation_settings = {
+    "input_path": input_path,
+    "custom_objects": custom_objects
 }
