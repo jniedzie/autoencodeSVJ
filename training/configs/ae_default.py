@@ -4,6 +4,7 @@
 # ------------------------------------------------------------------------------------------------
 
 from ROOT import kBlue, kGreen, kRed, kOrange
+from module.architectures.DenseTiedLayer import DenseTiedLayer
 
 # Model type
 model_type = "AutoEncoder"
@@ -14,7 +15,10 @@ model_evaluator_path = "module/architectures/EvaluatorAutoEncoder.py"
 
 # ---------------------------------------------
 # Output paths
-output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_test_ae/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_excluding_eta_phi/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_activations/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_small_archs/"
+output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_norms/"
 summary_path = output_path+"summary/"
 
 results_path = output_path+"trainingRuns/"
@@ -22,7 +26,7 @@ plots_path = output_path+"plots/"
 stat_hists_path = output_path+"stat_hists.root"
 
 # output_file_suffix = "_noChargedFraction"
-output_file_suffix = ""
+output_file_suffix = "_same_train_val_scaler"
 
 # ---------------------------------------------
 # Build general training/evaluation settings dictionary
@@ -53,7 +57,6 @@ signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/
 input_path = signals_base_path+"/*/base_{}/*.h5".format(efp_base)
 
 
-
 # ---------------------------------------------
 # Training parameters
 training_params = {
@@ -81,8 +84,8 @@ training_params = {
     # 'optimizer': 'Ftrl',
 
     'metric': 'accuracy',
-
-    'epochs': 10,
+    
+    'epochs': 400,
     
     'learning_rate': 0.00051,
     'es_patience': 12,
@@ -92,11 +95,25 @@ training_params = {
     "bottleneck_size": 9,
     
     "intermediate_architecture": (42, 42),
+    
+    # activation functions documentation
+    # https://keras.io/api/layers/activations/
+    # "activation": "relu",
+    "activation": "elu",
+    # "activation": "sigmoid",
+    # "activation": "softmax",
+    # "activation": "softplus",
+    # "activation": "softsign",
+    # "activation": "tanh",
+    # "activation": "selu",
+    # "activation": "exponential",
+    
+    "output_activation": "linear"
 }
 
 # ---------------------------------------------
 # Number of models to train
-n_models = 1
+n_models = 10
 
 # ---------------------------------------------
 # Pick normalization type (definitions below):
@@ -146,7 +163,10 @@ best_model = 0
 fraction_of_models_for_avg_chi2 = 0.8
 
 # only files matching this pattern will be used for tests
-test_filename_pattern = "_v"
+
+
+test_filename_pattern = "hlf_efp_3_bottle_9_arch_42__42_loss_mean_absolute_error_optimizer_Adam_batch_size_256_scaler_StandardScaler_activation_elu_same_train_val_scaler_v0"
+# test_filename_pattern = "_v"
 
 # signal points for which tests will be done
 # masses = [1500, 2000, 2500, 3000, 3500, 4000]
@@ -170,15 +190,16 @@ n_events_per_class = 10000
 # Output file names
 arch_summary = str(training_params["intermediate_architecture"]).replace("(","").replace(")","").replace(",","_").replace(" ","_")
 
-file_name = "hlf_efp_{}_bottle_{}_arch_{}_loss_{}_optimizer_{}_batch_size_{}_scaler_{}{}".format(efp_base,
-                                                                                                 training_params["bottleneck_size"],
-                                                                                                 arch_summary,
-                                                                                                 training_params["loss"],
-                                                                                                 training_params["optimizer"],
-                                                                                                 training_params["batch_size"],
-                                                                                                 norm_type,
-                                                                                                 output_file_suffix
-                                                                                                 )
+file_name = "hlf_efp_{}_bottle_{}_arch_{}_loss_{}_optimizer_{}_batch_size_{}_scaler_{}_activation_{}{}".format(efp_base,
+                                                                                                               training_params["bottleneck_size"],
+                                                                                                               arch_summary,
+                                                                                                               training_params["loss"],
+                                                                                                               training_params["optimizer"],
+                                                                                                               training_params["batch_size"],
+                                                                                                               norm_type,
+                                                                                                               training_params["activation"],
+                                                                                                               output_file_suffix
+                                                                                                               )
 
 
 # ---------------------------------------------
@@ -193,5 +214,8 @@ training_settings = {
 
 evaluation_settings = {
     "input_path": input_path,
-    "custom_objects": {}
+    # "custom_objects": {}
+    "custom_objects": {
+        "DenseTiedLayer": DenseTiedLayer,
+    }
 }

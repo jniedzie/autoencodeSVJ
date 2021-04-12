@@ -7,7 +7,7 @@ from sklearn.metrics import roc_curve
 import pandas as pd
 import pickle
 
-from module.architectures.vaeHelpers import *
+from module.architectures.DenseTiedLayer import DenseTiedLayer
 
 
 class EvaluatorAutoEncoder:
@@ -167,16 +167,28 @@ class EvaluatorAutoEncoder:
         
     def __load_model(self, summary):
     
-        model_path = summary.training_output_path + ".pkl"
-        
+        model_path = summary.training_output_path + ".h5"
+
         try:
-            print("Reading file: ", model_path)
-            model_file = open(model_path, 'rb')
-        except IOError:
-            print("Couldn't open file ", model_path, ". Skipping...")
-            return None
-    
-        model = model_from_json(pickle.load(model_file), custom_objects=self.custom_objects)
+            print("Trying to read model with keras load_model")
+            model = tf.keras.models.load_model(model_path, custom_objects=self.custom_objects)
+        except:
+            print("Failed reading model with keras load_model")
+            model_path = model_path.replace(".h5", ".pkl")
+            try:
+                print("Trying to read model with model_from_json")
+                model_file = open(model_path, 'rb')
+                model = model_from_json(pickle.load(model_file), custom_objects=self.custom_objects)
+            except IOError:
+                print("Failed reading model with model_from_json")
+                return None
+
+        model.summary()
+
+        # config = model.get_config()
+        #
+        # with keras.utils.custom_object_scope(self.custom_objects):
+        #     model = keras.Model.from_config(config)
     
         model.load_weights(summary.training_output_path + "_weights.h5")
         
