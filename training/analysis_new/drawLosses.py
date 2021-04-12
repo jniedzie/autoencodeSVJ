@@ -42,11 +42,11 @@ def get_qcd_and_signal_losses(summary, evaluator):
     qcd_loss = evaluator.get_error(qcd_data, summary=summary)
     
     scaler = qcd_data.scaler
-    
+
     signals_losses = []
     
     for path in get_signal_paths(config):
-        signal_data = evaluator.get_signal_data(name="", path=path, summary=summary, test_data_only=True)
+        signal_data = evaluator.get_signal_data(name="", path=path, summary=summary, test_data_only=False)
         signal_loss = evaluator.get_error(signal_data, summary=summary, scaler=scaler)
         signals_losses.append(signal_loss)
     
@@ -59,9 +59,6 @@ def draw_plots(summary, evaluator):
     qcd_loss, signals_losses = get_qcd_and_signal_losses(summary, evaluator)
     hist_background, hists_signal = get_loss_histograms(qcd_loss, signals_losses, suffix="v"+str(version))
     
-  
-    
-    
     hist_background.SetTitle("v" + str(version))
     hist_background.GetXaxis().SetTitle("loss")
     
@@ -71,6 +68,7 @@ def draw_plots(summary, evaluator):
         hist_signal.DrawNormalized("same")
     
     return hist_background, hists_signal[0]
+
 
 def save_canvas(canvas, legend, n_plots):
     legend.Draw()
@@ -88,6 +86,7 @@ def save_canvas(canvas, legend, n_plots):
     filename = config.plots_path + "losses_" + config.test_filename_pattern + "_log.pdf"
     canvas.SaveAs(filename)
     saved_plots.append(filename)
+
 
 def main():
     gStyle.SetOptStat(0)

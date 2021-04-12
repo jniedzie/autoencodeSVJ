@@ -1,4 +1,4 @@
-from ROOT import TH1D, kGreen, kBlue, TCanvas, gApplication, gStyle, TLegend, kRed, gPad, kOrange
+from ROOT import TH1D, TH2D, kGreen, kBlue, TCanvas, gApplication, gStyle, TLegend, kRed, gPad, kOrange
 
 bins = {
     "Eta": (-3.5, 3.5, 100),
@@ -22,6 +22,16 @@ def get_histogram(data, variable_name, color=None, suffix=""):
     __fill_histogram(hist, data, variable_name)
     if color is not None:
         hist.SetLineColor(color)
+    return hist
+
+
+def get_histogram_2d(data, variable_name_x, variable_name_y, suffix=""):
+    """
+    Returns TH2D filled with data for specified variables x and y.
+    """
+
+    hist = __initialize_histogram_2d(variable_name_x, variable_name_y, suffix)
+    __fill_histogram_2d(hist, data, variable_name_x, variable_name_y)
     return hist
 
 
@@ -70,6 +80,16 @@ def __initialize_histogram(variable_name, suffix=""):
     return TH1D(variable_name + suffix, variable_name + suffix, n_bins, min, max)
 
 
+def __initialize_histogram_2d(variable_name_x, variable_name_y, suffix=""):
+    """
+    Returns TH1D with correct binning and title for given variable.
+    """
+
+    n_bins_x, min_x, max_x = __get_binning_for_variable(variable_name_x)
+    n_bins_y, min_y, max_y = __get_binning_for_variable(variable_name_y)
+    title = variable_name_x + variable_name_y + suffix
+    return TH2D(title, title, n_bins_x, min_x, max_x, n_bins_y, min_y, max_y)
+
 def __fill_histogram(histogram, data, variable_name):
     """
     Fills provided histogram with data.
@@ -80,3 +100,14 @@ def __fill_histogram(histogram, data, variable_name):
         values = data[variable_name].tolist()
     for value in values:
         histogram.Fill(value)
+
+def __fill_histogram_2d(histogram, data, variable_name_x, variable_name_y):
+    """
+    Fills provided histogram with data.
+    """
+
+    values_x = data[variable_name_x].tolist()
+    values_y = data[variable_name_y].tolist()
+
+    for x, y in zip(values_x, values_y):
+        histogram.Fill(x, y)
