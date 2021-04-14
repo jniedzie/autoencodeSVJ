@@ -9,7 +9,8 @@ bins = {
     "PTD": (0, 1, 100),
     "Axis2": (0, 0.2, 100),
     "eflow": (0, 1, 100),
-    "loss": (0.0, 0.4, 40),
+    "loss": (0.0, 40, 40),
+    "latent": (-1, 4, 150),
 }
 
 
@@ -63,6 +64,10 @@ def __get_binning_for_variable(variable_name):
         min = bins["eflow"][0]
         max = bins["eflow"][1]
         n_bins = bins["eflow"][2]
+    elif "latent" in variable_name:
+        min = bins["latent"][0]
+        max = bins["latent"][1]
+        n_bins = bins["latent"][2]
     else:
         min = bins[variable_name][0]
         max = bins[variable_name][1]
@@ -96,6 +101,8 @@ def __fill_histogram(histogram, data, variable_name):
     """
     if variable_name == "loss":
         values = data
+    elif "latent" in variable_name:
+        values = data[int(variable_name.replace("latent_", ""))].tolist()
     else:
         values = data[variable_name].tolist()
     for value in values:
@@ -105,6 +112,12 @@ def __fill_histogram_2d(histogram, data, variable_name_x, variable_name_y):
     """
     Fills provided histogram with data.
     """
+
+    if "latent" in variable_name_x:
+        variable_name_x = int(variable_name_x.replace("latent_", ""))
+
+    if "latent" in variable_name_y:
+        variable_name_y = int(variable_name_y.replace("latent_", ""))
 
     values_x = data[variable_name_x].tolist()
     values_y = data[variable_name_y].tolist()

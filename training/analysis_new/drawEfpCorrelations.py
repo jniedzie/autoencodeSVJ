@@ -44,13 +44,44 @@ def get_plots_for_all_efp_combinations(data, suffix=""):
     return plots
 
 
+def drop_efp_variables(variables, min):
+    new_variables = []
+    for var in variables:
+        if "eflow" in var:
+            efp_number = int(var.replace("eflow ", ""))
+            if efp_number < min:
+                new_variables.append(var)
+        else:
+            new_variables.append(var)
+    return new_variables
+
+
+def get_plots_for_all_variable_combinations(data, suffix=""):
+    plots = [[]]
+
+    variables_to_plot = drop_efp_variables(data.keys(), min=2)
+
+    for var_x in variables_to_plot:
+        print("Preparing hists for: ", var_x)
+        plots_row = []
+
+        for var_y in variables_to_plot:
+            hist = get_histogram_2d(data, var_x, var_y, suffix)
+            plots_row.append(hist)
+        plots.append(plots_row)
+
+    return plots
+
+
 def get_qcd_efp_plots(summary, evaluator):
     qcd_input_data = evaluator.get_qcd_data(summary=summary, test_data_only=False)
 
     # path = get_signal_paths(config)[0]
     # qcd_input_data = evaluator.get_signal_data(name="", path=path, summary=summary, test_data_only=False)
 
-    qcd_input_plots = get_plots_for_all_efp_combinations(qcd_input_data, suffix="QCD_input")
+    # qcd_input_plots = get_plots_for_all_efp_combinations(qcd_input_data, suffix="QCD_input")
+    qcd_input_plots = get_plots_for_all_variable_combinations(qcd_input_data, suffix="QCD_input")
+
     return qcd_input_plots
 
 
