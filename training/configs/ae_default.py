@@ -11,7 +11,6 @@ model_type = "AutoEncoder"
 
 train_on_signal = False
 
-model_evaluator_path = "module/architectures/EvaluatorAutoEncoder.py"
 
 # ---------------------------------------------
 # Output paths
@@ -19,8 +18,9 @@ model_evaluator_path = "module/architectures/EvaluatorAutoEncoder.py"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_activations/"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_small_archs/"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_norms/"
-output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_1_efp/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_1_efp/"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_archs/"
+output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_tiedWeights/"
 summary_path = output_path+"summary/"
 
 results_path = output_path+"trainingRuns/"
@@ -29,8 +29,8 @@ stat_hists_path = output_path+"stat_hists.root"
 
 # output_file_suffix = "_noChargedFraction"
 # output_file_suffix = "_noAxis2"
-output_file_suffix = "_same_train_val_scaler"
-# output_file_suffix = ""
+# output_file_suffix = "_same_train_val_scaler"
+output_file_suffix = ""
 
 # ---------------------------------------------
 # Build general training/evaluation settings dictionary
@@ -90,7 +90,7 @@ training_params = {
 
     'metric': 'accuracy',
     
-    'epochs': 400,
+    'epochs': 5,
     
     'learning_rate': 0.00051,
     'es_patience': 12,
@@ -113,12 +113,14 @@ training_params = {
     # "activation": "selu",
     # "activation": "exponential",
     
-    "output_activation": "linear"
+    "output_activation": "linear",
+
+    "tied_weights": True
 }
 
 # ---------------------------------------------
 # Number of models to train
-n_models = 5
+n_models = 1
 
 # ---------------------------------------------
 # Pick normalization type (definitions below):
@@ -194,17 +196,16 @@ n_events_per_class = 10000
 # Output file names
 arch_summary = str(training_params["intermediate_architecture"]).replace("(","").replace(")","").replace(",","_").replace(" ","_")
 
-file_name = "hlf_efp_{}_bottle_{}_arch_{}_loss_{}_optimizer_{}_batch_size_{}_scaler_{}_activation_{}{}".format(efp_base,
-                                                                                                               training_params["bottleneck_size"],
-                                                                                                               arch_summary,
-                                                                                                               training_params["loss"],
-                                                                                                               training_params["optimizer"],
-                                                                                                               training_params["batch_size"],
-                                                                                                               norm_type,
-                                                                                                               training_params["activation"],
-                                                                                                               output_file_suffix
-                                                                                                               )
-
+file_name = "efp_{}".format(efp_base)
+file_name += "_bottle_{}".format(training_params["bottleneck_size"])
+file_name += "_arch_{}".format(arch_summary)
+file_name += "_loss_{}".format(training_params["loss"])
+file_name += "_optimizer_{}".format(training_params["optimizer"])
+file_name += "_batchSize_{}".format(training_params["batch_size"])
+file_name += "_{}".format(norm_type)
+file_name += "_activation_{}".format(training_params["activation"])
+file_name += "_tiedWeights_{}".format(training_params["tied_weights"])
+file_name += "{}".format(output_file_suffix)
 
 test_filename_pattern = file_name+"_v"
 # test_filename_pattern = "hlf_efp_3_bottle_9_arch_18__15__12_loss_mean_absolute_error_batch_size_256_v0"

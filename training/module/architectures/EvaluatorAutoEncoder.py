@@ -187,31 +187,40 @@ class EvaluatorAutoEncoder:
         
     def __load_model(self, summary):
     
-        model_path = summary.training_output_path + ".h5"
+        model_path = summary.training_output_path + ".tf"
 
         try:
-            print("Trying to read model with keras load_model")
+            print("Trying to read model with keras load_model with .tf extension")
             model = tf.keras.models.load_model(model_path, custom_objects=self.custom_objects)
         except:
-            print("Failed reading model with keras load_model")
-            model_path = model_path.replace(".h5", ".pkl")
+            print("Failed reading model with keras load_model with .tf extension")
+            model_path = model_path.replace(".tf", ".h5")
+
             try:
-                print("Trying to read model with model_from_json")
-                model_file = open(model_path, 'rb')
-                model = model_from_json(pickle.load(model_file), custom_objects=self.custom_objects)
-            except IOError:
-                print("Failed reading model with model_from_json")
-                return None
+                print("Trying to read model with keras load_model with .h5 extension")
+                model = tf.keras.models.load_model(model_path, custom_objects=self.custom_objects)
+            except:
+                print("Failed reading model with keras load_model with .h5 extensiion")
+                model_path = model_path.replace(".h5", ".pkl")
+                try:
+                    print("Trying to read model with model_from_json")
+                    model_file = open(model_path, 'rb')
+                    model = model_from_json(pickle.load(model_file), custom_objects=self.custom_objects)
+                except IOError:
+                    print("Failed reading model with model_from_json")
+                    return None
 
-        model.summary()
+        try:
+            print("Trying to load weights from h5 file")
+            model.load_weights(summary.training_output_path + "_weights.h5")
+        except:
+            print("Failed")
+            try:
+                print("Trying to load weights from tf file")
+                model.load_weights(summary.training_output_path + "_weights.tf")
+            except:
+                print("Failed")
 
-        # config = model.get_config()
-        #
-        # with keras.utils.custom_object_scope(self.custom_objects):
-        #     model = keras.Model.from_config(config)
-    
-        model.load_weights(summary.training_output_path + "_weights.h5")
-        
         return model
 
     def __get_aucs(self, summary, data_processor, data_loader, model, loss_function, test_key='qcd'):

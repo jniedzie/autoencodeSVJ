@@ -85,25 +85,32 @@ class Trainer:
         
         model = self.model_trainer.model
 
-        pickle_output_path = self.training_output_path + ".h5"
+        pickle_output_path = self.training_output_path + ".tf"
         Path(os.path.dirname(pickle_output_path)).mkdir(parents=True, exist_ok=True)
 
         try:
-            print("Trying to save model using keras save_model")
-            tf.keras.models.save_model(model, pickle_output_path)
+            print("Trying to save model using keras save_model with .tf extension")
+            tf.keras.models.save_model(model, pickle_output_path, save_format="tf")
         except AttributeError:
-            print("Failed saving model using keras save_model")
-            pickle_output_path = pickle_output_path.replace(".h5", ".pkl")
+            print("Failed saving model using keras save_model with .tf extension")
             try:
-                print("Trying to save model using to_json")
-                pickle.dump(model.to_json(), open(pickle_output_path, 'wb'))
-            except AttributeError:
-                print("Failed saving model using to_json")
+                print("Trying to save model using keras save_model with .h5 extension")
+                pickle_output_path = pickle_output_path.replace(".tf", ".h5")
+                tf.keras.models.save_model(model, pickle_output_path)
+            except:
+                print("Failed saving model using keras save_model with .h5 extension")
+                pickle_output_path = pickle_output_path.replace(".h5", ".pkl")
                 try:
-                    print("Trying to save model directly")
-                    pickle.dump(model, open(pickle_output_path, 'wb'))
-                except TypeError:
-                    print("Failed to save model")
+                    print("Trying to save model using to_json")
+                    pickle.dump(model.to_json(), open(pickle_output_path, 'wb'))
+                except AttributeError:
+                    print("Failed saving model using to_json")
+                    try:
+                        print("Trying to save model directly to pkl")
+                        pickle.dump(model, open(pickle_output_path, 'wb'))
+                    except TypeError:
+                        print("Failed to save model")
+                        return
 
         print("Successfully saved the model")
         

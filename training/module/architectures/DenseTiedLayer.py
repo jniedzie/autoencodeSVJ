@@ -8,7 +8,7 @@ import tensorflow as tf
 
 @tf.keras.utils.register_keras_serializable()
 class DenseTiedLayer(Layer):
-    
+
     def __init__(self, units,
                  tied_to=None,  # Enter a layer as input to enforce weight-tying
                  activation=None,
@@ -39,35 +39,54 @@ class DenseTiedLayer(Layer):
         self.bias_constraint = constraints.get(bias_constraint)
         self.input_spec = InputSpec(min_ndim=2)
         self.supports_masking = True
-    
+
     def build(self, input_shape):
         assert len(input_shape) >= 2
         input_dim = input_shape[-1]
-        
-        # We remove the weights and bias because we do not want them to be trainable
-        
+
+        ### This code could be potentialy useful
+        # self.kernel = K.transpose(self.tied_to.kernel)
+        # self._non_trainable_weights.append(self.kernel)
+        #
+        # if self.use_bias:
+        #     self.bias = self.add_weight(shape=(self.units,),
+        #                                 initializer=self.bias_initializer,
+        #                                 name='bias',
+        #                                 regularizer=self.bias_regularizer,
+        #                                 constraint=self.bias_constraint)
+        # else:
+        #     self.bias = None
+        ###
+
         self.input_spec = InputSpec(min_ndim=2, axes={-1: input_dim})
         self.built = True
-    
+
     def call(self, inputs, **kwargs):
         # Return the transpose layer mapping using the explicit weight matrices
+
         output = K.dot(inputs - self.tied_weights[1], K.transpose(self.tied_weights[0]))
+
+        ### This code could be potentialy useful
+        # output = K.dot(inputs, self.kernel)
+        # if self.use_bias:
+        #     output = K.bias_add(output, self.bias, data_format='channels_last')
+        ###
+
         if self.activation is not None:
             output = self.activation(output)
         return output
-    
+
     def compute_output_shape(self, input_shape):
         assert input_shape and len(input_shape) >= 2
         assert input_shape[-1]
         output_shape = list(input_shape)
         output_shape[-1] = self.units
         return tuple(output_shape)
-    
+
     def get_config(self):
         config = {
             'units': self.units,
             'tied_to': self.tied_to,
-            'tied_weights': self.tied_weights,
             'activation': activations.serialize(self.activation),
             'use_bias': self.use_bias,
             'kernel_initializer': initializers.serialize(self.kernel_initializer),
