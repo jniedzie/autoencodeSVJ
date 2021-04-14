@@ -3,12 +3,13 @@ from ROOT import TLegend, TH1D, TCanvas, gApplication, TGraph, TGraphErrors
 from ROOT import kRed, kOrange, kGreen, kBlue, kViolet, kBlack
 import glob
 
+show_plots = False
+
 input_paths = [
-    # (glob.glob("../trainingResults_previous_default/aucs/hlf_eflow_3_bottle_8_default_v*"), kRed, "old"),
-    # (glob.glob("../trainingResults_new_default/aucs/hlf_eflow_4_bottle_6_new_default_v*"), kBlue, "new"),
-    (glob.glob("../trainingResults_new_config/aucs/hlf_bottle_4_arch_8_loss_30__30_batch_size_mean_squared_error_v*"), kBlue, "mse"),
-    (glob.glob("../trainingResults_new_config/aucs/hlf_bottle_4_arch_8_loss_30__30_batch_size_mean_absolute_error_v*"), kGreen, "mae"),
-    (glob.glob("../trainingResults_new_config/aucs/hlf_bottle_4_arch_8_loss_30__30_batch_size_mean_squared_logarithmic_error_v*"), kViolet, "msle"),
+    (glob.glob("../trainingResults_1_efp/aucs/hlf_efp_3_bottle_5_arch_7__7_loss_mean_absolute_error_optimizer_Adam_batch_size_256_scaler_StandardScaler_activation_elu_noAxis2_v*"), kBlue, "(7, 7), BN: 1"),
+    (glob.glob("../trainingResults_1_efp/aucs/hlf_efp_3_bottle_5_arch_7__7_loss_mean_absolute_error_optimizer_Adam_batch_size_256_scaler_StandardScaler_activation_elu_same_train_val_scaler_v*"), kBlue, "(7, 7), BN: 1"),
+    (glob.glob("../trainingResults_1_efp/aucs/hlf_efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batch_size_256_scaler_StandardScaler_activation_elu_same_train_val_scaler_v*"), kBlue, "(7, 7), BN: 1"),
+    (glob.glob("../trainingResults_1_efp/aucs/hlf_efp_3_bottle_6_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batch_size_256_scaler_StandardScaler_activation_elu_same_train_val_scaler_v*"), kBlue, "(7, 7), BN: 1"),
 ]
 
 draw_auc_distributions = False
@@ -80,7 +81,7 @@ def drawHistsForVariable(stats, forMass):
 def print_average_auc_for_files(paths):
     
     auc_per_path = []
-    
+
     for path in paths:
         average_auc = 0
         count = 0
@@ -104,14 +105,18 @@ def print_average_auc_for_files(paths):
         auc_per_path.append((average_auc, path))
     
     auc_per_path = sorted(auc_per_path, key=lambda x: x[0])
-    
+
+    avg_auc = 0
+
     for auc, path in auc_per_path:
-        print("Avg auc for file: ", path, "is: ", auc)
+        avg_auc += auc
+
+    print("Avg auc for file: ", paths[0], "is: ", avg_auc/len(auc_per_path))
         
 
 def get_auc_params(csv_file_paths, forMass):
     model_stats = []
-    
+
     for csv_file_path in csv_file_paths:
     
         with open(csv_file_path, newline='') as csvfile:
@@ -124,10 +129,11 @@ def get_auc_params(csv_file_paths, forMass):
                     continue
     
                 values = row[0].split(",")
-    
+
+                mass = float(values[0])
+                rinv = float(values[1])
                 auc = float(values[2])
-                mass = float(values[3])
-                rinv = float(values[4])
+
     
                 model_stats.append((mass, rinv, auc))
     
@@ -202,11 +208,18 @@ if __name__ == "__main__":
     graphs_per_path_per_mass = {}
     
     for path, _, _ in input_paths:
+        if len(path) == 0:
+            print("Can't load AUC's, maybe you forgot to run produceMissingAucs.py ?")
+            continue
+
         graphs_per_path_per_rinv[path[0]] = get_graphs_from_path(path, forMass=True)
         graphs_per_path_per_mass[path[0]] = get_graphs_from_path(path, forMass=False)
         
         print_average_auc_for_files(path)
-        
+
+    if not show_plots:
+        exit()
+
     legend = TLegend(0.5, 0.7, 0.9, 0.9)
     
     for path, color, title in input_paths:
