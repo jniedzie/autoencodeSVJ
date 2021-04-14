@@ -18,7 +18,9 @@ model_evaluator_path = "module/architectures/EvaluatorAutoEncoder.py"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_excluding_eta_phi/"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_activations/"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_small_archs/"
-output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_norms/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_norms/"
+output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_1_efp/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_archs/"
 summary_path = output_path+"summary/"
 
 results_path = output_path+"trainingRuns/"
@@ -26,7 +28,9 @@ plots_path = output_path+"plots/"
 stat_hists_path = output_path+"stat_hists.root"
 
 # output_file_suffix = "_noChargedFraction"
+# output_file_suffix = "_noAxis2"
 output_file_suffix = "_same_train_val_scaler"
+# output_file_suffix = ""
 
 # ---------------------------------------------
 # Build general training/evaluation settings dictionary
@@ -37,7 +41,8 @@ training_general_settings = {
     "test_data_fraction": 0.15,
     "include_hlf": True,
     "include_efp": True,
-    "hlf_to_drop": ['Energy', 'Flavor', "ChargedFraction"],
+    "hlf_to_drop": ['Energy', 'Flavor', "ChargedFraction", "Axis2"],
+    "efp_to_drop": [str(i) for i in range(2, 13)],
 }
 
 evaluation_general_settings = {
@@ -92,10 +97,10 @@ training_params = {
     'lr_patience': 9,
     'lr_factor': 0.5,
     
-    "bottleneck_size": 9,
+    "bottleneck_size": 5,
     
-    "intermediate_architecture": (42, 42),
-    
+    "intermediate_architecture": (7, 7),
+
     # activation functions documentation
     # https://keras.io/api/layers/activations/
     # "activation": "relu",
@@ -113,7 +118,7 @@ training_params = {
 
 # ---------------------------------------------
 # Number of models to train
-n_models = 10
+n_models = 5
 
 # ---------------------------------------------
 # Pick normalization type (definitions below):
@@ -165,8 +170,7 @@ fraction_of_models_for_avg_chi2 = 0.8
 # only files matching this pattern will be used for tests
 
 
-test_filename_pattern = "hlf_efp_3_bottle_9_arch_42__42_loss_mean_absolute_error_optimizer_Adam_batch_size_256_scaler_StandardScaler_activation_elu_same_train_val_scaler_v0"
-# test_filename_pattern = "_v"
+
 
 # signal points for which tests will be done
 # masses = [1500, 2000, 2500, 3000, 3500, 4000]
@@ -202,6 +206,10 @@ file_name = "hlf_efp_{}_bottle_{}_arch_{}_loss_{}_optimizer_{}_batch_size_{}_sca
                                                                                                                )
 
 
+test_filename_pattern = file_name+"_v"
+# test_filename_pattern = "hlf_efp_3_bottle_9_arch_18__15__12_loss_mean_absolute_error_batch_size_256_v0"
+# test_filename_pattern = "_v"
+
 # ---------------------------------------------
 # Build specific training/evaluation settings dictionary (this will be passed to the specialized trainer class)
 training_settings = {
@@ -214,7 +222,6 @@ training_settings = {
 
 evaluation_settings = {
     "input_path": input_path,
-    # "custom_objects": {}
     "custom_objects": {
         "DenseTiedLayer": DenseTiedLayer,
     }

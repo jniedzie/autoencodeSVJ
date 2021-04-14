@@ -32,13 +32,17 @@ class Evaluator:
         
         self.model_evaluator = self.model_class(**evaluation_setting)
     
-    def get_weights(self):
+    def get_weights(self, test_file_name):
         summaries = summaryProcessor.get_summaries_from_path(self.summary_path)
     
         weights = {}
     
         for _, summary in summaries.df.iterrows():
             filename = summary.training_output_path.split("/")[-1]
+
+            if test_file_name not in filename:
+                continue
+
             weights[filename] = self.model_evaluator.get_weights(summary)
     
         return weights
@@ -188,11 +192,17 @@ class Evaluator:
         utils.set_random_seed(summary.seed)
         data_processor = DataProcessor(summary=summary)
         return self.model_evaluator.get_error(input_data, summary, data_processor, scaler)
-    
+
+    def get_latent_space_values(self, input_data, summary, scaler=None):
+        utils.set_random_seed(summary.seed)
+        data_processor = DataProcessor(summary=summary)
+        return self.model_evaluator.get_latent_space_values(input_data, summary, data_processor, scaler)
+
     def __get_data_loader(self, summary):
         data_loader = DataLoader()
         data_loader.set_params(include_hlf=summary.include_hlf,
                                include_eflow=summary.include_efp,
-                               hlf_to_drop=summary.hlf_to_drop
+                               hlf_to_drop=summary.hlf_to_drop,
+                               efp_to_drop=summary.efp_to_drop
                                )
         return data_loader

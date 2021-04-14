@@ -76,6 +76,26 @@ class EvaluatorAutoEncoder:
                                                           inverse=True)
         
         return reconstructed_denormed
+
+    def get_latent_space_values(self, input_data, summary, data_processor, scaler):
+
+        input_data_normed = data_processor.normalize(data_table=input_data,
+                                                     normalization_type=summary.norm_type,
+                                                     norm_args=summary.norm_args,
+                                                     scaler=scaler)
+
+        model = self.__load_model(summary)
+
+        n_layers = len(summary.intermediate_architecture) + 2
+        encoder = tf.keras.Model(model.input, model.layers[-n_layers].output)
+        print("\n\nEncoder:")
+        encoder.summary()
+
+        predicted_data = encoder.predict(input_data_normed.data)
+        latent_values = pd.DataFrame(predicted_data, dtype="float64")
+
+        return latent_values
+
         
     def get_error(self, input_data, summary, data_processor, scaler):
         recon = self.get_reconstruction(input_data, summary, data_processor, scaler)

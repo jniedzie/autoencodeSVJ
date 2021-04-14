@@ -9,6 +9,7 @@ from pathlib import Path
 import os, pickle
 import tensorflow as tf
 
+
 class Trainer:
 
     def __init__(self,
@@ -19,6 +20,7 @@ class Trainer:
                  include_hlf,
                  include_efp,
                  hlf_to_drop,
+                 efp_to_drop,
                  # arguments that will be passed to the specialized trainer class
                  **training_settings):
         """
@@ -35,6 +37,7 @@ class Trainer:
         self.include_hlf = include_hlf
         self.include_efp = include_efp
         self.hlf_to_drop = hlf_to_drop
+        self.efp_to_drop = efp_to_drop
 
         # Draw, set and save random seed
         self.seed = np.random.randint(0, 99999999)
@@ -49,7 +52,8 @@ class Trainer:
                                        seed=self.seed)
 
         data_loader = DataLoader()
-        data_loader.set_params(include_hlf=include_hlf, include_eflow=include_efp, hlf_to_drop=hlf_to_drop)
+        data_loader.set_params(include_hlf=include_hlf, include_eflow=include_efp,
+                               hlf_to_drop=hlf_to_drop, efp_to_drop=efp_to_drop)
 
         # Initialize specialized trainer object
         self.model_trainer = self.model_class(data_processor=data_processor,
@@ -116,6 +120,7 @@ class Trainer:
             'include_hlf': self.include_hlf,
             'include_efp': self.include_efp,
             'hlf_to_drop': tuple(self.hlf_to_drop),
+            'efp_to_drop': tuple(self.efp_to_drop),
             'start_time': str(self.start_timestamp),
             'end_time': str(self.end_timestamp),
         }
