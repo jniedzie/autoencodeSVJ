@@ -21,11 +21,13 @@ class DataLoader:
         self.include_hlf = None
         self.include_eflow = None
         self.hlf_to_drop = None
+        self.efp_to_drop = None
 
-    def set_params(self, include_hlf, include_eflow, hlf_to_drop):
+    def set_params(self, include_hlf, include_eflow, hlf_to_drop, efp_to_drop):
         self.include_hlf = include_hlf
         self.include_eflow = include_eflow
         self.hlf_to_drop = hlf_to_drop
+        self.efp_to_drop = efp_to_drop
         
     def load_all_data(self, globstring, name):
     
@@ -55,7 +57,8 @@ class DataLoader:
         data_loader = DataLoader(name)
         data_loader.set_params(include_hlf=self.include_hlf,
                                include_eflow=self.include_eflow,
-                               hlf_to_drop=self.hlf_to_drop)
+                               hlf_to_drop=self.hlf_to_drop,
+                               efp_to_drop=self.efp_to_drop)
         
         for f in files:
             data_loader.add_sample(f)
@@ -106,7 +109,7 @@ class DataLoader:
         if not isinstance(tables, list) or isinstance(tables, tuple):
             tables = [tables]
         for i, table in enumerate(tables):
-            tables[i].cdrop(['0'] + self.hlf_to_drop, inplace=True)
+            tables[i].cdrop(['0'] + self.hlf_to_drop + self.efp_to_drop, inplace=True)
         
             newNames = dict()
         
@@ -142,7 +145,7 @@ class DataLoader:
         if not isinstance(tables, list) or isinstance(tables, tuple):
             tables = [tables]
         for i, table in enumerate(tables):
-            tables[i].cdrop(['0'], inplace=True)
+            tables[i].cdrop(['0'] + self.efp_to_drop, inplace=True)
             tables[i].df.rename(columns=dict([(c, "eflow {}".format(c)) for c in tables[i].df.columns if c.isdigit()]),
                                 inplace=True)
             tables[i].headers = list(tables[i].df.columns)
