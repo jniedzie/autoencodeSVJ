@@ -31,13 +31,16 @@ def get_qcd_chi2_per_variable(summary, evaluator):
 
 def get_reconstruction_chi2s(summaries, evaluator):
     chi2_values = {}
-    
+
+    print("Filename pattern: ", config.test_filename_pattern)
+
     for _, summary in summaries.df.iterrows():
         
         filename = summary.training_output_path.split("/")[-1]
         if config.test_filename_pattern not in filename:
             continue
-        
+
+        print("Analyzing file: ", filename)
         chi2_values[filename] = get_qcd_chi2_per_variable(summary, evaluator)
     
     return chi2_values

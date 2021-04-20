@@ -6,10 +6,7 @@ import glob
 show_plots = False
 
 input_paths = [
-    (glob.glob("../trainingResults_1_efp/aucs/hlf_efp_3_bottle_5_arch_7__7_loss_mean_absolute_error_optimizer_Adam_batch_size_256_scaler_StandardScaler_activation_elu_noAxis2_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_1_efp/aucs/hlf_efp_3_bottle_5_arch_7__7_loss_mean_absolute_error_optimizer_Adam_batch_size_256_scaler_StandardScaler_activation_elu_same_train_val_scaler_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_1_efp/aucs/hlf_efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batch_size_256_scaler_StandardScaler_activation_elu_same_train_val_scaler_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_1_efp/aucs/hlf_efp_3_bottle_6_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batch_size_256_scaler_StandardScaler_activation_elu_same_train_val_scaler_v*"), kBlue, "(7, 7), BN: 1"),
+    (glob.glob("../trainingResults_oldSamples/aucs/efp_3_bottle_5_arch_7__loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_v*"), kBlue, "(7, 7), BN: 1"),
 ]
 
 draw_auc_distributions = False

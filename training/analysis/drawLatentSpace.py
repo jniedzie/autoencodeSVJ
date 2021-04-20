@@ -92,14 +92,8 @@ def save_1d_latent_plots(summary, evaluator):
     
     plots = zip(qcd_latent_plots, signal_latent_plots)
 
-    total_chi2 = 0
-
     for qcd_latent_plot, signal_latent_plots in plots:
         canvas.cd(i_plot)
-
-        chi2 = get_hists_chi_2(signal_latent_plots[0], qcd_latent_plot)
-        print("chi2 ", i_plot - 1, " :", chi2)
-        total_chi2 += chi2
 
         first_plot = True
         
@@ -108,12 +102,7 @@ def save_1d_latent_plots(summary, evaluator):
             first_plot = False
 
         qcd_latent_plot.DrawNormalized("" if first_plot else "same")
-
-
-
         i_plot += 1
-
-    print("total chi2: ", total_chi2)
 
     legend.Draw()
     canvas.Update()
@@ -129,38 +118,20 @@ def save_1d_latent_plots(summary, evaluator):
 
     i_plot = 1
 
-    avg_correlation = 0
-    n_avg_correlation = 0
-
     for x, plots_row in enumerate(qcd_latent_correlation_plots):
 
         for y, plot in enumerate(plots_row):
             canvas_correlation.cd(i_plot)
             plot.Draw("colz")
-
-            correlation = plot.GetCorrelationFactor()
-
-            print(correlation, end="\t")
-
-            if x < y:
-                avg_correlation += correlation
-                n_avg_correlation += 1
-
             i_plot += 1
 
         print()
-
-
-    avg_correlation = avg_correlation/n_avg_correlation
-
-    print("Avg correlation: ", avg_correlation)
 
     canvas_correlation.Update()
     filename = config.plots_path + summary.training_output_path.split("/")[-1] + "_latent_corr.pdf"
 
     canvas_correlation.SaveAs(filename)
     saved_plots.append(filename)
-
 
 
 def main():
@@ -182,7 +153,7 @@ def main():
             continue
         
         save_1d_latent_plots(summary, evaluator)
-        break
+
 
     print("\n\nthe following plots were created:\n")
     for path in saved_plots:
