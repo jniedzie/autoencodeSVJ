@@ -1,8 +1,8 @@
 #include "SVJFinder.hpp"
 #include "LorentzMock.h"
 
-const int maxNelectrons = 0;
-const int maxNmuons = 0;
+const int maxNelectrons = 99999;
+const int maxNmuons = 99999;
 const double minLeptonPt = 10; // GeV
 const double maxLeptonEta = 2.4;
 const double minLeptonIsolation = 0.4;

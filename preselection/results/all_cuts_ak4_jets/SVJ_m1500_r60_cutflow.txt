@@ -1,0 +1,2 @@
+50000, 43262, 37812, 31918, 27159, 18275, 4080, 447, 197, 197
+0 Passing Electrons, 0 Passing Muons, n Jets > 1, abs jet Etas < 2.4, abs DeltaEta < 1.5, Jet PT > 200, M_T > 1500, MET/M_T > 0.25, final selection

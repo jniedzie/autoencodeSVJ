@@ -14,7 +14,7 @@ echo "Setting up ROOT"
 
 . /cvmfs/sft.cern.ch/lcg/app/releases/ROOT/6.22.02/x86_64-centos7-gcc48-opt/bin/thisroot.sh
 
-i=$(($1-1))
+i=$(($1))
 
 echo "Running for QCD part: ${i}"
 
@@ -24,9 +24,11 @@ selections_type=no_lepton_veto_fat_jets
 #selections_type=no_lepton_veto_ak4_jets
 
 selections_path=../preselection/results/${selections_type}/qcd_merged/QCD_part_${i}.txt
-output_path=results/${selections_type}/qcd/QCD_part_${i}.h5
+output_path=results/${selections_type}_dr0p8_efp4/qcd
+mkdir -p $output_path
+output_path=${output_path}/QCD_part_${i}.h5
 
-python rootToH5.py -i $selections_path -o $output_path -e 3
+python rootToH5.py -i $selections_path -o $output_path -e 3 -r 0.8
 
 
 #source /cvmfs/sft.cern.ch/lcg/views/LCG_93/x86_64-centos7-gcc7-opt/setup.sh

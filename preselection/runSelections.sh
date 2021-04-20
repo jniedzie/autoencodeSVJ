@@ -1,12 +1,17 @@
 #!/bin/bash
 
-output_path=results/all_cuts_fat_jets/
+output_path=results/no_lepton_veto_fat_jets/
+#output_path=results/no_lepton_veto_ak4_jets/
+#output_path=results/all_cuts_fat_jets/
+#output_path=results/all_cuts_ak4_jets/
 
 nEvents=$1
 i=$(($2-1))
 
 cd /afs/cern.ch/work/j/jniedzie/private/svjets/autoencodeSVJ/preselection
 . setenv.sh
+
+mkdir -p $output_path
 
 ir=$(($i / 6))
 im=$(($i % 6))

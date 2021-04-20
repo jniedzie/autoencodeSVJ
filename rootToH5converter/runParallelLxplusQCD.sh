@@ -2,10 +2,10 @@
 
 
 # run for all QCD parts from 1 to 30
-iConvs=($(seq 0 1 30))
+#iConvs=($(seq 0 1 20))
 
 # or pick just a few
-#iConvs=(2 9 5 17 29)
+iConvs=(10 11 17 20)
 
 # list of lxplus servers that are working and can be accessed without providing a password
 goodServers=(1 3 4 6 7 8 10 11 12 13 14 15 16 18 19 20 21 22 23 24 25 26 27 28 30 31 32 33 34 35)
