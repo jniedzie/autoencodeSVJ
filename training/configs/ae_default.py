@@ -23,7 +23,8 @@ train_on_signal = False
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_tiedWeights/"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_flatAe/"
 
-output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_oldSamples/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_oldSamples/"
+output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_withConstituents/"
 
 summary_path = output_path+"summary/"
 
@@ -42,6 +43,7 @@ training_general_settings = {
     "test_data_fraction": 0.15,
     "include_hlf": True,
     "include_efp": True,
+    "include_constituents": True,
     "hlf_to_drop": ['Energy', 'Flavor', "ChargedFraction"],
     "efp_to_drop": [str(i) for i in range(2, 13)],
 }
@@ -57,10 +59,13 @@ evaluation_general_settings = {
 # Path to training data
 efp_base = 3
 # qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8/base_{}/*.h5".format(efp_base)
-qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/old_training_data/qcd/base_{}/*.h5".format(efp_base)
+# qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/old_training_data/qcd/base_{}/*.h5".format(efp_base)
+qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/test_data/base_{}/*.h5".format(efp_base)
 
 # signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8/"
-signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/old_training_data/all_signals/"
+# signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/old_training_data/all_signals/"
+signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/test_data"
+
 
 # Path to testing data
 input_path = signals_base_path+"/*/base_{}/*.h5".format(efp_base)

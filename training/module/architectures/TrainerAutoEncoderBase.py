@@ -48,7 +48,7 @@ class TrainerAutoEncoderBase:
         """
         Loading and splitting the data for the training, using data loader and data processor.
         """
-        (self.qcd, _, _, _) = self.data_loader.load_all_data(self.qcd_path, "QCD")
+        (self.qcd, _, _) = self.data_loader.load_all_data(self.qcd_path, "QCD")
         (self.train_data, self.validation_data, _) = self.data_processor.split_to_train_validate_test(
             data_table=self.qcd)
     

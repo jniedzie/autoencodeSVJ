@@ -23,9 +23,10 @@ class DataLoader:
         self.hlf_to_drop = None
         self.efp_to_drop = None
 
-    def set_params(self, include_hlf, include_eflow, hlf_to_drop, efp_to_drop):
+    def set_params(self, include_hlf, include_eflow, include_constituents, hlf_to_drop, efp_to_drop):
         self.include_hlf = include_hlf
         self.include_eflow = include_eflow
+        self.include_constituents = include_constituents
         self.hlf_to_drop = hlf_to_drop
         self.efp_to_drop = efp_to_drop
         
@@ -50,13 +51,17 @@ class DataLoader:
     
         if self.include_eflow:
             to_include.append("jet_eflow_variables")
-    
+
+        if self.include_constituents:
+            to_include.append("jet_constituents")
+
         if not (self.include_hlf or self.include_eflow):
             raise AttributeError
     
         data_loader = DataLoader(name)
         data_loader.set_params(include_hlf=self.include_hlf,
                                include_eflow=self.include_eflow,
+                               include_constituents=self.include_constituents,
                                hlf_to_drop=self.hlf_to_drop,
                                efp_to_drop=self.efp_to_drop)
         
@@ -85,10 +90,9 @@ class DataLoader:
         event.headers = list(event.df.columns)
         
         data = train_modify(data_loader.make_tables(to_include, name, 'stack'))
-        jets = train_modify(data_loader.make_tables(to_include, name, 'split'))
         flavors = data_loader.make_table('jet_features', name + ' jet flavor', 'stack').cfilter("Flavor")
     
-        return data, jets, event, flavors
+        return data, event, flavors
 
     def __glob_in_repo(self, globstring):
         info = {}
@@ -218,6 +222,22 @@ class DataLoader:
                     name=name,
                 )
                 # combine behavior
+        elif len(data.shape) == 4:
+
+            new_labels = []
+            for i_constituent in range(len(data[0][0])):
+                for label in labels:
+                    new_labels.append(label+np.bytes_(str(i_constituent)))
+
+
+            stacked_data = np.vstack(data)
+            stacked_data = stacked_data.transpose((1, 2, 0)) # [eta_1, phi_1, pt_1, y_1, E_1, eta_2, phi_2, pt_2, y_2, E_2, ...]
+            # stacked_data = stacked_data.transpose((2, 1, 0))  # [eta_1, eta_2,..., phi_1, phi_2, ..., pt_1, pt_2, ... , y_1, y_2, ..., E_1, E_2, ...]
+            stacked_data = np.vstack(stacked_data)
+            stacked_data = stacked_data.transpose()
+
+            return DataTable(stacked_data, headers=new_labels, name=name )
+
         else:
             raise AttributeError
     

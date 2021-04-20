@@ -19,6 +19,7 @@ rootToH5converter/test_selections_delphes.txt
 rootToH5converter/test_selections_nanoAOD.txt
 rootToH5converter/output*.txt
 rootToH5converter/results/*
+rootToH5converter/test_withConstituents.C
 
 
 

@@ -19,6 +19,7 @@ class Trainer:
                  test_data_fraction,
                  include_hlf,
                  include_efp,
+                 include_constituents,
                  hlf_to_drop,
                  efp_to_drop,
                  # arguments that will be passed to the specialized trainer class
@@ -36,6 +37,7 @@ class Trainer:
         self.test_data_fraction = test_data_fraction
         self.include_hlf = include_hlf
         self.include_efp = include_efp
+        self.include_constituents = include_constituents
         self.hlf_to_drop = hlf_to_drop
         self.efp_to_drop = efp_to_drop
 
@@ -53,6 +55,7 @@ class Trainer:
 
         data_loader = DataLoader()
         data_loader.set_params(include_hlf=include_hlf, include_eflow=include_efp,
+                               include_constituents=include_constituents,
                                hlf_to_drop=hlf_to_drop, efp_to_drop=efp_to_drop)
 
         # Initialize specialized trainer object
@@ -126,6 +129,7 @@ class Trainer:
             'test_split': self.test_data_fraction,
             'include_hlf': self.include_hlf,
             'include_efp': self.include_efp,
+            'include_constituents': self.include_constituents,
             'hlf_to_drop': tuple(self.hlf_to_drop),
             'efp_to_drop': tuple(self.efp_to_drop),
             'start_time': str(self.start_timestamp),
