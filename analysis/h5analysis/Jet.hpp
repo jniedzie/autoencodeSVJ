@@ -10,22 +10,19 @@
 #define Jet_hpp
 
 #include "Helpers.hpp"
+#include "Constituent.hpp"
 
-class Jet{
+class Jet
+{
 public:
   Jet(){}
   
-  vector<double> EFPs;
-  double eta, phi, pt, mass, chargedFraction, PTD, axis2, flavor, energy;
   
-  void print(){
-    cout<<"Jet:"<<endl;
-    cout<<"\teta: "<<eta<<"\tphi: "<<phi<<"\tpt: "<<pt<<"\tmass: "<<mass<<"\tcharged fraction: "<<chargedFraction;
-    cout<<"\tPTD: "<<PTD<<"\taxis2: "<<axis2<<"\tflavor: "<<flavor<<"\tenergy: "<<energy<<endl;
-    cout<<"\tEFPs:";
-    for(double EFP : EFPs) cout<<EFP<<"\t";
-    cout<<endl;
-  }
+  double eta, phi, pt, mass, chargedFraction, PTD, axis2, flavor, energy;
+  vector<double> EFPs;
+  vector<shared_ptr<Constituent>> constituents;
+  
+  void print();
 };
 
 #endif /* Jet_hpp */

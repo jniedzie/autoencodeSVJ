@@ -12,21 +12,15 @@
 #include "Helpers.hpp"
 #include "Jet.hpp"
 
-class Event{
+class Event
+{
 public:
   Event(){}
   
   double MET, METeta, METphi, MT, Mjj;
-  
   vector<shared_ptr<Jet>> jets;
   
-  void print(){
-    cout<<"Event:"<<endl;
-    cout<<"\tMET: "<<MET<<"\tMETeta: "<<METeta<<"\tMETphi: "<<METphi;
-    cout<<"\tMT: "<<MT<<"\tMjj: "<<Mjj<<endl;
-    cout<<"\tJets:"<<endl;
-    for(auto jet : jets) jet->print();
-  }
+  void print();
 };
 
 #endif /* Event_hpp */
