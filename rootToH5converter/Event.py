@@ -152,7 +152,7 @@ class Event:
         
         has_jets_with_no_constituents = False
     
-        for i in range(0, max_n_jets):
+        for i in range(0, min(max_n_jets, len(self.jets))):
             if len(self.jets[i].constituents) == 0:
                 has_jets_with_no_constituents = True
                 break
