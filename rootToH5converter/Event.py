@@ -5,7 +5,7 @@ from DataProcessor import InputTypes
 
 
 class Event:
-    def __init__(self, input_type, data_processor, i_event, delta_r, use_fat_jets=False):
+    def __init__(self, input_type, data_processor, i_event, delta_r, use_fat_jets=False, verbosity_level=1):
         """
         Reads/calculates event level features, loads jets, tracks, photons and neutral hadrons.
         Adds jet constituents to jets.
@@ -15,6 +15,8 @@ class Event:
         self.delta_r = delta_r
         self.data_processor = data_processor
         self.input_type = input_type
+    
+        self.verbosity_level = verbosity_level
     
         # account for the fact that in Delphes MET is stored in an array with just one element
         i_object = None
@@ -165,15 +167,15 @@ class Event:
         """
         
         if len(self.jets) <= 1:
-            print("ERROR -- events has less than 2 jets, which should never happen!")
+            if self.verbosity_level > 0:
+                print("ERROR -- events has less than 2 jets, which should never happen!")
             return
         
         if len(self.jets) != 2:
-            print("WARNING -- expected two jets in the event, but there are ", len(self.jets))
+            if self.verbosity_level > 1:
+                print("WARNING -- expected two jets in the event, but there are ", len(self.jets))
         
         dijet_vector = self.jets[0].get_four_vector() + self.jets[1].get_four_vector()
-        
-        print("\n\n MET phi: ", self.metPhi)
         
         met_py = self.metPt * np.sin(self.metPhi)
         met_px = self.metPt * np.cos(self.metPhi)

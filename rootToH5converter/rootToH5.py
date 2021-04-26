@@ -24,6 +24,9 @@ parser.add_argument("-j", "--store_n_jets", dest="store_n_jets", type=int, defau
 parser.add_argument("-f", "--use_fat_jets", dest="use_fat_jets", default=False, action='store_true',
                     help="Should fat jets be stored instead of AK4 (default: False).")
 
+parser.add_argument("-v", "--verbosity_level", dest="verbosity_level", type=int, default=1,
+                    help="Verbosity level. 0 - no output, 1 - basic output, 2 - detailed output. (default: 1).")
+
 args = parser.parse_args()
 
 
@@ -35,12 +38,15 @@ print("max constituents: ", args.max_constituents)
 print("EFP basis degree: ", args.EFP_degree)
 print("=======================================================\n\n")
 
+
+
 converter = Converter(input_path = args.input_path,
                       store_n_jets= args.store_n_jets,
                       jet_delta_r = args.delta_r,
                       efp_degree=args.EFP_degree,
                       max_n_constituents=args.max_constituents,
-                      use_fat_jets=args.use_fat_jets
+                      use_fat_jets=args.use_fat_jets,
+                      verbosity_level=args.verbosity_level
                       )
 
 converter.convert()

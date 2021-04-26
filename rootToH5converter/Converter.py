@@ -18,12 +18,12 @@ class OutputTypes(Enum):
 
 class Converter:
 
-    def __init__(self, input_path, store_n_jets, jet_delta_r, max_n_constituents, efp_degree, use_fat_jets=False):
+    def __init__(self, input_path, store_n_jets, jet_delta_r, max_n_constituents, efp_degree, use_fat_jets=False, verbosity_level=1):
         """
         Reads input trees, recognizes input types, initializes EFP processor and prepares all arrays needed to
         store output variables.
         """
-        
+        self.verbosity_level = verbosity_level
         self.set_input_paths_and_selections(input_path=input_path)
 
         # read files, trees and recognize input type
@@ -34,9 +34,12 @@ class Converter:
         self.n_all_events = sum([tree.num_entries for tree in self.trees.values()])
         self.n_events = sum(map(len, list(self.selections.values()))) + 1
 
-        print("Found {0} file(s)".format(len(self.files)))
-        print("Found {0} tree(s)".format(len(self.trees)))
-        print("Found ", self.n_events - 1, " selected events, out of a total of ", self.n_all_events)
+        
+
+        if self.verbosity_level > 0:
+            print("Found {0} file(s)".format(len(self.files)))
+            print("Found {0} tree(s)".format(len(self.trees)))
+            print("Found ", self.n_events - 1, " selected events, out of a total of ", self.n_all_events)
 
         # set internal parameters
         self.jet_delta_r = jet_delta_r
@@ -47,12 +50,15 @@ class Converter:
 
         # initialize EFP set
         if efp_degree >= 0:
-            print("\n\n=======================================================")
-            print("Creating energyflow particle set with degree d <= {0}...".format(efp_degree))
-            self.efpset = ef.EFPSet("d<={0}".format(efp_degree), measure='hadr', beta=1.0, normed=True, verbose=True)
+            if self.verbosity_level > 0:
+                print("\n\n=======================================================")
+                print("Creating energyflow particle set with degree d <= {0}...".format(efp_degree))
+            verbose = True if self.verbosity_level>0 else False
+            self.efpset = ef.EFPSet("d<={0}".format(efp_degree), measure='hadr', beta=1.0, normed=True, verbose=verbose)
             self.EFP_size = self.efpset.count()
-            print("EFP set is size: {}".format(self.EFP_size))
-            print("=======================================================\n\n")
+            if self.verbosity_level > 0:
+                print("EFP set is size: {}".format(self.EFP_size))
+                print("=======================================================\n\n")
             
         # prepare arrays for event & jet features, EFPs and jet constituents
         
@@ -109,7 +115,8 @@ class Converter:
                 if key.startswith("Delphes"):
                     self.trees[path] = file["Delphes"]
                     self.input_types[path] = InputTypes.Delphes
-                    print("Adding Delphes tree")
+                    if self.verbosity_level > 0:
+                        print("Adding Delphes tree")
                 elif key.startswith("Events"):
                     self.trees[path] = file[key]
                 
@@ -119,10 +126,12 @@ class Converter:
                         self.input_types[path] = InputTypes.PFnanoAOD102X
                     else:
                         self.input_types[path] = InputTypes.nanoAOD
-                
-                    print("Adding nanoAOD tree: ", key)
+
+                    if self.verbosity_level > 0:
+                        print("Adding nanoAOD tree: ", key)
                 else:
-                    print("Unknown tree type: ", key, ". Skipping...")
+                    if self.verbosity_level > 0:
+                        print("Unknown tree type: ", key, ". Skipping...")
 
     def convert(self):
         """
@@ -135,31 +144,37 @@ class Converter:
     
             input_type = self.input_types[file_name]
             data_processor = DataProcessor(tree, input_type)
-    
-            print("\n\n=======================================================")
-            print("Loading events from file: ", file_name)
-            print("Input type was recognised to be: ", input_type)
+
+            if self.verbosity_level > 0:
+                print("\n\n=======================================================")
+                print("Loading events from file: ", file_name)
+                print("Input type was recognised to be: ", input_type)
 
             for iEvent in self.selections[file_name]:
-                print("\n\n------------------------------")
-                print("Event: ", iEvent)
+                if self.verbosity_level > 1:
+                    print("\n\n------------------------------")
+                    print("Event: ", iEvent)
+
+                if self.verbosity_level > 0 and total_count%100==0:
+                    print("Processed events:", total_count, "\tcurrent event number: ", iEvent)
                 
                 # load event
-                event = Event(input_type, data_processor, iEvent, self.jet_delta_r, self.use_fat_jets)
-                event.print()
+                event = Event(input_type, data_processor, iEvent, self.jet_delta_r, self.use_fat_jets, self.verbosity_level)
+
+                if self.verbosity_level > 1:
+                    event.print()
                 
                 # check event properties
                 if event.nJets < 2:
-                    print("WARNING -- event has less than 2 jets! Skipping...")
-                    print("------------------------------\n\n")
+                    if self.verbosity_level > 0:
+                        print("WARNING -- event has less than 2 jets! Skipping...")
+                    if self.verbosity_level > 1:
+                        print("------------------------------\n\n")
                     continue
-
-                if event.has_jets_with_no_constituents(self.max_n_jets):
-                    print("WARNING -- one of the jets that should be stored has no constituents. Skipping...")
-                    continue
-                    
+    
                 if not event.are_jets_ordered_by_pt():
-                    print("WARNING -- jets in the event are not ordered by pt! Skipping...")
+                    if self.verbosity_level > 0:
+                        print("WARNING -- jets in the event are not ordered by pt! Skipping...")
                     continue
                 
                 # fill feature arrays
@@ -168,7 +183,12 @@ class Converter:
                 for iJet, jet in enumerate(event.jets):
                     if iJet == self.max_n_jets:
                         break
-
+                    
+                    if len(jet.constituents)==0:
+                        if self.verbosity_level > 0:
+                            print("Jet has no constituents! Skipping...")
+                        continue
+                    
                     self.output_arrays[OutputTypes.JetFeatures][total_count, iJet, :] = jet.get_features()
 
                     if self.save_outputs[OutputTypes.JetConstituents]:
@@ -177,10 +197,14 @@ class Converter:
                     if self.save_outputs[OutputTypes.EPFs]:
                         self.output_arrays[OutputTypes.EPFs][total_count, iJet, :] = jet.get_EFPs(self.efpset)
                         
-                total_count += 1
-                print("------------------------------\n\n")
+                
+                if self.verbosity_level > 1:
+                    print("------------------------------\n\n")
 
-            print("\n\n=======================================================")
+                total_count += 1
+
+            if self.verbosity_level > 1:
+                print("\n\n=======================================================")
 
         # remove redundant rows for events that didn't meet some criteria
         for output_type in OutputTypes:
@@ -213,8 +237,9 @@ class Converter:
         if not output_file_name.endswith(".h5"):
             output_file_name += ".h5"
 
-        print("\n\n=======================================================")
-        print("Saving h5 data to file: ", output_file_name)
+        if self.verbosity_level > 0:
+            print("\n\n=======================================================")
+            print("Saving h5 data to file: ", output_file_name)
 
         # create output file
         file = h5py.File(output_file_name, "w")
@@ -225,6 +250,8 @@ class Converter:
         
         # save the file
         file.close()
-        print("Successfully saved!")
-        print("=======================================================\n\n")
+
+        if self.verbosity_level > 0:
+            print("Successfully saved!")
+            print("=======================================================\n\n")
         
