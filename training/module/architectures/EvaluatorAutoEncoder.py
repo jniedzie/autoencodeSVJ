@@ -210,6 +210,8 @@ class EvaluatorAutoEncoder:
                     print("Failed reading model with model_from_json")
                     return None
 
+        print("Model loaded")
+
         try:
             print("Trying to load weights from h5 file")
             model.load_weights(summary.training_output_path + "_weights.h5")
@@ -220,6 +222,8 @@ class EvaluatorAutoEncoder:
                 model.load_weights(summary.training_output_path + "_weights.tf")
             except:
                 print("Failed")
+
+        print("Weights loaded")
 
         return model
 

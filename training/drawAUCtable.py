@@ -87,8 +87,11 @@ def produce_dataframe(masses, rinvs, data):
         for rinv in rinvs:
             if rinv not in columns.keys():
                 columns[rinv] = []
-            
-            columns[rinv].append(data[(mass, rinv)])
+
+            if (mass, rinv) in data.keys():
+                columns[rinv].append(data[(mass, rinv)])
+            else:
+                columns[rinv].append(0.0)
     
     return pd.DataFrame(columns, index=masses, dtype=float)
 

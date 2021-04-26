@@ -6,7 +6,10 @@ import glob
 show_plots = False
 
 input_paths = [
-    (glob.glob("../trainingResults_oldSamples/aucs/efp_3_bottle_5_arch_7__loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_v*"), kBlue, "(7, 7), BN: 1"),
+
+    (glob.glob("../trainingResults_withConstituents/aucs/efp_3_bottle_50_arch_20__20_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_23constituents_v*"), kBlue, "(7, 7), BN: 1"),
+    (glob.glob("../trainingResults_withConstituents/aucs/efp_3_bottle_50_arch_50__50_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_23constituents_v*"), kBlue, "(7, 7), BN: 1"),
+    (glob.glob("../trainingResults_withConstituents/aucs/efp_3_bottle_10_arch_20__20_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_23constituents_v*"), kBlue, "(7, 7), BN: 1"),
 ]
 
 draw_auc_distributions = False
