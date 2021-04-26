@@ -91,6 +91,8 @@ class Jet:
             'PT',
             'Rapidity',
             'Energy',
+            'DeltaEta',
+            'DeltaPhi'
         ]
 
     def get_ptD(self):
@@ -213,7 +215,10 @@ class Jet:
     
         constituents = -np.ones((len(self.constituents), len(Jet.get_constituent_feature_names())))
         for i, c in enumerate(self.constituents):
-            constituents[i, :] = [c.Eta(), c.Phi(), c.Pt(), c.Rapidity(), c.E()]
+            delta_eta = c.Eta() - self.eta
+            delta_phi = self.get_four_vector().DeltaPhi(c)
+
+            constituents[i, :] = [c.Eta(), c.Phi(), c.Pt(), c.Rapidity(), c.E(), delta_eta, delta_phi]
 
         constituents = constituents[np.argsort(constituents[:, 2]), :][::-1][:max, :]
         constituents = np.pad(constituents, ((0, max - constituents.shape[0]), (0, 0)), 'constant')
