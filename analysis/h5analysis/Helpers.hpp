@@ -20,6 +20,9 @@
 #include <TH2D.h>
 #include <TApplication.h>
 #include <TCanvas.h>
+#include <TStyle.h>
+#include <TFile.h>
+#include <TLorentzVector.h>
 
 using namespace std;
 using namespace H5;

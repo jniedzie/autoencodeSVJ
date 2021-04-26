@@ -16,3 +16,8 @@ void Constituent::print()
   
   cout<<endl;
 }
+
+bool Constituent::isEmpty()
+{
+  return eta == 0 && phi == 0 && pt == 0;
+}

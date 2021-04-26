@@ -20,6 +20,9 @@ public:
   double eta, phi, pt, energy, rapidity;
   
   void print();
+  
+  bool isEmpty();
+  
 };
 
 #endif /* Constituent_hpp */
