@@ -204,6 +204,7 @@ class Evaluator:
                                include_eflow=summary.include_efp,
                                include_constituents=summary.include_constituents,
                                hlf_to_drop=summary.hlf_to_drop,
-                               efp_to_drop=summary.efp_to_drop
+                               efp_to_drop=summary.efp_to_drop,
+                               constituents_to_drop=summary.constituents_to_drop
                                )
         return data_loader

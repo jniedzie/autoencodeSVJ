@@ -32,7 +32,10 @@ results_path = output_path+"trainingRuns/"
 plots_path = output_path+"plots/"
 stat_hists_path = output_path+"stat_hists.root"
 
-output_file_suffix = ""
+# output_file_suffix = "_smallConstituents"
+# output_file_suffix = ""
+output_file_suffix = "_23constituents"
+
 
 # ---------------------------------------------
 # Build general training/evaluation settings dictionary
@@ -46,6 +49,8 @@ training_general_settings = {
     "include_constituents": True,
     "hlf_to_drop": ['Energy', 'Flavor', "ChargedFraction"],
     "efp_to_drop": [str(i) for i in range(2, 13)],
+    "constituents_to_drop": ["constituent_Rapidity_*"] + ["constituent_*_{}".format(i) for i in range(23, 100)]
+    # "constituents_to_drop": []
 }
 
 evaluation_general_settings = {
@@ -60,11 +65,12 @@ evaluation_general_settings = {
 efp_base = 3
 # qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8/base_{}/*.h5".format(efp_base)
 # qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/old_training_data/qcd/base_{}/*.h5".format(efp_base)
-qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/test_data/base_{}/*.h5".format(efp_base)
+# qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/test_data/base_{}/*.h5".format(efp_base)
+qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/base_{}/*.h5".format(efp_base)
 
 # signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8/"
 # signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/old_training_data/all_signals/"
-signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/test_data"
+signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/"
 
 
 # Path to testing data
@@ -127,9 +133,9 @@ training_params = {
     'lr_patience': 9,
     'lr_factor': 0.5,
     
-    "bottleneck_size": 5,
+    "bottleneck_size": 30,
     
-    "intermediate_architecture": (7, ),
+    "intermediate_architecture": (100, 100),
 
     # activation functions documentation
     # https://keras.io/api/layers/activations/
@@ -209,7 +215,7 @@ fraction_of_models_for_avg_chi2 = 0.8
 # masses = [2500, 3000, 3500, 4000]
 test_masses = [3000]
 # rinvs = [0.15, 0.30, 0.45, 0.60, 0.75]
-test_rinvs = [0.45]
+test_rinvs = [0.75]
 
 qcd_input_color = kGreen
 qcd_reco_color = kBlue

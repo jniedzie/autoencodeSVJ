@@ -9,6 +9,7 @@ from module.Evaluator import Evaluator
 import importlib, argparse
 from pathlib import Path
 from ROOT import TH1D, kGreen, kBlue, TCanvas, gApplication, gStyle, TLegend, kRed, gPad, kOrange
+import re
 
 # ------------------------------------------------------------------------------------------------
 # This script will draw input and reconstructed variables for signal found in the
@@ -25,11 +26,23 @@ config = importlib.import_module(config_path)
 
 saved_plots = []
 
+constituents_to_plot = [0, 9]
+1
 
 def get_plots_for_all_variables(data, color, suffix=""):
     plots = []
     
     for variable_name in data.keys():
+        if re.match(r"constituent_[a-zA-Z0-9_]+", variable_name):
+            should_plot = False
+            for constituent_number in constituents_to_plot:
+                if re.match(r"constituent_[a-zA-Z]+_{}".format(constituent_number), variable_name):
+                    should_plot = True
+
+            if not should_plot:
+                continue
+
+        print("Filling histogram for ", variable_name)
         hist = get_histogram(data, variable_name, color, suffix)
         plots.append(hist)
     
@@ -40,6 +53,7 @@ def get_qcd_and_signal_reco_plots(summary, evaluator):
     qcd_input_data = evaluator.get_qcd_data(summary=summary, test_data_only=False)
     qcd_reconstructed = evaluator.get_reconstruction(input_data=qcd_input_data, summary=summary)
 
+    print("Preparing QCD plots")
     qcd_input_plots = get_plots_for_all_variables(qcd_input_data, color=config.qcd_input_color, suffix="QCD_input")
     qcd_reco_plots = get_plots_for_all_variables(qcd_reconstructed, color=config.qcd_reco_color, suffix="QCD_reco")
 
@@ -47,7 +61,8 @@ def get_qcd_and_signal_reco_plots(summary, evaluator):
 
     signals_input_plots = []
     signals_reco_plots = []
-    
+
+    print("Preparing SVJ plots")
     for path in get_signal_paths(config):
         signal_input_data = evaluator.get_signal_data(name="", path=path, summary=summary, test_data_only=False)
         signal_reco_data = evaluator.get_reconstruction(input_data=signal_input_data, summary=summary, scaler=scaler)
@@ -62,15 +77,16 @@ def get_qcd_and_signal_reco_plots(summary, evaluator):
 
 
 def save_variable_distribution_plots(summary, evaluator):
-    
+
+    print("Creating plots")
     qcd_input_plots, qcd_reco_plots, signal_input_plots, signal_reco_plots = get_qcd_and_signal_reco_plots(summary, evaluator)
     
     # transpose:
     signal_input_plots = [list(x) for x in zip(*signal_input_plots)]
     signal_reco_plots = [list(x) for x in zip(*signal_reco_plots)]
     
-    canvas = TCanvas("", "", 2000, 1000)
-    canvas.Divide(5, 2)
+    canvas = TCanvas("", "", 2000, 2000)
+    canvas.Divide(5, 4)
     i_plot = 1
     
     legend = TLegend(0.5, 0.5, 0.9, 0.9)
@@ -78,9 +94,14 @@ def save_variable_distribution_plots(summary, evaluator):
     legend.AddEntry(qcd_reco_plots[0], "QCD reco", "l")
     legend.AddEntry(signal_input_plots[0][0], "SVJ input", "l")
     legend.AddEntry(signal_reco_plots[0][0], "SVJ reco", "l")
-    
+
+    print("Drawing plots")
     plots = zip(qcd_input_plots, qcd_reco_plots, signal_input_plots, signal_reco_plots)
     for qcd_input_hist, qcd_reco_hist, signal_input_hists, signal_reco_hists in plots:
+
+        if i_plot == 8:
+            i_plot = 11
+
         canvas.cd(i_plot)
 
         first_plot = True
@@ -100,7 +121,8 @@ def save_variable_distribution_plots(summary, evaluator):
     legend.Draw()
     canvas.Update()
     filename = config.plots_path + summary.training_output_path.split("/")[-1]  + ".pdf"
-    
+
+    print("Saving canvas")
     canvas.SaveAs(filename)
     saved_plots.append(filename)
 
@@ -117,7 +139,8 @@ def main():
         filename = summary.training_output_path.split("/")[-1]
         if config.test_filename_pattern not in filename:
             continue
-        
+
+        print("Producing plots for file: ", filename)
         save_variable_distribution_plots(summary, evaluator)
 
     print("\n\nthe following plots were created:\n")

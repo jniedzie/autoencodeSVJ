@@ -176,8 +176,6 @@ class DataTable:
     
         return match
 
-    
-
     def cdrop(self, globstr, inplace=False):
         to_drop = list(self.parse_globlist(globstr, list(self.df.columns)))
         

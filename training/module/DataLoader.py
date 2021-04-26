@@ -20,15 +20,18 @@ class DataLoader:
 
         self.include_hlf = None
         self.include_eflow = None
+        self.include_constituents = None
         self.hlf_to_drop = None
         self.efp_to_drop = None
+        self.constituents_to_drop = None
 
-    def set_params(self, include_hlf, include_eflow, include_constituents, hlf_to_drop, efp_to_drop):
+    def set_params(self, include_hlf, include_eflow, include_constituents, hlf_to_drop, efp_to_drop, constituents_to_drop):
         self.include_hlf = include_hlf
         self.include_eflow = include_eflow
         self.include_constituents = include_constituents
         self.hlf_to_drop = hlf_to_drop
         self.efp_to_drop = efp_to_drop
+        self.constituents_to_drop = constituents_to_drop
         
     def load_all_data(self, globstring, name):
     
@@ -63,7 +66,8 @@ class DataLoader:
                                include_eflow=self.include_eflow,
                                include_constituents=self.include_constituents,
                                hlf_to_drop=self.hlf_to_drop,
-                               efp_to_drop=self.efp_to_drop)
+                               efp_to_drop=self.efp_to_drop,
+                               constituents_to_drop=self.constituents_to_drop)
         
         for f in files:
             data_loader.add_sample(f)
@@ -113,7 +117,7 @@ class DataLoader:
         if not isinstance(tables, list) or isinstance(tables, tuple):
             tables = [tables]
         for i, table in enumerate(tables):
-            tables[i].cdrop(['0'] + self.hlf_to_drop + self.efp_to_drop, inplace=True)
+            tables[i].cdrop(['0'] + self.hlf_to_drop + self.efp_to_drop + self.constituents_to_drop, inplace=True)
         
             newNames = dict()
         
@@ -224,10 +228,10 @@ class DataLoader:
                 # combine behavior
         elif len(data.shape) == 4:
 
-            new_labels = []
+            constituents_labels = []
             for i_constituent in range(len(data[0][0])):
                 for label in labels:
-                    new_labels.append(label+np.bytes_(str(i_constituent)))
+                    constituents_labels.append(np.bytes_("constituent_")+label+np.bytes_("_"+str(i_constituent)))
 
 
             stacked_data = np.vstack(data)
@@ -236,7 +240,7 @@ class DataLoader:
             stacked_data = np.vstack(stacked_data)
             stacked_data = stacked_data.transpose()
 
-            return DataTable(stacked_data, headers=new_labels, name=name )
+            return DataTable(stacked_data, headers=constituents_labels, name=name )
 
         else:
             raise AttributeError

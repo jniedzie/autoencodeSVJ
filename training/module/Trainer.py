@@ -22,6 +22,7 @@ class Trainer:
                  include_constituents,
                  hlf_to_drop,
                  efp_to_drop,
+                 constituents_to_drop,
                  # arguments that will be passed to the specialized trainer class
                  **training_settings):
         """
@@ -40,6 +41,7 @@ class Trainer:
         self.include_constituents = include_constituents
         self.hlf_to_drop = hlf_to_drop
         self.efp_to_drop = efp_to_drop
+        self.constituents_to_drop = constituents_to_drop
 
         # Draw, set and save random seed
         self.seed = np.random.randint(0, 99999999)
@@ -56,7 +58,8 @@ class Trainer:
         data_loader = DataLoader()
         data_loader.set_params(include_hlf=include_hlf, include_eflow=include_efp,
                                include_constituents=include_constituents,
-                               hlf_to_drop=hlf_to_drop, efp_to_drop=efp_to_drop)
+                               hlf_to_drop=hlf_to_drop, efp_to_drop=efp_to_drop,
+                               constituents_to_drop=constituents_to_drop)
 
         # Initialize specialized trainer object
         self.model_trainer = self.model_class(data_processor=data_processor,
@@ -132,6 +135,7 @@ class Trainer:
             'include_constituents': self.include_constituents,
             'hlf_to_drop': tuple(self.hlf_to_drop),
             'efp_to_drop': tuple(self.efp_to_drop),
+            'constituents_to_drop': tuple(self.constituents_to_drop),
             'start_time': str(self.start_timestamp),
             'end_time': str(self.end_timestamp),
         }

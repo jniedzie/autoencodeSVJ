@@ -2,9 +2,13 @@ from ROOT import TH1D, TH2D, kGreen, kBlue, TCanvas, gApplication, gStyle, TLege
 
 bins = {
     "Eta": (-3.5, 3.5, 100),
+    "Rapidity": (-3.5, 3.5, 100),
     "Phi": (-3.5, 3.5, 100),
     "Pt": (0, 2000, 100),
+
     "M": (0, 800, 100),
+    "constituent_Energy": (0, 800, 100),
+    "constituent_PT": (0, 2000, 100),
     "ChargedFraction": (0, 1, 100),
     "PTD": (0, 1, 100),
     "Axis2": (0, 0.2, 100),
@@ -59,19 +63,16 @@ def __get_binning_for_variable(variable_name):
     """
     Returns (n_bins, min, max) for a histogram, based on the variable name
     """
-    
-    if "eflow" in variable_name:
-        min = bins["eflow"][0]
-        max = bins["eflow"][1]
-        n_bins = bins["eflow"][2]
-    elif "latent" in variable_name:
-        min = bins["latent"][0]
-        max = bins["latent"][1]
-        n_bins = bins["latent"][2]
-    else:
-        min = bins[variable_name][0]
-        max = bins[variable_name][1]
-        n_bins = bins[variable_name][2]
+
+    special_keys = ["eflow", "latent", "Eta", "Phi", "constituent_PT", "constituent_Energy", "Rapidity"]
+
+    for key in special_keys:
+        if key in variable_name:
+            variable_name = key
+
+    min = bins[variable_name][0]
+    max = bins[variable_name][1]
+    n_bins = bins[variable_name][2]
     
     return n_bins, min, max
 
