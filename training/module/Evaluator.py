@@ -47,7 +47,7 @@ class Evaluator:
     
         return weights
     
-    def save_aucs(self):
+    def save_aucs(self, test_filename_pattern="*"):
     
         summaries = summaryProcessor.get_summaries_from_path(self.summary_path)
 
@@ -57,6 +57,10 @@ class Evaluator:
         for _, summary in summaries.df.iterrows():
             
             filename = summary.training_output_path.split("/")[-1]
+
+            if test_filename_pattern not in filename:
+                continue
+
             utils.set_random_seed(summary.seed)
             data_processor = DataProcessor(summary=summary)
             data_loader = self.__get_data_loader(summary)
@@ -205,6 +209,7 @@ class Evaluator:
                                include_constituents=summary.include_constituents,
                                hlf_to_drop=summary.hlf_to_drop,
                                efp_to_drop=summary.efp_to_drop,
-                               constituents_to_drop=summary.constituents_to_drop
+                               constituents_to_drop=summary.constituents_to_drop,
+                               max_jets=summary.max_jets
                                )
         return data_loader

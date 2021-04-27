@@ -15,4 +15,4 @@ config = importlib.import_module(config_path)
 
 
 evaluator = Evaluator(**config.evaluation_general_settings, **config.evaluation_settings)
-evaluator.save_aucs()
+evaluator.save_aucs(test_filename_pattern=config.test_filename_pattern)
