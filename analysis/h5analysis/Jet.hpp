@@ -22,6 +22,8 @@ public:
   vector<double> EFPs;
   vector<shared_ptr<Constituent>> constituents;
   
+  bool isEmpty();
+  
   void print();
 };
 

@@ -19,8 +19,12 @@
 //const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/base_3/QCD_part_1.h5";
 //const string outputPath = "h5histsQCD.root";
 
-const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/3000GeV_0.15/base_3/SVJ_m3000_r15.h5";
-const string outputPath = "h5histsSVJ_r15.root";
+const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituentsDelta_5jets/base_3/QCD_part_1.h5";
+const string outputPath = "h5histsQCD.root";
+
+
+//const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/3000GeV_0.15/base_3/SVJ_m3000_r15.h5";
+//const string outputPath = "h5histsSVJ_r15.root";
 
 //const string inputPath = "../../rootToH5converter/test.h5";
 
@@ -104,6 +108,9 @@ int main (int argc, char** argv)
   TH1D *constituentsAvgDr           = new TH1D("constituentsAvgDr" , "constituentsAvgDr"  , 100, 0.1, 0.6);
   TH1D *constituentsAvgDrPrevious   = new TH1D("constituentsAvgDrPrevious" , "constituentsAvgDrPrevious"  , 100, 0.2, 0.8);
   
+  TH1D *nConstituents   = new TH1D("nConstituents" , "nConstituents"  , 500, 0, 500);
+  
+  
   for(auto event : events){
     eventHists["MET"]->Fill(event->MET);
     eventHists["METeta"]->Fill(event->METeta);
@@ -112,6 +119,8 @@ int main (int argc, char** argv)
     eventHists["Mjj"]->Fill(event->Mjj);
     
     for(auto jet : event->jets){
+      if(jet->isEmpty()) continue;
+      
       jetHists["eta"]->Fill(jet->eta);
       jetHists["phi"]->Fill(jet->phi);
       jetHists["pt"]->Fill(jet->pt);
@@ -141,6 +150,10 @@ int main (int argc, char** argv)
       double sumDrPrevious = 0;
       int nSumDr = 0;
       int nSumDrPrevious = 0;
+      
+      int nConstit = 0;
+      
+      
       
       for(auto constituent : jet->constituents){
         if(constituent->isEmpty()) continue;
@@ -177,6 +190,7 @@ int main (int argc, char** argv)
         }
         
         previousConstituent = constituent;
+        nConstit++;
       }
       
       constituentsSumDr->Fill(sumDr);
@@ -185,7 +199,11 @@ int main (int argc, char** argv)
       constituentsAvgDr->Fill(sumDr/nSumDr);
       constituentsAvgDrPrevious->Fill(sumDrPrevious/nSumDrPrevious);
       
+      nConstituents->Fill(nConstit);
     }
+    
+    
+    
     
     double lastValue = 0;
     
@@ -207,10 +225,10 @@ int main (int argc, char** argv)
     
     
     
-    if(event->jets.size() != 2){
-      cout<<"WARNING -- expected 2 jets in an event, but "<<event->jets.size()<<" were found!"<<endl;
-      continue;
-    }
+//    if(event->jets.size() != 2){
+//      cout<<"WARNING -- expected 2 jets in an event, but "<<event->jets.size()<<" were found!"<<endl;
+//      continue;
+//    }
     
     double dijetMass = event->jets[0]->mass + event->jets[1]->mass;
     jetsMasses->Fill(event->Mjj, dijetMass);
@@ -290,6 +308,9 @@ int main (int argc, char** argv)
   canvasConstituents->cd(10);
   constituentsAvgDrPrevious->Draw();
   
+  canvasConstituents->cd(11);
+  gStyle->SetOptStat(111111);
+  nConstituents->Draw();
   
   canvasEvents->Update();
   canvasJets->Update();
@@ -310,6 +331,7 @@ int main (int argc, char** argv)
   constituentsSumDrPrevious->Write();
   constituentsAvgDr->Write();
   constituentsAvgDrPrevious->Write();
+  nConstituents->Write();
   
   jetHists["pt"]->Write();
   jetHists["mass"]->Write();

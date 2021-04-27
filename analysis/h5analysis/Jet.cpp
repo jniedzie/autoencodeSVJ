@@ -20,3 +20,8 @@ void Jet::print()
   
   cout<<endl;
 }
+
+bool Jet::isEmpty()
+{
+  return eta==0 && phi==0 && pt==0;
+}
