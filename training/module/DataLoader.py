@@ -24,14 +24,16 @@ class DataLoader:
         self.hlf_to_drop = None
         self.efp_to_drop = None
         self.constituents_to_drop = None
+        self.max_jets = None
 
-    def set_params(self, include_hlf, include_eflow, include_constituents, hlf_to_drop, efp_to_drop, constituents_to_drop):
+    def set_params(self, include_hlf, include_eflow, include_constituents, hlf_to_drop, efp_to_drop, constituents_to_drop, max_jets):
         self.include_hlf = include_hlf
         self.include_eflow = include_eflow
         self.include_constituents = include_constituents
         self.hlf_to_drop = hlf_to_drop
         self.efp_to_drop = efp_to_drop
         self.constituents_to_drop = constituents_to_drop
+        self.max_jets = int(max_jets)
         
     def load_all_data(self, globstring, name):
     
@@ -67,20 +69,21 @@ class DataLoader:
                                include_constituents=self.include_constituents,
                                hlf_to_drop=self.hlf_to_drop,
                                efp_to_drop=self.efp_to_drop,
-                               constituents_to_drop=self.constituents_to_drop)
+                               constituents_to_drop=self.constituents_to_drop,
+                               max_jets=self.max_jets)
         
         for f in files:
             data_loader.add_sample(f)
     
         train_modify = None
     
-        if self.include_hlf and self.include_eflow:
-            train_modify = lambda *args, **kwargs: self.all_modify(*args, **kwargs)
-        elif self.include_hlf:
-            train_modify = lambda *args, **kwargs: self.hlf_modify(*args, **kwargs)
-        else:
-            train_modify = self.eflow_modify
-    
+        # if self.include_hlf and self.include_eflow:
+        train_modify = lambda *args, **kwargs: self.all_modify(*args, **kwargs)
+        # elif self.include_hlf:
+        #     train_modify = lambda *args, **kwargs: self.hlf_modify(*args, **kwargs)
+        # else:
+        #     train_modify = self.eflow_modify
+        #
         event = data_loader.make_table('event_features', name + ' event features')
 
         newNames = dict()
@@ -95,7 +98,11 @@ class DataLoader:
         
         data = train_modify(data_loader.make_tables(to_include, name, 'stack'))
         flavors = data_loader.make_table('jet_features', name + ' jet flavor', 'stack').cfilter("Flavor")
-    
+
+        print("Getting rid of empty jets...", end="")
+        data.drop(data[data.Eta == 0].index, inplace=True)
+        print("done.")
+
         return data, event, flavors
 
     def __glob_in_repo(self, globstring):
@@ -269,7 +276,6 @@ class DataLoader:
                 new.append("{}{}_{}".format(prefix, j, l))
         return np.asarray(new)
        
-   
     def _update_data(self, sample_file, keys_to_add):
         for key in keys_to_add:
             assert 'data' in sample_file[key]
@@ -279,8 +285,19 @@ class DataLoader:
                 self.labels[key] = np.asarray(sample_file[key]['labels'])
             else:
                 assert (self.labels[key] == np.asarray(sample_file[key]['labels'])).all()
-            
+
+            sample_data = sample_file[key]['data']
+
+            if key == "jet_features" or key == "jet_eflow_variables":
+                sample_data = sample_data[:, 0:self.max_jets, :]
+
+            if key == "jet_constituents":
+                sample_data = sample_data[:, 0:self.max_jets, :, :]
+
             if key not in self.data:
-                self.data[key] = np.asarray(sample_file[key]['data'])
+                self.data[key] = np.asarray(sample_data)
             else:
-                self.data[key] = np.concatenate([self.data[key], sample_file[key]['data']])
+                self.data[key] = np.concatenate([self.data[key], sample_data])
+            
+                
+

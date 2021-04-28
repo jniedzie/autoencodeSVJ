@@ -120,7 +120,11 @@ class EvaluatorAutoEncoder:
         tf.compat.v1.reset_default_graph()
     
         model = self.__load_model(summary)
-    
+
+        if model is None:
+            print("Model is None")
+            return None
+
         print("using summary: ", summary)
         print("AUCs path:", auc_path)
         print("filename: ", filename)

@@ -24,7 +24,11 @@ train_on_signal = False
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_flatAe/"
 
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_oldSamples/"
-output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_withConstituents/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_withConstituents/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_debugging/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_nJets/"
+output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_metrics/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_changesTests/"
 
 summary_path = output_path+"summary/"
 
@@ -33,8 +37,8 @@ plots_path = output_path+"plots/"
 stat_hists_path = output_path+"stat_hists.root"
 
 # output_file_suffix = "_smallConstituents"
-# output_file_suffix = ""
-output_file_suffix = "_23constituents"
+output_file_suffix = ""
+# output_file_suffix = "_30constituents"
 
 
 # ---------------------------------------------
@@ -46,11 +50,12 @@ training_general_settings = {
     "test_data_fraction": 0.15,
     "include_hlf": True,
     "include_efp": True,
-    "include_constituents": True,
+    "include_constituents": False,
     "hlf_to_drop": ['Energy', 'Flavor', "ChargedFraction"],
     "efp_to_drop": [str(i) for i in range(2, 13)],
-    "constituents_to_drop": ["constituent_Rapidity_*"] + ["constituent_*_{}".format(i) for i in range(23, 100)]
+    "constituents_to_drop": ["constituent_Rapidity_*", "constituent_Eta_*", "constituent_Phi_*"] + ["constituent_*_{}".format(i) for i in range(30, 150)],
     # "constituents_to_drop": []
+    "max_jets": 2
 }
 
 evaluation_general_settings = {
@@ -63,14 +68,17 @@ evaluation_general_settings = {
 # ---------------------------------------------
 # Path to training data
 efp_base = 3
-# qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8/base_{}/*.h5".format(efp_base)
+qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8/base_{}/*.h5".format(efp_base)
 # qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/old_training_data/qcd/base_{}/*.h5".format(efp_base)
 # qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/test_data/base_{}/*.h5".format(efp_base)
-qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/base_{}/*.h5".format(efp_base)
+# qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/base_{}/*.h5".format(efp_base)
+# qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituentsDelta_5jets/base_{}/*.h5".format(efp_base)
 
-# signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8/"
+
+signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8/"
 # signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/old_training_data/all_signals/"
-signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/"
+# signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/"
+# signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_withConstituentsDelta_5jets/"
 
 
 # Path to testing data
@@ -109,21 +117,21 @@ training_params = {
     # 'metric': 'binary_accuracy',
     # 'metric': 'categorical_accuracy',
     # 'metric': 'top_k_categorical_accuracy',
-    # 'metric': 'sparse_top_k_categorical_accuracy',
+    # 'metric': 'sparse_top_k_categorical_accuracy', # doesn't work
 
     # 'metric': 'binary_crossentropy',
     # 'metric': 'categorical_crossentropy',
-    # 'metric': 'sparse_categorical_crossentropy',
-    # 'metric': 'kullback_leibler_divergence',
+    # 'metric': 'sparse_categorical_crossentropy',  # doesn't work
+    # 'metric': 'kullback_leibler_divergence', # can't restore model
     # 'metric': 'poisson',
 
     # 'metric': 'mean_squared_error',
-    # 'metric': 'root_mean_squared_error',
+    # 'metric': 'root_mean_squared_error', # doesn't work
     # 'metric': 'mean_absolute_error',
     # 'metric': 'mean_absolute_percentage_error',
     # 'metric': 'mean_squared_logarithmic_error',
     # 'metric': 'cosine_similarity',
-    # 'metric': 'logcosh',
+    # 'metric': 'logcosh', # can't restore model
 
     
     'epochs': 200,
@@ -133,9 +141,11 @@ training_params = {
     'lr_patience': 9,
     'lr_factor': 0.5,
     
-    "bottleneck_size": 30,
-    
-    "intermediate_architecture": (100, 100),
+    # "bottleneck_size": 20,
+    # "intermediate_architecture": (100, 100),
+
+    "bottleneck_size": 5,
+    "intermediate_architecture": (8, 8),
 
     # activation functions documentation
     # https://keras.io/api/layers/activations/
@@ -156,7 +166,7 @@ training_params = {
 
 # ---------------------------------------------
 # Number of models to train
-n_models = 5
+n_models = 1
 
 # ---------------------------------------------
 # Pick normalization type (definitions below):
@@ -242,11 +252,13 @@ file_name += "_{}".format(norm_type)
 file_name += "_activation_{}".format(training_params["activation"])
 file_name += "_tiedWeights_{}".format(training_params["tied_weights"])
 file_name += "_epochs_{}".format(training_params["epochs"])
+file_name += "_maxJets_{}".format(training_general_settings["max_jets"])
+file_name += "_metric_{}".format(training_params["metric"])
 file_name += "{}".format(output_file_suffix)
 
-test_filename_pattern = file_name+"_v"
-# test_filename_pattern = "hlf_efp_3_bottle_5_arch_7__7_loss_mean_absolute_error_optimizer_Adam_batch_size_256_scaler_StandardScaler_activation_elu_same_train_val_scaler_v"
-# test_filename_pattern = "_v"
+# test_filename_pattern = file_name+"_v"
+# test_filename_pattern = "hlf_efp_3_bottle_5_arch_10__10_loss_mean_absolute_error_optimizer_Adam_batch_size_256_scaler_StandardScaler_activation_elu_v0"
+test_filename_pattern = "_v"
 
 # ---------------------------------------------
 # Build specific training/evaluation settings dictionary (this will be passed to the specialized trainer class)

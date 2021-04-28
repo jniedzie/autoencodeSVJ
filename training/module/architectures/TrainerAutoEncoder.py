@@ -44,36 +44,6 @@ class TrainerAutoEncoder(TrainerAutoEncoderBase):
         """
         return super(TrainerAutoEncoder, self).get_summary()
 
-    # def __get_model(self):
-    #     """
-    #     Builds an auto-encoder model as specified in object's fields: input_size,
-    #     intermediate_architecture and bottleneck_size
-    #     """
-    #
-    #     input_layer = tf.keras.layers.Input(shape=(self.input_size,))
-    #     ae_layers = input_layer
-    #
-    #     for elt in self.training_params["intermediate_architecture"]:
-    #         ae_layers = layers.Dense(units=elt, activation=self.training_params["activation"])(ae_layers)
-    #
-    #     ae_layers = layers.Dense(units=self.training_params["bottleneck_size"],
-    #                              activation=self.training_params["activation"])(ae_layers)
-    #
-    #     for elt in reversed(self.training_params["intermediate_architecture"]):
-    #         ae_layers = layers.Dense(units=elt, activation=self.training_params["activation"])(ae_layers)
-    #
-    #     ae_layers = layers.Dense(units=self.input_size,
-    #                              activation=self.training_params["output_activation"])(ae_layers)
-    #
-    #     autoencoder = tf.keras.Model(input_layer, ae_layers)
-    #     autoencoder.compile(optimizer=self.training_params["optimizer"],
-    #                         loss=self.training_params["loss"],
-    #                         metrics=[self.training_params["metric"]])
-    #
-    #     return autoencoder
-
-
-    # tied weights with custom layer
     def __get_model(self):
         """
         Builds an auto-encoder model as specified in object's fields: input_size,

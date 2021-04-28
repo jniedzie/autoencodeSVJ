@@ -18,7 +18,10 @@ results_path = output_path+"trainingRuns/"
 plots_path = output_path+"plots/"
 stat_hists_path = output_path+"stat_hists.root"
 
-output_file_suffix = "_noConstituents_oneEFP"
+# output_file_suffix = "_noConstituents_oneEFP"
+# output_file_suffix = "_noConstituents_oneEFP_oneJet"
+output_file_suffix = "_noConstituents_oneEFP_threeJets"
+# output_file_suffix = "_30Constituents_noEFP"
 
 # ---------------------------------------------
 # General training/evaluation settings
@@ -31,7 +34,8 @@ training_general_settings = {
     "include_constituents": False,
     "hlf_to_drop": ["Energy", "Flavor", "ChargedFraction"],
     "efp_to_drop": [str(i) for i in range(2, 13)],
-    "constituents_to_drop": ["constituent_Rapidity_*"] + ["constituent_*_{}".format(i) for i in range(30, 100)]
+    "constituents_to_drop": ["constituent_Rapidity_*", "constituent_Eta_*", "constituent_Phi_*"] + ["constituent_*_{}".format(i) for i in range(30, 150)],
+    "max_jets": 3
 }
 
 evaluation_general_settings = {
@@ -47,8 +51,8 @@ n_models = 1
 # ---------------------------------------------
 # Input data paths
 efp_base = 3
-qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/base_{}/*.h5".format(efp_base)
-signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/"
+qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituentsDelta_5jets/base_{}/*.h5".format(efp_base)
+signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_withConstituentsDelta_5jets/"
 
 
 # ---------------------------------------------
@@ -100,7 +104,7 @@ file_name += "_nEstimators_{}".format(training_params["n_estimators"])
 file_name += "_learningRate_{}".format(training_params["learning_rate"])
 file_name += "{}".format(output_file_suffix)
 
-test_filename_pattern = file_name+"_v"
+test_filename_pattern = file_name
 
 # ---------------------------------------------
 # Architecture specific training settings (this will be passed to the specialized trainer class)
