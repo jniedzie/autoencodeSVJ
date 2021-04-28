@@ -19,12 +19,12 @@
 //const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/base_3/QCD_part_1.h5";
 //const string outputPath = "h5histsQCD.root";
 
-const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituentsDelta_5jets/base_3/QCD_part_1.h5";
-const string outputPath = "h5histsQCD.root";
+//const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituentsDelta_5jets/base_3/QCD_part_1.h5";
+//const string outputPath = "h5histsQCD.root";
 
 
-//const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/3000GeV_0.15/base_3/SVJ_m3000_r15.h5";
-//const string outputPath = "h5histsSVJ_r15.root";
+const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_withConstituentsDelta_5jets/3000GeV_0.15/base_3/SVJ_m3000_r15.h5";
+const string outputPath = "h5histsSVJ_r15.root";
 
 //const string inputPath = "../../rootToH5converter/test.h5";
 
@@ -109,6 +109,7 @@ int main (int argc, char** argv)
   TH1D *constituentsAvgDrPrevious   = new TH1D("constituentsAvgDrPrevious" , "constituentsAvgDrPrevious"  , 100, 0.2, 0.8);
   
   TH1D *nConstituents   = new TH1D("nConstituents" , "nConstituents"  , 500, 0, 500);
+  TH1D *nJetsHist   = new TH1D("nJets" , "nJets"  , 20, 0, 20);
   
   
   for(auto event : events){
@@ -118,8 +119,12 @@ int main (int argc, char** argv)
     eventHists["MT"]->Fill(event->MT);
     eventHists["Mjj"]->Fill(event->Mjj);
     
+    int nJets = 0;
+    
     for(auto jet : event->jets){
       if(jet->isEmpty()) continue;
+      
+      nJets++;
       
       jetHists["eta"]->Fill(jet->eta);
       jetHists["phi"]->Fill(jet->phi);
@@ -202,8 +207,7 @@ int main (int argc, char** argv)
       nConstituents->Fill(nConstit);
     }
     
-    
-    
+    nJetsHist->Fill(nJets);
     
     double lastValue = 0;
     
@@ -257,6 +261,8 @@ int main (int argc, char** argv)
     
     if(name=="mass") efpMAss->Draw("same");
   }
+  nJetsHist->Draw();
+  
   
   TCanvas *canvasEFPs = new TCanvas("EFPs", "EFPs", 2000, 1500);
   canvasEFPs->Divide(4, 3);
