@@ -31,6 +31,7 @@ class Converter:
         self.trees = {}
         self.input_types = {}
         self.read_trees()
+        self.set_selections_all_events()
         self.n_all_events = sum([tree.num_entries for tree in self.trees.values()])
         self.n_events = sum(map(len, list(self.selections.values()))) + 1
 
@@ -105,6 +106,7 @@ class Converter:
             self.input_file_paths.append(file_name)
             self.selections[file_name] = list(map(int, selections.split()))
 
+
     def read_trees(self):
         """
         Reads input ROOT files, extracts trees and recognizes type of the input file (Delphes/nanoAOD/PFnanoAOD).
@@ -132,6 +134,17 @@ class Converter:
                 else:
                     if self.verbosity_level > 0:
                         print("Unknown tree type: ", key, ". Skipping...")
+
+
+    def set_selections_all_events(self):
+        """
+        If event number is -1, this means selecting all events.
+        Set selection to all events here.
+        """
+        for file_name in self.selections.keys():
+            if self.selections[file_name] == [-1]:
+                self.selections[file_name] = list(range(self.trees[file_name].num_entries))
+
 
     def convert(self):
         """
