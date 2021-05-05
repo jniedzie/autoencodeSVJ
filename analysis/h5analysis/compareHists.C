@@ -1,23 +1,26 @@
 
-const string inputPathQCD = "h5histsQCD.root";
-const string inputPathSVJ = "h5histsSVJ.root";
-
 vector<string> inputPaths = {
-  "h5histsQCD.root",
-  "h5histsSVJ_r15.root",
-  "h5histsSVJ_r30.root",
-  "h5histsSVJ_r45.root",
-  "h5histsSVJ_r60.root",
-  "h5histsSVJ_r75.root",
+//  "h5histsQCD.root",
+//  "h5histsSVJ_r15.root",
+//  "h5histsSVJ_r30.root",
+//  "h5histsSVJ_r45.root",
+//  "h5histsSVJ_r60.root",
+//  "h5histsSVJ_r75.root",
+  
+  "h5histsSVJ_m3500_r30_delphes.root",
+  "h5histsSVJ_m3500_r30_cmssw.root",
 };
 
 map<string, string> nameForPath = {
-  {"h5histsQCD.root"    , "QCD"       },
-  {"h5histsSVJ_r15.root", "SVJ r=0.15"},
-  {"h5histsSVJ_r30.root", "SVJ r=0.30"},
-  {"h5histsSVJ_r45.root", "SVJ r=0.45"},
-  {"h5histsSVJ_r60.root", "SVJ r=0.60"},
-  {"h5histsSVJ_r75.root", "SVJ r=0.75"},
+//  {"h5histsQCD.root"    , "QCD"       },
+//  {"h5histsSVJ_r15.root", "SVJ r=0.15"},
+//  {"h5histsSVJ_r30.root", "SVJ r=0.30"},
+//  {"h5histsSVJ_r45.root", "SVJ r=0.45"},
+//  {"h5histsSVJ_r60.root", "SVJ r=0.60"},
+//  {"h5histsSVJ_r75.root", "SVJ r=0.75"},
+  
+  {"h5histsSVJ_m3500_r30_delphes.root"  , "SVJ Delphes"},
+  {"h5histsSVJ_m3500_r30_cmssw.root"    , "SVJ CMSSW"},
 };
 
 vector<string> histNames1D = {
@@ -124,7 +127,6 @@ void compareHists()
     }
   }
   
-  int nHists = histDetaDphi.size();
   
   for(auto &[name, hists] : hists1D){
     for(int i=0; i<hists.size(); i++) hists[i]->SetLineColor(colors[i]);

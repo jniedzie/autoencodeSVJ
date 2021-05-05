@@ -14,6 +14,8 @@
  
  */
 
+const int maxEvents = 6725;
+
 //const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/training_data/qcd/base_3/data_0_data.h5";
 
 //const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/base_3/QCD_part_1.h5";
@@ -23,8 +25,12 @@
 //const string outputPath = "h5histsQCD.root";
 
 
-const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_withConstituentsDelta_5jets/3000GeV_0.15/base_3/SVJ_m3000_r15.h5";
-const string outputPath = "h5histsSVJ_r15.root";
+const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/3500GeV_0.30/base_3/SVJ_m3500_r30.h5";
+const string outputPath = "h5histsSVJ_m3500_r30_delphes.root";
+
+//const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_cms/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/3500GeV_0.30/base_3/SVJ_m3500_r30_part0.h5";
+//const string outputPath = "h5histsSVJ_m3500_r30_cmssw.root";
+
 
 //const string inputPath = "../../rootToH5converter/test.h5";
 
@@ -94,7 +100,7 @@ int main (int argc, char** argv)
   TH1D *efpMAss = new TH1D("EFP mass", "EFP mass", 100, 0, 500);
   efpMAss->SetLineColor(kRed);
   
-  TH2D *constituentsDetaDphi        = new TH2D("constituentsDetaDphi"       , "constituentsDetaDphi", 200, -0.8, 0.8, 200, -0.8, 0.8);
+  TH2D *constituentsDetaDphi        = new TH2D("constituentsDetaDphi"       , "constituentsDetaDphi", 1000, -0.8, 0.8, 1000, -0.8, 0.8);
   TH1D *constituentsDr              = new TH1D("constituentsDr"             , "constituentsDr"              , 200, 0, 1);
   TH1D *constituentsDrCorrected     = new TH1D("constituentsDrCorrected"    , "constituentsDrCorrected"     , 1000, 0, 0.1);
   
@@ -112,7 +118,13 @@ int main (int argc, char** argv)
   TH1D *nJetsHist   = new TH1D("nJets" , "nJets"  , 20, 0, 20);
   
   
+  int iEvent=0;
+  
   for(auto event : events){
+    
+    if(iEvent >= maxEvents) break;
+    iEvent++;
+    
     eventHists["MET"]->Fill(event->MET);
     eventHists["METeta"]->Fill(event->METeta);
     eventHists["METphi"]->Fill(event->METphi);
@@ -238,6 +250,7 @@ int main (int argc, char** argv)
     jetsMasses->Fill(event->Mjj, dijetMass);
   }
   
+  cout<<"Processed "<<iEvent<<" events"<<endl;
   
   TCanvas *canvasEvents = new TCanvas("Events", "Events", 1000, 1500);
   canvasEvents->Divide(2, 3);
