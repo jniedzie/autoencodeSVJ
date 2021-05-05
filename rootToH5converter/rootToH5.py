@@ -27,6 +27,9 @@ parser.add_argument("-f", "--use_fat_jets", dest="use_fat_jets", default=False, 
 parser.add_argument("-v", "--verbosity_level", dest="verbosity_level", type=int, default=1,
                     help="Verbosity level. 0 - no output, 1 - basic output, 2 - detailed output. (default: 1).")
 
+parser.add_argument("-d", "--force_delta_r_usage", dest="force_delta_r_usage", default=False, action='store_true',
+                    help="Force using delta R for constituents, even if true links are available, like for PFnanoAOD. (default: False).")
+
 args = parser.parse_args()
 
 
@@ -46,7 +49,8 @@ converter = Converter(input_path = args.input_path,
                       efp_degree=args.EFP_degree,
                       max_n_constituents=args.max_constituents,
                       use_fat_jets=args.use_fat_jets,
-                      verbosity_level=args.verbosity_level
+                      verbosity_level=args.verbosity_level,
+                      force_delta_r_usage=args.force_delta_r_usage
                       )
 
 converter.convert()

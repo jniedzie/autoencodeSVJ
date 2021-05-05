@@ -18,12 +18,13 @@ class OutputTypes(Enum):
 
 class Converter:
 
-    def __init__(self, input_path, store_n_jets, jet_delta_r, max_n_constituents, efp_degree, use_fat_jets=False, verbosity_level=1):
+    def __init__(self, input_path, store_n_jets, jet_delta_r, max_n_constituents, efp_degree, use_fat_jets=False, verbosity_level=1, force_delta_r_usage=False):
         """
         Reads input trees, recognizes input types, initializes EFP processor and prepares all arrays needed to
         store output variables.
         """
         self.verbosity_level = verbosity_level
+        self.force_delta_r_usage = force_delta_r_usage
         self.set_input_paths_and_selections(input_path=input_path)
 
         # read files, trees and recognize input type
@@ -122,9 +123,9 @@ class Converter:
                 elif key.startswith("Events"):
                     self.trees[path] = file[key]
                 
-                    if "JetPFCandsAK4_jetIdx" in file[key].keys():
+                    if "FatJetPFCandsAK4_jetIdx" in file[key].keys():
                         self.input_types[path] = InputTypes.PFnanoAOD106X
-                    elif "JetPFCands_jetIdx" in file[key].keys():
+                    elif "FatJetPFCands_jetIdx" in file[key].keys():
                         self.input_types[path] = InputTypes.PFnanoAOD102X
                     else:
                         self.input_types[path] = InputTypes.nanoAOD
@@ -152,6 +153,7 @@ class Converter:
         """
         
         total_count = 0
+        n_jets_without_constituents = 0
         
         for file_name, tree in self.trees.items():
     
@@ -170,9 +172,11 @@ class Converter:
 
                 if self.verbosity_level > 0 and total_count%100==0:
                     print("Processed events:", total_count, "\tcurrent event number: ", iEvent)
+                    print("Jets without constituents so far: ", n_jets_without_constituents)
                 
                 # load event
-                event = Event(input_type, data_processor, iEvent, self.jet_delta_r, self.use_fat_jets, self.verbosity_level)
+                event = Event(input_type, data_processor, iEvent, self.jet_delta_r, self.use_fat_jets,
+                              self.verbosity_level, self.force_delta_r_usage)
 
                 if self.verbosity_level > 1:
                     event.print()
@@ -200,6 +204,7 @@ class Converter:
                     if len(jet.constituents)==0:
                         if self.verbosity_level > 0:
                             print("Jet has no constituents! Skipping...")
+                            n_jets_without_constituents += 1
                         continue
                     
                     self.output_arrays[OutputTypes.JetFeatures][total_count, iJet, :] = jet.get_features()
@@ -215,6 +220,9 @@ class Converter:
                     print("------------------------------\n\n")
 
                 total_count += 1
+
+            if self.verbosity_level > 0:
+                print("Total jets without constituents: ", n_jets_without_constituents)
 
             if self.verbosity_level > 1:
                 print("\n\n=======================================================")

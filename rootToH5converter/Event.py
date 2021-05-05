@@ -5,7 +5,7 @@ from DataProcessor import InputTypes
 
 
 class Event:
-    def __init__(self, input_type, data_processor, i_event, delta_r, use_fat_jets=False, verbosity_level=1):
+    def __init__(self, input_type, data_processor, i_event, delta_r, use_fat_jets=False, verbosity_level=1, force_delta_r_usage=False):
         """
         Reads/calculates event level features, loads jets, tracks, photons and neutral hadrons.
         Adds jet constituents to jets.
@@ -17,6 +17,7 @@ class Event:
         self.input_type = input_type
     
         self.verbosity_level = verbosity_level
+        self.force_delta_r_usage = force_delta_r_usage
     
         # account for the fact that in Delphes MET is stored in an array with just one element
         i_object = None
@@ -51,6 +52,9 @@ class Event:
         # load photons from tree
         self.photons = []
         self.fill_photons()
+        
+        if input_type is not InputTypes.Delphes and force_delta_r_usage:
+            self.find_photons_and_neutrals()
         
         # load jets from tree
         self.jets = []
@@ -94,7 +98,8 @@ class Event:
             track = PhysObject(eta=self.data_processor.get_value_from_tree("Track_eta"+suffix, self.i_event, i_track),
                                phi=self.data_processor.get_value_from_tree("Track_phi"+suffix, self.i_event, i_track),
                                pt=self.data_processor.get_value_from_tree("Track_pt"+suffix, self.i_event, i_track),
-                               mass=self.data_processor.get_value_from_tree("Track_mass"+suffix, self.i_event, i_track))
+                               mass=self.data_processor.get_value_from_tree("Track_mass"+suffix, self.i_event, i_track),
+                               pid=self.data_processor.get_value_from_tree("Track_pid"+suffix, self.i_event, i_track))
             self.tracks.append(track)
     
     def fill_neutral_hadrons(self):
@@ -119,6 +124,24 @@ class Event:
                                 mass=self.data_processor.get_value_from_tree("Photon_mass", self.i_event, i_photon))
             self.photons.append(photon)
     
+    def find_photons_and_neutrals(self):
+    
+        photon_id = 22
+        neutral_hardons_ids = [111, 130, 310]
+        charged_ids = [211, 11, 13]
+    
+        for track in self.tracks:
+            if track.pid == photon_id:
+                self.photons.append(self.tracks.pop(self.tracks.index(track)))
+            elif track.pid in neutral_hardons_ids:
+                self.neutral_hadrons.append(self.tracks.pop(self.tracks.index(track)))
+            elif abs(track.pid) not in charged_ids:
+                print("Unrecognized PID: ", track.pid)
+            
+        self.nTracks = len(self.tracks)
+        self.nNeutralHadrons = len(self.neutral_hadrons)
+        self.nPhotons = len(self.photons)
+    
     def fill_jets(self, use_fat_jets=False):
         if self.nJets is None:
             return
@@ -139,7 +162,7 @@ class Event:
 
             # check if tree contains links between tracks and jets
             track_jet_index = self.data_processor.get_value_from_tree("Track_jet_index_"+jet_radius, self.i_event)
-            jet_index = -1 if track_jet_index is None else i_jet
+            jet_index = -1 if track_jet_index is None or self.force_delta_r_usage else i_jet
             track_cand_index = self.data_processor.get_value_from_tree("Track_cand_index_"+jet_radius, self.i_event)
             
             # fill jet constituents

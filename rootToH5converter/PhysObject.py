@@ -2,7 +2,7 @@ import ROOT
 
 
 class PhysObject:
-    def __init__(self, eta, phi, pt, mass):
+    def __init__(self, eta, phi, pt, mass, pid = None):
         """
         Initializes simple representation of a physics object (track/neutral hadron/photon), containing
         just eta, phi, pt and mass.
@@ -12,6 +12,7 @@ class PhysObject:
         self.phi = phi
         self.pt = pt
         self.mass = mass if mass is not None else 0
+        self.pid = pid
         
     def get_four_vector(self):
         """

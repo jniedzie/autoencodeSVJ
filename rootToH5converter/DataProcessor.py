@@ -109,12 +109,14 @@ class DataProcessor:
                 "Track_pt_AK4": "JetPFCands_pt",
                 "Track_mass_AK4": "JetPFCands_mass",
                 "Track_jet_index_AK4": "JetPFCands_jetIdx",
+                "Track_pid_AK4": "JetPFCands_pdgId",
                 # tracks for fat jets
                 "Track_eta_AK8": "FatJetPFCands_eta",
                 "Track_phi_AK8": "FatJetPFCands_phi",
                 "Track_pt_AK8": "FatJetPFCands_pt",
                 "Track_mass_AK8": "FatJetPFCands_mass",
                 "Track_jet_index_AK8": "FatJetPFCands_jetIdx",
+                "Track_pid_AK8": "FatJetPFCands_pdgId",
                 # photons
                 "Photon_eta": "Photon_eta",
                 "Photon_phi": "Photon_phi",
@@ -151,6 +153,7 @@ class DataProcessor:
                 "Track_cand_index_AK4": "JetPFCandsAK4_candIdx",
                 "Track_jet_index_AK8": "JetPFCandsAK8_jetIdx",
                 "Track_cand_index_AK8": "JetPFCandsAK8_candIdx",
+                "Track_pid_AK8": "JetPFCandsAK8_pdgId",
                 # photons
                 "Photon_eta": "Photon_eta",
                 "Photon_phi": "Photon_phi",
@@ -161,6 +164,9 @@ class DataProcessor:
         
         # pre-load all branches for this tree to avoid calling this for every event/track/jet
         self.branches = {}
+        
+        print("Keys found in the tree:", tree.keys())
+        
         for key, value in self.variables[input_type].items():
             if value in tree.keys():
                 self.branches[key] = tree[value].array()
