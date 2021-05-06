@@ -68,6 +68,7 @@ class DataProcessor:
                 # event features
                 "MET_pt": "MET_pt",
                 "MET_phi": "MET_phi",
+                "Gen_weight": "genWeight",
                 # jet features
                 "Jet_eta": "Jet_eta",
                 "Jet_phi": "Jet_phi",
@@ -91,6 +92,7 @@ class DataProcessor:
                 # event features
                 "MET_pt": "MET_pt",
                 "MET_phi": "MET_phi",
+                "Gen_weight": "genWeight",
                 # jet features
                 "Jet_eta": "Jet_eta",
                 "Jet_phi": "Jet_phi",
@@ -132,6 +134,7 @@ class DataProcessor:
                 # event features
                 "MET_pt": "MET_pt",
                 "MET_phi": "MET_phi",
+                "Gen_weight": "genWeight",
                 # jet features
                 "Jet_eta": "Jet_eta",
                 "Jet_phi": "Jet_phi",
@@ -153,7 +156,7 @@ class DataProcessor:
                 "Track_cand_index_AK4": "JetPFCandsAK4_candIdx",
                 "Track_jet_index_AK8": "JetPFCandsAK8_jetIdx",
                 "Track_cand_index_AK8": "JetPFCandsAK8_candIdx",
-                "Track_pid_AK8": "JetPFCandsAK8_pdgId",
+                "Track_pid": "JetPFCands_pdgId",
                 # photons
                 "Photon_eta": "Photon_eta",
                 "Photon_phi": "Photon_phi",

@@ -28,6 +28,7 @@ class Event:
         self.metPt = data_processor.get_value_from_tree("MET_pt", i_event, i_object)
         self.metPhi = data_processor.get_value_from_tree("MET_phi", i_event, i_object)
         self.metEta = data_processor.get_value_from_tree("MET_eta", i_event, i_object)
+        self.genWeight = data_processor.get_value_from_tree("Gen_weight", i_event, i_object)
         
         self.nJets = data_processor.get_value_from_tree("N_fat_jets" if use_fat_jets else "N_jets", i_event)
         if input_type == InputTypes.PFnanoAOD102X:
@@ -129,6 +130,9 @@ class Event:
         photon_id = 22
         neutral_hardons_ids = [111, 130, 310]
         charged_ids = [211, 11, 13]
+        weird_ids = [1, 2]
+        
+        n_weird = 0
     
         for track in self.tracks:
             if track.pid == photon_id:
@@ -136,8 +140,13 @@ class Event:
             elif track.pid in neutral_hardons_ids:
                 self.neutral_hadrons.append(self.tracks.pop(self.tracks.index(track)))
             elif abs(track.pid) not in charged_ids:
-                print("Unrecognized PID: ", track.pid)
+                if abs(track.pid) not in weird_ids:
+                    print("Unrecognized PID: ", track.pid)
+                else:
+                   n_weird += 1
             
+        # print("There were ", n_weird, " weird PID's")
+        
         self.nTracks = len(self.tracks)
         self.nNeutralHadrons = len(self.neutral_hadrons)
         self.nPhotons = len(self.photons)
@@ -234,6 +243,7 @@ class Event:
             self.metPhi,
             self.MT,
             self.Mjj,
+            self.genWeight,
         ]
     
     @staticmethod
@@ -247,4 +257,5 @@ class Event:
             'METPhi',
             'MT',
             'Mjj',
+            'genWeight',
         ]

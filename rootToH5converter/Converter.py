@@ -123,7 +123,7 @@ class Converter:
                 elif key.startswith("Events"):
                     self.trees[path] = file[key]
                 
-                    if "FatJetPFCandsAK4_jetIdx" in file[key].keys():
+                    if "JetPFCandsAK4_jetIdx" in file[key].keys() or "JetPFCandsAK8_jetIdx" in file[key].keys():
                         self.input_types[path] = InputTypes.PFnanoAOD106X
                     elif "FatJetPFCands_jetIdx" in file[key].keys():
                         self.input_types[path] = InputTypes.PFnanoAOD102X
