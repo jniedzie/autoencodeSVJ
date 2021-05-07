@@ -22,8 +22,6 @@
 #include <cmath>
 #include <cassert>
 #include <string>
-#include "THashList.h"
-#include "TBenchmark.h"
 #include <sstream>
 #include <fstream>
 #include <utility>
@@ -38,6 +36,8 @@
 #pragma clang diagnostic ignored "-Wdocumentation" // turn off ROOT's warnings
 #pragma clang diagnostic ignored "-Wconversion"
 
+#include "THashList.h"
+#include "TBenchmark.h"
 #include "TTree.h"
 #include "TLeaf.h"
 #include "TFile.h"
