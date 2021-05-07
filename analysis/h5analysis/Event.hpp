@@ -18,6 +18,7 @@ public:
   Event(){}
   
   double MET, METeta, METphi, MT, Mjj;
+  double genWeight;
   vector<shared_ptr<Jet>> jets;
   
   void print();

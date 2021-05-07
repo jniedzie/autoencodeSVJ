@@ -72,14 +72,30 @@ void EventProcessor::fillEvents(Group groupEvent)
   double values[dimEvent[0]][dimEvent[1]];
   datasetEvent.read(values, floatTypeEvent, dataspaceEvent);
   
+  if(dimEvent[1] != 6){
+    cout<<"WARNING -- could not read getWeight, will assume 1.0!"<<endl;
+  }
+  
   for(int i=0; i<dimEvent[0]; i++){
     auto event = make_shared<Event>();
     
-    event->MET    = values[i][0];
-    event->METeta = values[i][1];
-    event->METphi = values[i][2];
-    event->MT     = values[i][3];
-    event->Mjj    = values[i][4];
+    event->MET        = values[i][0];
+    event->METeta     = values[i][1];
+    event->METphi     = values[i][2];
+    event->MT         = values[i][3];
+    event->Mjj        = values[i][4];
+    
+    double genWeight = 1.0;
+    if(dimEvent[1] == 6){
+      if(isnormal(values[i][5])){
+        genWeight = values[i][5];
+      }
+      else{
+        cout<<"WARNING -- could not read getWeight, will assume 1.0!"<<endl;
+      }
+    }
+    
+    event->genWeight  = genWeight;
     
     events.push_back(event);
   }

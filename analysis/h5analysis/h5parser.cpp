@@ -14,27 +14,59 @@
  
  */
 
-const int maxEvents = 6725;
+const int maxEvents = 999999999;
 
 //const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/training_data/qcd/base_3/data_0_data.h5";
 
-//const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/base_3/QCD_part_1.h5";
-//const string outputPath = "h5histsQCD.root";
+//vector<tuple<string, double, int>> inputPaths = {
+//  {"/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/base_3/QCD_part_1.h5", 1, 1},
+//};
+//
+//const string outputPath = "results/h5histsSVJ_m3500_r30_delphes_test.root";
 
-//const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituentsDelta_5jets/base_3/QCD_part_1.h5";
-//const string outputPath = "h5histsQCD.root";
+//vector<tuple<string, double, int>> inputPaths = {
+//  {"/Users/Jeremi/Documents/Physics/ETH/data/s_channel_cms/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/3500GeV_0.30/base_3/SVJ_m3500_r30_part0.h5", 1, 1},
+//};
+//
+//const string outputPath = "results/h5histsSVJ_m3500_r30_cmssw.root";
+
+vector<tuple<string, double, int>> inputPaths = {
+  {"/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJets_150constituents_2jets/base_3/QCD_part_1.h5"  , 1, 1},
+  {"/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJets_150constituents_2jets/base_3/QCD_part_12.h5" , 1, 1},
+};
+
+const string outputPath = "results/h5histsQCD_delphes_fixed.root";
 
 
-const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/3500GeV_0.30/base_3/SVJ_m3500_r30.h5";
-const string outputPath = "h5histsSVJ_m3500_r30_delphes.root";
 
-//const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_cms/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/3500GeV_0.30/base_3/SVJ_m3500_r30_part0.h5";
-//const string outputPath = "h5histsSVJ_m3500_r30_cmssw.root";
+//vector<tuple<string, double, int>> inputPaths = {
+//  {"/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_cmssw/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/base_3/QCD_pt3200toInf.h5", 1, 1},
+//};
+//
+//const string outputPath = "results/h5histsQCD_cmssw_3200toInf.root";
+
+//vector<tuple<string, double, int>> inputPaths = {
+//  //  path                                                                                                                                        x-sec (pb)  n_generated
+//  {"/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_cmssw/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/base_3/QCD_pt1000to1400.h5"  , 7.398     , 19967700  },
+//  {"/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_cmssw/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/base_3/QCD_pt1400to1800.h5"  , 6.42E-01  , 5434800   },
+//  {"/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_cmssw/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/base_3/QCD_pt1800to2400.h5"  , 0.08671   , 2999700   },
+//  {"/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_cmssw/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/base_3/QCD_pt2400to3200.h5"  , 0.005193  , 1919400   },
+//  {"/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_cmssw/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/base_3/QCD_pt3200toInf.h5"   , 0.000134  , 800000    },
+//};
+//
+//const string outputPath = "results/h5histsQCD_cmssw_mixed.root";
 
 
-//const string inputPath = "../../rootToH5converter/test.h5";
+//const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/3500GeV_0.30/base_3/SVJ_m3500_r30.h5";
+//const string outputPath = "results/h5histsSVJ_m3500_r30_delphes.root";
 
-//const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/rootToH5converter/test_data_0.h5";
+map<string, TH1D*>  eventHists;
+map<string, TH1D*>  jetHists;
+map<string, TH1D*>  constituentHists;
+map<int, TH1D*>     EFPhists;
+map<string, TH2D*>  hists2d;
+
+TFile *outfile;
 
 vector<tuple<string, int, double, double>> eventHistParams = {
   {"MET"    , 100, 0    , 5000  },
@@ -42,24 +74,45 @@ vector<tuple<string, int, double, double>> eventHistParams = {
   {"METphi" , 100, -4   , 4     },
   {"MT"     , 100, 0    , 5000  },
   {"Mjj"    , 100, 0    , 5000  },
+  {"nJets"  , 20 , 0    , 20    },
 };
 
 vector<tuple<string, int, double, double>> jetHistParams = {
   {"eta"              , 100, -3.5   , 3.5     },
   {"phi"              , 100, -3.5   , 3.5     },
   {"pt"               , 100, 0    , 2000  },
+  {"pt_1"             , 100, 0    , 10000 },
+  {"pt_2"             , 100, 0    , 2000  },
   {"mass"             , 100, 0    , 800   },
   {"chargedFraction"  , 100, 0    , 1     },
   {"PTD"              , 100, 0    , 1     },
   {"axis2"            , 100, 0    , 0.2   },
   {"flavor"           , 100, -50  , 50    },
   {"energy"           , 100, 0    , 5000  },
+  {"efpMass"          , 100, 0    , 500   },
 };
 
-int main (int argc, char** argv)
+vector<tuple<string, int, double, double>> constituentHistParams = {
+  {"constituentsDr"               , 200   , 0   , 1   },
+  {"constituentsDrCorrected"      , 1000  , 0   , 0.1 },
+  {"constituentsDrFromPrevious"   , 200   , 0   , 2   },
+  {"constituentsPt"               , 200   , 0   , 10  },
+  {"constituentsDptFromPrevious"  , 200   , -4  , 0   },
+  {"constituentsSumDr"            , 100   , 0   , 100 },
+  {"constituentsSumDrPrevious"    , 100   , 0   , 100 },
+  {"constituentsAvgDr"            , 100   , 0.1 , 0.6 },
+  {"constituentsAvgDrPrevious"    , 100   , 0.2 , 0.8 },
+  {"nConstituents"                , 500   , 0   , 500 },
+};
+
+vector<tuple<string, int, double, double, int, double, double>> hists2Dparams = {
+  {"efpVErification"              , 50, 0, 200, 50, 0, 200},
+  {"constituentsDetaDphi"         , 1000, -1, 1, 1000, -1, 1},
+};
+
+vector<shared_ptr<Event>> getEventsFromFile(string inputPath)
 {
   auto eventProcessor = make_unique<EventProcessor>();
-  
   
   // Open H5 file, get data groups
   H5File file(inputPath.c_str(), H5F_ACC_RDONLY);
@@ -70,15 +123,128 @@ int main (int argc, char** argv)
   Group jetConstituentsGroup  = rootGroup.openGroup("jet_constituents");
   
   // Load data into vector of events
-  auto events = eventProcessor->getValues(eventFeaturesGroup, jetEFPsGroup, jetFeaturesGroup, jetConstituentsGroup);
+  return eventProcessor->getValues(eventFeaturesGroup, jetEFPsGroup, jetFeaturesGroup, jetConstituentsGroup);
+}
+
+void fillEventHists(const shared_ptr<Event> event, int nJets, double eventWeight)
+{
+  eventHists["MET"]->Fill(event->MET, eventWeight);
+  eventHists["METeta"]->Fill(event->METeta, eventWeight);
+  eventHists["METphi"]->Fill(event->METphi, eventWeight);
+  eventHists["MT"]->Fill(event->MT, eventWeight);
+  eventHists["Mjj"]->Fill(event->Mjj, eventWeight);
   
+  eventHists["nJets"]->Fill(nJets, eventWeight);
+}
+
+void fillJetHists(const shared_ptr<Jet> jet, int iJet, double eventWeight)
+{
+  jetHists["eta"]->Fill(jet->eta, eventWeight);
+  jetHists["phi"]->Fill(jet->phi, eventWeight);
+  jetHists["pt"]->Fill(jet->pt, eventWeight);
+  if(iJet==0) jetHists["pt_1"]->Fill(jet->pt, eventWeight);
+  if(iJet==1) jetHists["pt_2"]->Fill(jet->pt, eventWeight);
+  jetHists["mass"]->Fill(jet->mass, eventWeight);
+  jetHists["chargedFraction"]->Fill(jet->chargedFraction, eventWeight);
+  jetHists["PTD"]->Fill(jet->PTD, eventWeight);
+  jetHists["axis2"]->Fill(jet->axis2, eventWeight);
+  jetHists["flavor"]->Fill(jet->flavor, eventWeight);
+  jetHists["energy"]->Fill(jet->energy, eventWeight);
   
-  TApplication theApp("App",&argc, argv);
+  double recoMass = jet->pt * sqrt(0.1*jet->EFPs[1]/2);
+  hists2d["efpVErification"]->Fill(jet->mass, recoMass, eventWeight);
+  jetHists["efpMass"]->Fill(recoMass, eventWeight);
+}
+
+void fillEfpHists(const shared_ptr<Jet> jet, double eventWeight)
+{
+  for(int iEFP=0; iEFP<13; iEFP++){
+    EFPhists[iEFP]->Fill(jet->EFPs[iEFP], eventWeight);
+  }
+}
+
+void fillConstituentHists(const shared_ptr<Jet> jet, double eventWeight)
+{
+  shared_ptr<Constituent> previousConstituent = nullptr;
   
-  map<string, TH1D*>  eventHists;
-  map<string, TH1D*>  jetHists;
-  map<int, TH1D*>     EFPhists;
+  TLorentzVector jetVector;
+  jetVector.SetPtEtaPhiM(jet->pt, jet->eta, jet->phi, jet->mass);
   
+  double sumDr = 0;
+  double sumDrPrevious = 0;
+  int nSumDr = 0;
+  int nSumDrPrevious = 0;
+  
+  int nConstit = 0;
+  
+  for(auto constituent : jet->constituents){
+    if(constituent->isEmpty()) continue;
+    
+    TLorentzVector constituentVector;
+    constituentVector.SetPtEtaPhiE(constituent->pt, constituent->eta, constituent->phi, constituent->energy);
+    
+    double dEta = jet->eta - constituent->eta;
+    double dPhi = jetVector.DeltaPhi(constituentVector);
+    double dR = jetVector.DeltaR(constituentVector);
+    
+    hists2d["constituentsDetaDphi"]->Fill(dEta, dPhi, eventWeight);
+    constituentHists["constituentsDr"]->Fill(dR, eventWeight);
+    
+    sumDr += dR;
+    nSumDr++;
+    
+    constituentHists["constituentsDrCorrected"]->Fill(dR, eventWeight);
+    constituentHists["constituentsPt"]->Fill(constituent->pt, eventWeight);
+    
+    if(previousConstituent){
+      TLorentzVector previousConstituentVector;
+      previousConstituentVector.SetPtEtaPhiE(previousConstituent->pt, previousConstituent->eta,
+                                             previousConstituent->phi, previousConstituent->energy);
+      
+      double dPtPrevious  = constituent->pt - previousConstituent->pt;
+      double dRprevious = constituentVector.DeltaR(previousConstituentVector);
+      
+      constituentHists["constituentsDrFromPrevious"]->Fill(dRprevious, eventWeight);
+      sumDrPrevious += dRprevious;
+      nSumDrPrevious++;
+      
+      constituentHists["constituentsDptFromPrevious"]->Fill(dPtPrevious, eventWeight);
+    }
+    
+    previousConstituent = constituent;
+    nConstit++;
+  }
+  
+  constituentHists["constituentsSumDr"]->Fill(sumDr, eventWeight);
+  constituentHists["constituentsSumDrPrevious"]->Fill(sumDrPrevious, eventWeight);
+  constituentHists["constituentsAvgDr"]->Fill(sumDr/nSumDr, eventWeight);
+  constituentHists["constituentsAvgDrPrevious"]->Fill(sumDrPrevious/nSumDrPrevious, eventWeight);
+  constituentHists["nConstituents"]->Fill(nConstit, eventWeight);
+}
+
+void produceCorrectedHists()
+{
+  double lastValue = 0;
+  
+  for(int iBin=0; iBin<constituentHists["constituentsDrCorrected"]->GetNbinsX(); iBin++){
+    double binContent = constituentHists["constituentsDrCorrected"]->GetBinContent(iBin);
+    double binCenter = constituentHists["constituentsDrCorrected"]->GetXaxis()->GetBinCenter(iBin);
+    
+    double expectedContent = 2*TMath::Pi()*binCenter;
+    constituentHists["constituentsDrCorrected"]->SetBinContent(iBin, binContent - expectedContent);
+    
+    if(binCenter < 0.8) lastValue = binContent - expectedContent;
+  }
+  
+  for(int iBin=0; iBin<constituentHists["constituentsDrCorrected"]->GetNbinsX(); iBin++){
+    double binContent = constituentHists["constituentsDrCorrected"]->GetBinContent(iBin);
+    double binCenter = constituentHists["constituentsDrCorrected"]->GetXaxis()->GetBinCenter(iBin);
+    constituentHists["constituentsDrCorrected"]->SetBinContent(iBin, binCenter < 0.8 ? binContent - lastValue : 0.0);
+  }
+}
+
+void initHists()
+{
   for(auto &[name, nBins, min, max] : eventHistParams){
     eventHists[name] = new TH1D(name.c_str(), name.c_str(), nBins, min, max);
   }
@@ -87,171 +253,22 @@ int main (int argc, char** argv)
     jetHists[name] = new TH1D(name.c_str(), name.c_str(), nBins, min, max);
   }
   
+  for(auto &[name, nBins, min, max] : constituentHistParams){
+    constituentHists[name] = new TH1D(name.c_str(), name.c_str(), nBins, min, max);
+  }
+  
   for(int i=0; i<13; i++){
     string name = "EFP_"+to_string(i);
     EFPhists[i] = new TH1D(name.c_str(), name.c_str(), 100, 0, 1.0);
   }
   
-  TH2D *jetsMasses = new TH2D("jetsMasses", "jetsMasses", 100, 0, 3500, 100, 0, 500);
-  jetsMasses->GetXaxis()->SetTitle("Event Mjj (GeV)");
-  jetsMasses->GetYaxis()->SetTitle("m_{j1}+m_{j2} (GeV)");
-  
-  TH2D *efpVErification = new TH2D("EFP verification", "EFP verification", 50, 0, 200, 50, 0, 200);
-  TH1D *efpMAss = new TH1D("EFP mass", "EFP mass", 100, 0, 500);
-  efpMAss->SetLineColor(kRed);
-  
-  TH2D *constituentsDetaDphi        = new TH2D("constituentsDetaDphi"       , "constituentsDetaDphi", 1000, -0.8, 0.8, 1000, -0.8, 0.8);
-  TH1D *constituentsDr              = new TH1D("constituentsDr"             , "constituentsDr"              , 200, 0, 1);
-  TH1D *constituentsDrCorrected     = new TH1D("constituentsDrCorrected"    , "constituentsDrCorrected"     , 1000, 0, 0.1);
-  
-  TH1D *constituentsDrFromPrevious  = new TH1D("constituentsDrFromPrevious" , "constituentsDrFromPrevious"  , 200, 0, 2);
-  TH1D *constituentsPt              = new TH1D("constituentsPt"             , "constituentsPt"              , 200, 0, 10);
-  TH1D *constituentsDptFromPrevious = new TH1D("constituentsDptFromPrevious", "constituentsDptFromPrevious" , 200, -4, 0);
-  
-  TH1D *constituentsSumDr           = new TH1D("constituentsSumDr" , "constituentsSumDr"  , 100, 0, 100);
-  TH1D *constituentsSumDrPrevious   = new TH1D("constituentsSumDrPrevious" , "constituentsSumDrPrevious"  , 100, 0, 100);
-  
-  TH1D *constituentsAvgDr           = new TH1D("constituentsAvgDr" , "constituentsAvgDr"  , 100, 0.1, 0.6);
-  TH1D *constituentsAvgDrPrevious   = new TH1D("constituentsAvgDrPrevious" , "constituentsAvgDrPrevious"  , 100, 0.2, 0.8);
-  
-  TH1D *nConstituents   = new TH1D("nConstituents" , "nConstituents"  , 500, 0, 500);
-  TH1D *nJetsHist   = new TH1D("nJets" , "nJets"  , 20, 0, 20);
-  
-  
-  int iEvent=0;
-  
-  for(auto event : events){
-    
-    if(iEvent >= maxEvents) break;
-    iEvent++;
-    
-    eventHists["MET"]->Fill(event->MET);
-    eventHists["METeta"]->Fill(event->METeta);
-    eventHists["METphi"]->Fill(event->METphi);
-    eventHists["MT"]->Fill(event->MT);
-    eventHists["Mjj"]->Fill(event->Mjj);
-    
-    int nJets = 0;
-    
-    for(auto jet : event->jets){
-      if(jet->isEmpty()) continue;
-      
-      nJets++;
-      
-      jetHists["eta"]->Fill(jet->eta);
-      jetHists["phi"]->Fill(jet->phi);
-      jetHists["pt"]->Fill(jet->pt);
-      jetHists["mass"]->Fill(jet->mass);
-      jetHists["chargedFraction"]->Fill(jet->chargedFraction);
-      jetHists["PTD"]->Fill(jet->PTD);
-      jetHists["axis2"]->Fill(jet->axis2);
-      jetHists["flavor"]->Fill(jet->flavor);
-      jetHists["energy"]->Fill(jet->energy);
-      
-      for(int iEFP=0; iEFP<13; iEFP++){
-        EFPhists[iEFP]->Fill(jet->EFPs[iEFP]);
-      }
-      
-      double X = jet->mass;
-      double Xreco = jet->pt * sqrt(0.1*jet->EFPs[1]/2);
-
-      efpVErification->Fill(X, Xreco);
-      efpMAss->Fill(Xreco);
-      
-      shared_ptr<Constituent> previousConstituent = nullptr;
-      
-      TLorentzVector jetVector;
-      jetVector.SetPtEtaPhiM(jet->pt, jet->eta, jet->phi, jet->mass);
-      
-      double sumDr = 0;
-      double sumDrPrevious = 0;
-      int nSumDr = 0;
-      int nSumDrPrevious = 0;
-      
-      int nConstit = 0;
-      
-      
-      
-      for(auto constituent : jet->constituents){
-        if(constituent->isEmpty()) continue;
-        
-        TLorentzVector constituentVector;
-        constituentVector.SetPtEtaPhiE(constituent->pt, constituent->eta, constituent->phi, constituent->energy);
-        
-        double dEta = jet->eta - constituent->eta;
-        double dPhi = jetVector.DeltaPhi(constituentVector);
-        double dR = jetVector.DeltaR(constituentVector);
-        
-        constituentsDetaDphi->Fill(dEta, dPhi);
-        constituentsDr->Fill(dR);
-        sumDr += dR;
-        nSumDr++;
-        
-        constituentsDrCorrected->Fill(dR);
-        
-        constituentsPt->Fill(constituent->pt);
-        
-        if(previousConstituent){
-          TLorentzVector previousConstituentVector;
-          previousConstituentVector.SetPtEtaPhiE(previousConstituent->pt, previousConstituent->eta,
-                                                 previousConstituent->phi, previousConstituent->energy);
-          
-          double dPtPrevious  = constituent->pt - previousConstituent->pt;
-          double dRprevious = constituentVector.DeltaR(previousConstituentVector);
-          
-          constituentsDrFromPrevious->Fill(dRprevious);
-          sumDrPrevious += dRprevious;
-          nSumDrPrevious++;
-          
-          constituentsDptFromPrevious->Fill(dPtPrevious);
-        }
-        
-        previousConstituent = constituent;
-        nConstit++;
-      }
-      
-      constituentsSumDr->Fill(sumDr);
-      constituentsSumDrPrevious->Fill(sumDrPrevious);
-      
-      constituentsAvgDr->Fill(sumDr/nSumDr);
-      constituentsAvgDrPrevious->Fill(sumDrPrevious/nSumDrPrevious);
-      
-      nConstituents->Fill(nConstit);
-    }
-    
-    nJetsHist->Fill(nJets);
-    
-    double lastValue = 0;
-    
-    for(int iBin=0; iBin<constituentsDrCorrected->GetNbinsX(); iBin++){
-      double binContent = constituentsDrCorrected->GetBinContent(iBin);
-      double binCenter = constituentsDrCorrected->GetXaxis()->GetBinCenter(iBin);
-      
-      double expectedContent = 2*TMath::Pi()*binCenter;
-      constituentsDrCorrected->SetBinContent(iBin, binContent - expectedContent);
-      
-      if(binCenter < 0.8) lastValue = binContent - expectedContent;
-    }
-    
-    for(int iBin=0; iBin<constituentsDrCorrected->GetNbinsX(); iBin++){
-      double binContent = constituentsDrCorrected->GetBinContent(iBin);
-      double binCenter = constituentsDrCorrected->GetXaxis()->GetBinCenter(iBin);
-      constituentsDrCorrected->SetBinContent(iBin, binCenter < 0.8 ? binContent - lastValue : 0.0);
-    }
-    
-    
-    
-//    if(event->jets.size() != 2){
-//      cout<<"WARNING -- expected 2 jets in an event, but "<<event->jets.size()<<" were found!"<<endl;
-//      continue;
-//    }
-    
-    double dijetMass = event->jets[0]->mass + event->jets[1]->mass;
-    jetsMasses->Fill(event->Mjj, dijetMass);
+  for(auto &[name, nBinsX, minX, maxX, nBinsY, minY, maxY] : hists2Dparams){
+    hists2d[name] = new TH2D(name.c_str(), name.c_str(), nBinsX, minX, maxX, nBinsY, minY, maxY);
   }
-  
-  cout<<"Processed "<<iEvent<<" events"<<endl;
-  
+}
+
+void plotAndSaveHists()
+{
   TCanvas *canvasEvents = new TCanvas("Events", "Events", 1000, 1500);
   canvasEvents->Divide(2, 3);
   
@@ -266,16 +283,20 @@ int main (int argc, char** argv)
   
   iPad=1;
   canvasJets->cd(iPad++);
-  efpVErification->Draw("colz");
+  hists2d["efpVErification"]->Draw("colz");
   
   for(auto &[name, hist] : jetHists){
     canvasJets->cd(iPad++);
     hist->DrawNormalized();
     
-    if(name=="mass") efpMAss->Draw("same");
+    if(name=="mass"){
+      jetHists["efpMass"]->SetLineColor(kRed);
+      jetHists["efpMass"]->Draw("same");
+    }
+    
+    outfile->cd();
+    hist->Write();
   }
-  nJetsHist->Draw();
-  
   
   TCanvas *canvasEFPs = new TCanvas("EFPs", "EFPs", 2000, 1500);
   canvasEFPs->Divide(4, 3);
@@ -284,6 +305,8 @@ int main (int argc, char** argv)
   for(auto &[iEFP, hist] : EFPhists){
     canvasEFPs->cd(iPad++);
     hist->DrawNormalized();
+    outfile->cd();
+    hist->Write();
   }
   
   gStyle->SetOptStat(0);
@@ -291,74 +314,78 @@ int main (int argc, char** argv)
   TCanvas *canvasConstituents = new TCanvas("Constituents", "Constituents", 2000, 2000);
   canvasConstituents->Divide(4, 3);
   
-  canvasConstituents->cd(1);
-  constituentsDetaDphi->Draw("colz");
-  constituentsDetaDphi->GetZaxis()->SetRangeUser(0, 200);
+  iPad=1;
   
-  canvasConstituents->cd(2);
-  constituentsDr->Draw();
+  canvasConstituents->cd(iPad++);
+  hists2d["constituentsDetaDphi"]->Draw("colz");
+  hists2d["constituentsDetaDphi"]->GetZaxis()->SetRangeUser(0, 200);
   
-  canvasConstituents->cd(3);
-  constituentsDrCorrected->Draw();
-  
-  canvasConstituents->cd(4);
-  gPad->SetLogy();
-  constituentsPt->Draw();
-  
-  canvasConstituents->cd(5);
-  gPad->SetLogy();
-  constituentsDptFromPrevious->Draw();
-  
-  canvasConstituents->cd(6);
-  gPad->SetLogy();
-  constituentsDrFromPrevious->Draw();
-  
-  canvasConstituents->cd(7);
-//  gPad->SetLogy();
-  constituentsSumDr->Draw();
-  
-  canvasConstituents->cd(8);
-//  gPad->SetLogy();
-  constituentsSumDrPrevious->Draw();
-  
-  canvasConstituents->cd(9);
-  constituentsAvgDr->Draw();
-  
-  canvasConstituents->cd(10);
-  constituentsAvgDrPrevious->Draw();
-  
-  canvasConstituents->cd(11);
-  gStyle->SetOptStat(111111);
-  nConstituents->Draw();
+  for(auto &[name, hist] : constituentHists){
+    canvasConstituents->cd(iPad++);
+    hist->Draw();
+    outfile->cd();
+    hist->Write();
+  }
   
   canvasEvents->Update();
   canvasJets->Update();
   canvasEFPs->Update();
   canvasConstituents->Update();
+
+}
+
+
+int main (int argc, char** argv)
+{
+  TApplication theApp("App",&argc, argv);
   
+  initHists();
   
-  TFile *outfile = new TFile(outputPath.c_str(), "recreate");
-  outfile->cd();
+  int iEvent=0;
   
-  constituentsDetaDphi->Write();
-  constituentsDr->Write();
-  constituentsDrCorrected->Write();
-  constituentsPt->Write();
-  constituentsDptFromPrevious->Write();
-  constituentsDrFromPrevious->Write();
-  constituentsSumDr->Write();
-  constituentsSumDrPrevious->Write();
-  constituentsAvgDr->Write();
-  constituentsAvgDrPrevious->Write();
-  nConstituents->Write();
+  for(auto &[inputPath, crossSection, nGenEvents] : inputPaths){
+    
+    auto events = getEventsFromFile(inputPath);
+    double sumGenWeights = 0;
+    
+    cout<<"Looping over events..."<<endl;
+    
+    for(auto event : events){
+      
+      if(iEvent >= maxEvents) break;
+      iEvent++;
+      
+      double eventWeight = crossSection * event->genWeight/nGenEvents;
+      sumGenWeights += event->genWeight;
+      
+      int iJet = 0;
+      
+      for(auto jet : event->jets){
+        if(jet->isEmpty()) continue;
+        
+        fillJetHists(jet, iJet, eventWeight);
+        fillEfpHists(jet, eventWeight);
+        fillConstituentHists(jet, eventWeight);
+        
+        iJet++;
+      }
+      
+      fillEventHists(event, iJet, eventWeight);
+    }
+    cout<<"path: "<<inputPath<<"\tsum gen weights: "<<sumGenWeights<<endl;
+    cout<<"n events: "<<events.size()<<endl;
+  }
   
-  jetHists["pt"]->Write();
-  jetHists["mass"]->Write();
-  jetHists["PTD"]->Write();
-  jetHists["axis2"]->Write();
-  EFPhists[1]->Write();
+  produceCorrectedHists();
   
+  cout<<"Processed "<<iEvent<<" events"<<endl;
+  
+  cout<<"Plotting and saving histograms..."<<endl;
+  outfile = new TFile(outputPath.c_str(), "recreate");
+  plotAndSaveHists();
   outfile->Close();
+  cout<<"Plotting and saving done"<<endl;
+  
   
   theApp.Run();
   return 0;
