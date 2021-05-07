@@ -5,10 +5,7 @@
 
 from ROOT import kBlue, kGreen, kRed, kOrange
 
-# Model type
-
 train_on_signal = False
-
 
 # ---------------------------------------------
 # Output paths
@@ -20,8 +17,9 @@ results_path = output_path+"trainingRuns/"
 plots_path = output_path+"plots/"
 stat_hists_path = output_path+"stat_hists.root"
 
-output_file_suffix = ""
-
+# output_file_suffix = ""
+output_file_suffix = "_whiten"
+# output_file_suffix = "_30constituents"
 
 # ---------------------------------------------
 # Build general training/evaluation settings dictionary
@@ -70,13 +68,16 @@ input_path = signals_base_path+"/*/base_{}/*.h5".format(efp_base)
 # ---------------------------------------------
 # Training parameters
 training_params = {
-    "n_components": 2,
+    # "n_components": 60,
+    "n_components": "mle",
     "svd_solver": "full",
+    "whiten": False,
+
 }
 
 # ---------------------------------------------
 # Number of models to train
-n_models = 1
+n_models = 5
 
 # ---------------------------------------------
 # Pick normalization type (definitions below):
@@ -156,7 +157,8 @@ file_name += "{}".format(output_file_suffix)
 
 # only files matching this pattern will be used for tests
 
-test_filename_pattern = file_name+"_v"
+# test_filename_pattern = file_name+"_v"
+test_filename_pattern = "_v"
 
 # ---------------------------------------------
 # Build specific training/evaluation settings dictionary (this will be passed to the specialized trainer class)

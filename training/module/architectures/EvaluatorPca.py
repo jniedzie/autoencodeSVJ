@@ -61,15 +61,9 @@ class EvaluatorPca:
         reconstructed = pd.DataFrame(reconstructed)
         reconstructed.index = input_data_normed.index
 
-        # reconstructed = pd.DataFrame(model.transform(input_data_normed.data),
-        #                              columns=input_data_normed.columns,
-        #                              index=input_data_normed.index,
-        #                              dtype="float64")
-
-
         return reconstructed
 
-    def MahalanobisDist(self, inv_cov_matrix, mean_distr, data, verbose=False):
+    def __get_mahalanobis_distance(self, inv_cov_matrix, mean_distr, data, verbose=False):
         inv_covariance_matrix = inv_cov_matrix
         vars_mean = mean_distr
         diff = data - vars_mean
@@ -82,10 +76,9 @@ class EvaluatorPca:
         recon = self.get_reconstruction(input_data, summary, data_processor, scaler)
 
         data_test = np.array(recon.values)
-        dist_test = self.MahalanobisDist(summary.inv_cov_matrix, summary.mean_distr, data_test, verbose=False)
+        dist_test = self.__get_mahalanobis_distance(summary.inv_cov_matrix, summary.mean_distribution, data_test, verbose=False)
 
         return dist_test
-
 
     def get_aucs(self, summary, AUCs_path, filename, data_processor, data_loader):
         
@@ -112,8 +105,7 @@ class EvaluatorPca:
         aucs = self.__get_aucs(summary=summary,
                                data_processor=data_processor,
                                data_loader=data_loader,
-                               model=model,
-                               loss_function=summary.loss
+                               model=model
                                )
         
         print("aucs: ", aucs)
@@ -139,7 +131,7 @@ class EvaluatorPca:
         for key, data in normed.items():
             recon = pd.DataFrame(model.transform(data.data), columns=data.columns, index=data.index, dtype="float64")
             data_test = np.array(recon.values)
-            dist_test = self.MahalanobisDist(summary.inv_cov_matrix, summary.mean_distr, data_test, verbose=False)
+            dist_test = self.__get_mahalanobis_distance(summary.inv_cov_matrix, summary.mean_distribution, data_test, verbose=False)
             errors[key] = dist_test
 
         signals_errors = {}
@@ -216,7 +208,7 @@ class EvaluatorPca:
 
         return model
 
-    def __get_aucs(self, summary, data_processor, data_loader, model, loss_function, test_key='qcd'):
+    def __get_aucs(self, summary, data_processor, data_loader, model, test_key='qcd'):
         
         normed = {
             test_key: self.get_qcd_data(summary, data_processor, data_loader, normalize=True, test_data_only=True)
@@ -252,9 +244,14 @@ class EvaluatorPca:
         errors = {}
     
         for key, data in normed.items():
-            recon = pd.DataFrame(model.transform(data.data), columns=data.columns, index=data.index, dtype="float64")
-            data_test = np.array(recon.values)
-            dist_test = self.MahalanobisDist(summary.inv_cov_matrix, summary.mean_distr, data_test, verbose=False)
+            model = self.__load_model(summary)
+
+            reconstructed = model.transform(data.data)
+            reconstructed = pd.DataFrame(reconstructed)
+            reconstructed.index = data.index
+
+            data_test = np.array(reconstructed.values)
+            dist_test = self.__get_mahalanobis_distance(summary.inv_cov_matrix, summary.mean_distribution, data_test, verbose=False)
             errors[key] = dist_test
     
         background_errors = errors[test_key]

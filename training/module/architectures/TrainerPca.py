@@ -37,7 +37,10 @@ class TrainerPca:
         self.norm_type = norm_type
         self.norm_args = norm_args
         self.verbose = verbose
-        
+
+        self.inv_cov_matrix = None
+        self.mean_distribution = None
+
         # Load and split the data
         self.__load_data()
         
@@ -56,49 +59,27 @@ class TrainerPca:
         """
         return self._model
 
-    def cov_matrix(self, data, verbose=False):
-        covariance_matrix = np.cov(data, rowvar=False)
-        if self.is_pos_def(covariance_matrix):
-            inv_covariance_matrix = np.linalg.inv(covariance_matrix)
-            if self.is_pos_def(inv_covariance_matrix):
-                return covariance_matrix, inv_covariance_matrix
-            else:
-                print("Error: Inverse of Covariance Matrix is not positive definite!")
-        else:
-            print("Error: Covariance Matrix is not positive definite!")
-
-    def MahalanobisDist(self, inv_cov_matrix, mean_distr, data, verbose=False):
-        inv_covariance_matrix = inv_cov_matrix
-        vars_mean = mean_distr
-        diff = data - vars_mean
-        md = []
-        for i in range(len(diff)):
-            md.append(np.sqrt(diff[i].dot(inv_covariance_matrix).dot(diff[i])))
-        return md
-
-    def MD_detectOutliers(self, dist, extreme=False, verbose=False):
-        k = 3. if extreme else 2.
-        threshold = np.mean(dist) * k
-        outliers = []
-        for i in range(len(dist)):
-            if dist[i] >= threshold:
-                outliers.append(i)  # index of the outlier
-        return np.array(outliers)
-
-    def MD_threshold(self, dist, extreme=False, verbose=False):
-        k = 3. if extreme else 2.
-        threshold = np.mean(dist) * k
-        return threshold
-
-    def is_pos_def(self, A):
-        if np.allclose(A, A.T):
+    def __is_matrix_positively_defined(self, matrix):
+        if np.allclose(matrix, matrix.T):
             try:
-                np.linalg.cholesky(A)
+                np.linalg.cholesky(matrix)
                 return True
             except np.linalg.LinAlgError:
                 return False
         else:
             return False
+
+    def __get_inverted_covariance_matrix(self, data):
+        covariance_matrix = np.cov(data, rowvar=False)
+
+        if self.__is_matrix_positively_defined(covariance_matrix):
+            inv_covariance_matrix = np.linalg.inv(covariance_matrix)
+            if self.__is_matrix_positively_defined(inv_covariance_matrix):
+                return inv_covariance_matrix
+            else:
+                print("Error: Inverse of Covariance Matrix is not positive definite!")
+        else:
+            print("Error: Covariance Matrix is not positive definite!")
 
     def __get_model(self):
 
@@ -106,7 +87,6 @@ class TrainerPca:
                   svd_solver=self.training_params["svd_solver"])
 
         return pca
-
 
     def __load_data(self):
         """
@@ -116,25 +96,6 @@ class TrainerPca:
         (self.train_data, self.validation_data, _) = self.data_processor.split_to_train_validate_test(
             data_table=self.qcd)
 
-        ### from tutorial
-        # data_dir = '2nd_test'
-        # merged_data = pd.DataFrame()
-        #
-        # for filename in os.listdir(data_dir):
-        #     print(filename)
-        #     dataset = pd.read_csv(os.path.join(data_dir, filename), sep='\t')
-        #     dataset_mean_abs = np.array(dataset.abs().mean())
-        #     dataset_mean_abs = pd.DataFrame(dataset_mean_abs.reshape(1, 4))
-        #     dataset_mean_abs.index = [filename]
-        #     merged_data = merged_data.append(dataset_mean_abs)
-        #
-        # merged_data.columns = ['Bearing 1', 'Bearing 2', 'Bearing 3', 'Bearing 4']
-
-        ###
-
-
-
-    
     def __normalize_data(self):
         """
         Preparing normalized version of the training data
@@ -151,22 +112,8 @@ class TrainerPca:
                                                                         normalization_type=self.norm_type,
                                                                         norm_args=self.norm_args)
 
-        ### this was in the tutorial:
-        # self.train_data_normalized.sample(frac=1)
-
-        ### from tutorial
-        # scaler = preprocessing.MinMaxScaler()
-        #
-        # X_train = pd.DataFrame(scaler.fit_transform(dataset_train),
-        #                        columns=dataset_train.columns,
-        #                        index=dataset_train.index)
-        # # Random shuffle training data
-        # X_train.sample(frac=1)
-        #
-        # X_test = pd.DataFrame(scaler.transform(dataset_test),
-        #                       columns=dataset_test.columns,
-        #                       index=dataset_test.index)
-
+        # Not sure if this is necessary
+        self.train_data_normalized.sample(frac=1)
 
     def train(self):
         """
@@ -187,12 +134,14 @@ class TrainerPca:
         X_train_PCA = pd.DataFrame(X_train_PCA)
         X_train_PCA.index = self.train_data_normalized.index
 
+        print("Input size: ", self.input_size)
+        print("N components: ", len(X_train_PCA.columns))
+
         data_train = np.array(X_train_PCA.values)
 
-        _, self.inv_cov_matrix = self.cov_matrix(data_train)
-        self.mean_distr = data_train.mean(axis=0)
+        self.inv_cov_matrix = self.__get_inverted_covariance_matrix(data_train)
+        self.mean_distribution = data_train.mean(axis=0)
 
-    
     def get_summary(self):
         """
         @mandatory
@@ -201,7 +150,7 @@ class TrainerPca:
         """
 
         flat_inv_cov_matrix = tuple(map(tuple, self.inv_cov_matrix))
-        flat_mean_distr = tuple(self.mean_distr)
+        flat_mean_distribution = tuple(self.mean_distribution)
 
         summary_dict = {
             'training_output_path': self.training_output_path,
@@ -213,7 +162,7 @@ class TrainerPca:
             'norm_args': self.norm_args,
             'input_dim': self.input_size,
             'inv_cov_matrix': flat_inv_cov_matrix,
-            'mean_distr': flat_mean_distr
+            'mean_distribution': flat_mean_distribution
         }
         
         summary_dict = {**summary_dict, **self.training_params}
