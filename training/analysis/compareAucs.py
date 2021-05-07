@@ -7,18 +7,13 @@ show_plots = False
 
 input_paths = [
 
-    (glob.glob("../trainingResults_metrics/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_metrics/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_binary_accuracy_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_metrics/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_binary_crossentropy_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_metrics/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_categorical_accuracy_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_metrics/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_categorical_crossentropy_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_metrics/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_cosine_similarity_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_metrics/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_mean_absolute_error_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_metrics/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_mean_absolute_percentage_error_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_metrics/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_mean_squared_error_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_metrics/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_mean_squared_logarithmic_error_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_metrics/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_poisson_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_metrics/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_top_k_categorical_accuracy_v*"), kBlue, "(7, 7), BN: 1"),
+
+    (glob.glob("../trainingResults_pca/aucs/efp_3_nComponents_mle_svdSolver_full_MinMaxScaler_maxJets_2_whiten_v*"), kBlue, "(7, 7), BN: 1"),
+
+
+
+
+
 
 ]
 

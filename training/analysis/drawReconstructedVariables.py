@@ -33,10 +33,10 @@ def get_plots_for_all_variables(data, color, suffix=""):
     plots = []
     
     for variable_name in data.keys():
-        if re.match(r"constituent_[a-zA-Z0-9_]+", variable_name):
+        if re.match(r"constituent_[a-zA-Z0-9_]+", str(variable_name)):
             should_plot = False
             for constituent_number in constituents_to_plot:
-                if re.match(r"constituent_[a-zA-Z]+_{}".format(constituent_number), variable_name):
+                if re.match(r"constituent_[a-zA-Z]+_{}".format(constituent_number), str(variable_name)):
                     should_plot = True
 
             if not should_plot:
