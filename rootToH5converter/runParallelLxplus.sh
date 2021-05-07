@@ -2,13 +2,13 @@
 
 
 # run for all signals from 1 to 30
-#iConvs=($(seq 1 1 30))
+iConvs=($(seq 1 1 30))
 
 # or pick just a few
-iConvs=(17 30)
+#iConvs=(13 2 26 27 11 17 23 29 12)
 
 # list of lxplus servers that are working and can be accessed without providing a password
-goodServers=(1 3 4 6 7 8 10 11 12 13 14 16 18 19 20 21 23 25 26 27 28 30 31 32 33 34 35 36 37 38)
+goodServers=(61 62 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 83 84 85 86 87 90 91 92 93 94 95 96 97 98)
 
 for iConv in "${iConvs[@]}"; do
   iServer=$((700+goodServers[$(($iConv-1))]))

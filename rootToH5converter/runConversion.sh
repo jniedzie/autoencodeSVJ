@@ -39,11 +39,11 @@ selections_type=no_lepton_veto_fat_jets
 #selections_type=no_lepton_veto_ak4_jets
 
 selections_path=../preselection/results/${selections_type}/SVJ_m${mass}_r${rinv}_selection.txt
-output_path=results/${selections_type}_dr0p8_efp4/svj
+output_path=results/${selections_type}_dr0p8_efp3_fatJets_150constituents_2jets/svj
 mkdir -p $output_path
 output_path=${output_path}/SVJ_m${mass}_r${rinv}.h5
 
-python rootToH5.py -i $selections_path -o $output_path -e 4 -r 0.8
+python rootToH5.py -i $selections_path -o $output_path -e 3 -r 0.8 -c 150 -j 2 -v 1 -f -d
 
 
 #source /cvmfs/sft.cern.ch/lcg/views/LCG_93/x86_64-centos7-gcc7-opt/setup.sh
