@@ -1,36 +1,12 @@
 #!/bin/bash
 
-declare -a workdirs=(
-  "/afs/cern.ch/work/j/jniedzie/private/svjets/autoencodeSVJ/preselection"
-  "/t3home/jniedzie/autoencodeSVJ/preselection"
-)
-
-found_workdir=false
- 
-
-for workdir in ${workdirs[@]}; do
-  echo "Trying to move to ${workdir}"
-  if [[ -d "$workdir" ]]
-  then
-    cd $workdir
-    echo "moving to $workdir"
-    found_workdir=true
-    break
-  fi
-done
-
-if [ $found_workdir != true ]; then
-  echo "Couldn't find working directory..."
-  exit
-fi
-
-
-string='My long string'
 if [[ $HOSTNAME == *"lxplus"* ]]; then
   echo "Setting environment for lxplus"
+  cd /afs/cern.ch/work/j/jniedzie/private/svjets/autoencodeSVJ/preselection
   . setenv.sh
 else
   echo "Setting environemtn for eth T3"
+  cd /t3home/jniedzie/autoencodeSVJ/preselection
 fi
 
 
@@ -42,7 +18,6 @@ output_path=results/no_lepton_veto_fat_jets/
 
 nEvents=$1
 i=$(($2-1))
-
 
 
 mkdir -p $output_path
@@ -59,8 +34,10 @@ rinv=${rinvs[$ir]}
 echo "Running for mass: ${mass}, r_inv: ${rinv}"
 
 #input_path=inputFileLists/input_file_list_m${mass}_r${rinv}.txt
-input_path=inputFileLists/input_file_list_m3500_mDark20_r30_alphaPeak.txt
+#input_path=inputFileLists/input_file_list_m3500_mDark20_r30_alphaPeak.txt
+input_path=inputFileLists/input_file_list_m3500_mDark40_r30_alphaPeak.txt
 #sample_name=SVJ_m${mass}_r${rinv}
-sample_name=SVJ_m3500_mDark20_r30_alphaPeak
+#sample_name=SVJ_m3500_mDark20_r30_alphaPeak
+sample_name=SVJ_m3500_mDark40_r30_alphaPeak
 
 ./SVJselection $input_path $sample_name $output_path 0 $nEvents
