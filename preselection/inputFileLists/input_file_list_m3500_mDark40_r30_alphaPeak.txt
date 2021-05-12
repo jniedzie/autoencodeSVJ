@@ -1,0 +1,5 @@
+/pnfs/psi.ch/cms/trivcat/store/user/jniedzie/svjets/s_channel_delphes/delphesRoot/mMediator-3500_mDark-40_rinv-0p30_alpha-peak/outpre_s-channel_mMed-3500_mDark-40_rinv-0.3_alpha-peak_13TeV-pythia8_n-10000_part-1-HepMC.root
+/pnfs/psi.ch/cms/trivcat/store/user/jniedzie/svjets/s_channel_delphes/delphesRoot/mMediator-3500_mDark-40_rinv-0p30_alpha-peak/outpre_s-channel_mMed-3500_mDark-40_rinv-0.3_alpha-peak_13TeV-pythia8_n-10000_part-2-HepMC.root
+/pnfs/psi.ch/cms/trivcat/store/user/jniedzie/svjets/s_channel_delphes/delphesRoot/mMediator-3500_mDark-40_rinv-0p30_alpha-peak/outpre_s-channel_mMed-3500_mDark-40_rinv-0.3_alpha-peak_13TeV-pythia8_n-10000_part-3-HepMC.root
+/pnfs/psi.ch/cms/trivcat/store/user/jniedzie/svjets/s_channel_delphes/delphesRoot/mMediator-3500_mDark-40_rinv-0p30_alpha-peak/outpre_s-channel_mMed-3500_mDark-40_rinv-0.3_alpha-peak_13TeV-pythia8_n-10000_part-4-HepMC.root
+/pnfs/psi.ch/cms/trivcat/store/user/jniedzie/svjets/s_channel_delphes/delphesRoot/mMediator-3500_mDark-40_rinv-0p30_alpha-peak/outpre_s-channel_mMed-3500_mDark-40_rinv-0.3_alpha-peak_13TeV-pythia8_n-10000_part-5-HepMC.root
