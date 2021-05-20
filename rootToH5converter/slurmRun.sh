@@ -10,7 +10,7 @@ selections_type=no_lepton_veto_fat_jets
 efp_base=3
 delta_r=0.8
 delta_r_name=0p8
-n_constituents=150
+n_constituents=0
 max_jets=2
 verbosity=1
 use_fat_jets=true
@@ -35,13 +35,30 @@ echo "Output dir: ${output_path}"
 mkdir -p $output_path
 
 echo "Running conversion"
-sbatch -p wn --account=t3 --job-name=rootToH5 --mem=4000M --time 02:00:00 -o output/%x-%j.out -e error/%x-%j.err runConversionSVJ.sh 1
 
-#iConvs=($(seq 0 1 20))
+
+#masses=(1500 2000 2500 3000 3500 4000)
+#rinvs=(30 50 70)
+
+#masses=(4000 )
+#rinvs=(30 50)
 #
-#for iConv in "${iConvs[@]}"; do
-#  sbatch -p wn --account=t3 --job-name=rootToH5 --mem=3000M --time 10:00:00 -o output/%x-%j.out -e error/%x-%j.err runConversionQCD.sh $iConv
+#for mass in "${masses[@]}"; do
+#  for rinv in "${rinvs[@]}"; do
+#    sbatch -p wn --account=t3 --job-name=rootToH5 --mem=4000M --time 02:00:00 -o output/%x-%j.out -e error/%x-%j.err runConversionSVJ.sh $mass $rinv
+#  done
 #done
+
+
+# run for all QCD parts from 0 to 19
+#iConvs=($(seq 0 1 19))
+
+# or pick just a few
+iConvs=(4 7 9 10 12 13 14 15 16 18)
+
+for iConv in "${iConvs[@]}"; do
+  sbatch -p wn --account=t3 --job-name=rootToH5 --mem=5000M --time 10:00:00 -o output/%x-%j.out -e error/%x-%j.err runConversionQCD.sh $iConv
+done
 
 
 

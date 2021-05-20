@@ -39,19 +39,8 @@ root --version
 #/usr/bin/eosfusebind -g krb5 ${HOME}/krb5cc_${UID}
 #echo "Done"
 
-
-echo "Figuring out mass and r inv"
-
-# find out sample name from the index
-i=$(($1-1))
-ir=$(($i / 6))
-im=$(($i % 6))
-
-masses=(1500 2000 2500 3000 3500 4000)
-rinvs=(15 30 45 60 75)
-
-mass=${masses[$im]}
-rinv=${rinvs[$ir]}
+mass=$1
+rinv=$2
 
 echo "Running for mass: ${mass}, r_inv: ${rinv}"
 
@@ -63,25 +52,21 @@ selections_type=no_lepton_veto_fat_jets
 efp_base=3
 delta_r=0.8
 delta_r_name=0p8
-n_constituents=150
+n_constituents=0
 max_jets=2
 verbosity=1
 use_fat_jets=true
 force_delphes_matching=true
 
 #selections_path=../preselection/results/${selections_type}/SVJ_m${mass}_r${rinv}_selection.txt
-selections_path=../preselection/results/${selections_type}/SVJ_m3500_mDark20_r30_alphaPeak_selection.txt
-#selections_path=../preselection/results/${selections_type}/SVJ_m3500_mDark40_r30_alphaPeak_selection.txt
+selections_path=../preselection/results/${selections_type}/SVJ_m${mass}_mDark20_r${rinv}_alphaPeak_selection.txt
 
 echo "Using selections: ${selections_path}"
-
-
 
 output_path=${output_path}/h5_${selections_type}_dr${delta_r_name}_efp${efp_base}_fatJets${use_fat_jets}_constituents${n_constituents}_maxJets${max_jets}/
 
 #output_path=${output_path}/SVJ_m${mass}_r${rinv}.h5
-output_path=${output_path}/SVJ_m3500_mDark20_r30_alphaPeak.h5
-#output_path=${output_path}/SVJ_m3500_mDark40_r30_alphaPeak.h5
+output_path=${output_path}/SVJ_m${mass}_mDark20_r${rinv}_alphaPeak.h5
 
 args=(
   -i "$selections_path"
@@ -100,5 +85,7 @@ fi
 if [[ -v force_delphes_matching ]]; then
     args+=(-d)
 fi
+
+echo "Executing: python rootToH5.py ${args[@]}"
 
 python rootToH5.py "${args[@]}"
