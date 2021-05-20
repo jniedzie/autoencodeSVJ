@@ -10,9 +10,17 @@ iConvs=(21 22 23 24 25 26 27 28 29 30)
 
 # list of lxplus servers that are working and can be accessed without providing a password
 
-for iConv in "${iConvs[@]}"; do
-  cd /Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training
-  (echo "Starting job $iConv"; python train.py -c configs/bdt_default.py -i ${iConv};) &
+masses=(1500 2000 2500 3000 3500 4000)
+#rinvs=(30 50 70)
+#rinvs=(30 )
+#rinvs=(50 )
+rinvs=(70 )
+
+for mass in "${masses[@]}"; do
+  for rinv in "${rinvs[@]}"; do
+    cd /Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training
+  (echo "Starting training for mass: $mass, rinv: $rinv"; python train.py -c configs/bdt_default.py -m ${mass} -r ${rinv};) &
+  done
 done
 wait
 echo "All processes started"

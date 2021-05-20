@@ -6,14 +6,22 @@ import glob
 show_plots = False
 
 input_paths = [
+    (glob.glob("../trainingResults_epochs/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_SGD_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_1_maxJets_2_metric_accuracy_v*"), kBlue, "(7, 7), BN: 1"),
+    (glob.glob("../trainingResults_epochs/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_SGD_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_10_maxJets_2_metric_accuracy_v*"), kBlue, "(7, 7), BN: 1"),
+    (glob.glob("../trainingResults_epochs/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_SGD_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_100_maxJets_2_metric_accuracy_v*"), kBlue, "(7, 7), BN: 1"),
+    (glob.glob("../trainingResults_epochs/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_SGD_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_500_maxJets_2_metric_accuracy_v*"), kBlue, "(7, 7), BN: 1"),
+    (glob.glob("../trainingResults_epochs/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_SGD_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_1000_maxJets_2_metric_accuracy_v*"), kBlue, "(7, 7), BN: 1"),
+    (glob.glob("../trainingResults_epochs/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_SGD_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_10000_maxJets_2_metric_accuracy_v*"), kBlue, "(7, 7), BN: 1"),
 
 
-    (glob.glob("../trainingResults_pca/aucs/efp_3_nComponents_mle_svdSolver_full_MinMaxScaler_maxJets_2_whiten_v*"), kBlue, "(7, 7), BN: 1"),
+
+    # (glob.glob("../trainingResults_archs/aucs/efp_3_bottle_2_arch_1__1_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_v*"), kBlue, "(7, 7), BN: 1"),
 
 
-
-
-
+    # (glob.glob("../trainingResults_pca/aucs/efp_3_nComponents_mle_svdSolver_full_MinMaxScaler_maxJets_2_whiten_v*"), kBlue, "(7, 7), BN: 1"),
+    # (glob.glob("../trainingResults_pca/aucs/efp_3_nComponents_mle_svdSolver_full_MaxAbsScaler_maxJets_2_v*"), kBlue, "(7, 7), BN: 1"),
+    # (glob.glob("../trainingResults_pca/aucs/efp_3_nComponents_mle_svdSolver_full_RobustScaler_maxJets_2_v*"), kBlue, "(7, 7), BN: 1"),
+    # (glob.glob("../trainingResults_pca/aucs/efp_3_nComponents_mle_svdSolver_full_StandardScaler_maxJets_2_v*"), kBlue, "(7, 7), BN: 1"),
 
 ]
 
@@ -109,14 +117,23 @@ def print_average_auc_for_files(paths):
         
         auc_per_path.append((average_auc, path))
     
-    auc_per_path = sorted(auc_per_path, key=lambda x: x[0])
+    auc_per_path = sorted(auc_per_path, key=lambda x: x[0], reverse=True)
 
     avg_auc = 0
 
-    for auc, path in auc_per_path:
-        avg_auc += auc
+    n_models_to_check = int(len(auc_per_path) * 0.8)
+    i_model = 0
 
-    print("Avg auc for file: ", paths[0], "is: ", avg_auc/len(auc_per_path))
+    for auc, path in auc_per_path:
+        print("auc:", auc)
+        if i_model < n_models_to_check:
+            avg_auc += auc
+
+        i_model += 1
+
+    print("n models to check: ", n_models_to_check)
+
+    print("Avg auc for file: ", paths[0], "is: ", avg_auc/n_models_to_check)
         
 
 def get_auc_params(csv_file_paths, forMass):

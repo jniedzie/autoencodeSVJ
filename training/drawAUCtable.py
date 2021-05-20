@@ -17,6 +17,9 @@ args = parser.parse_args()
 config_path = args.config_path.strip(".py").replace("/", ".")
 config = importlib.import_module(config_path)
 
+n_bins_rinv = 3
+n_bins_mass = 6
+
 matplotlib.rcParams.update({'font.size': 16})
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
@@ -31,8 +34,8 @@ def plot_aucs(dataframe, title=None):
     cb = plt.colorbar()
     cb.set_label(label='AUC value', fontsize=18 * fac)
     
-    plt.xticks(np.arange(0, 5, 1), map(lambda x: '{:.2f}'.format(float(x)), np.unique(dataframe.columns)))
-    plt.yticks(np.arange(0, 6, 1), np.unique(dataframe.index))
+    plt.xticks(np.arange(0, n_bins_rinv, 1), map(lambda x: '{:.2f}'.format(float(x)), np.unique(dataframe.columns)))
+    plt.yticks(np.arange(0, n_bins_mass, 1), np.unique(dataframe.index))
     
     plt.title(title, fontsize=fac * 25)
     plt.ylabel(r'$M_{Z^\prime}$ (GeV)', fontsize=fac * 20)
