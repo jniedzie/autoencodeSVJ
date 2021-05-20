@@ -3,8 +3,9 @@
 const bool calculateAucs = false;
 
 vector<string> inputPaths = {
-  "results/h5histsQCD_cmssw_mixed.root",
+//  "results/h5histsQCD_cmssw_mixed.root",
   "results/h5histsQCD_delphes_fixed.root",
+  
 //  "results/h5histsQCD_delphes.root",
 //  "results/h5histsQCD_cmssw_1000to1400.root",
 //  "results/h5histsQCD_cmssw_1400to1800.root",
@@ -21,17 +22,24 @@ vector<string> inputPaths = {
 //  "h5histsSVJ_r75.root",
   
 //  "results/h5histsSVJ_m3500_r30_delphes.root",
+  "results/h5histsSVJ_m3500_r30_mDark40_alphaPeak_delphes.root",
+  "results/h5histsSVJ_m3500_r30_mDark20_alphaPeak_delphes.root",
   "results/h5histsSVJ_m3500_r30_delphes_test.root",
   "results/h5histsSVJ_m3500_r30_cmssw.root",
+  "results/h5histsSVJ_m3500_r30_mDark40_alphaPeak_cmssw_fixed.root",
 };
 
 map<string, tuple<string, int, int, int>> histParams = {
   // path                                           title                       color       style   width
-  {"results/h5histsQCD_cmssw_mixed.root"            , {"QCD CMSSW mixed"          , kBlue       , 1     , 1   }},
-  {"results/h5histsQCD_delphes_fixed.root"          , {"QCD Delphes fixed"        , kBlack      , 1     , 3   }},
+//  {"results/h5histsQCD_cmssw_mixed.root"                                  , {"QCD CMSSW mixed"              , kBlue       , 1     , 1   }},
+  {"results/h5histsQCD_delphes_fixed.root"                                , {"QCD Delphes"                  , kBlack      , 1     , 3   }},
+  
 //  {"results/h5histsSVJ_m3500_r30_delphes.root"      , {"SVJ Delphes"              , kViolet     , 2     , 3   }},
-  {"results/h5histsSVJ_m3500_r30_delphes_test.root" , {"SVJ Delphes Fixed"        , kViolet      , 2     , 3   }},
-  {"results/h5histsSVJ_m3500_r30_cmssw.root"        , {"SVJ CMSSW"                , kRed        , 2     , 1   }},
+  {"results/h5histsSVJ_m3500_r30_mDark40_alphaPeak_delphes.root"          , {"SVJ Delphes mD=40, alphaPeak" , kCyan+1     , 2     , 3   }},
+  {"results/h5histsSVJ_m3500_r30_mDark20_alphaPeak_delphes.root"          , {"SVJ Delphes mD=20, alphaPeak" , kGreen+1    , 2     , 3   }},
+  {"results/h5histsSVJ_m3500_r30_delphes_test.root"                       , {"SVJ Delphes mD=20, alpha=0.1" , kViolet     , 2     , 3   }},
+  {"results/h5histsSVJ_m3500_r30_cmssw.root"                              , {"SVJ CMSSW"                    , kRed        , 2     , 1   }},
+  {"results/h5histsSVJ_m3500_r30_mDark40_alphaPeak_cmssw_fixed.root"      , {"SVJ CMSSW (fixed)"            , kBlue       , 2     , 1   }},
   
 //  {"results/h5histsQCD_cmssw_1000to1400.root"   , {"QCD CMSSW 1000-1400 GeV" , kBlue      , 1 , 1 }  },
 //  {"results/h5histsQCD_cmssw_1400to1800.root"   , {"QCD CMSSW 1400-1800 GeV" , kCyan      , 1 , 1 }  },

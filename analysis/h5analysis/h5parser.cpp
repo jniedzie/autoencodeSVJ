@@ -24,18 +24,18 @@ const int maxEvents = 999999999;
 //
 //const string outputPath = "results/h5histsSVJ_m3500_r30_delphes_test.root";
 
-//vector<tuple<string, double, int>> inputPaths = {
-//  {"/Users/Jeremi/Documents/Physics/ETH/data/s_channel_cms/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/3500GeV_0.30/base_3/SVJ_m3500_r30_part0.h5", 1, 1},
-//};
-//
-//const string outputPath = "results/h5histsSVJ_m3500_r30_cmssw.root";
-
 vector<tuple<string, double, int>> inputPaths = {
-  {"/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJets_150constituents_2jets/base_3/QCD_part_1.h5"  , 1, 1},
-  {"/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJets_150constituents_2jets/base_3/QCD_part_12.h5" , 1, 1},
+  {"/Users/Jeremi/Documents/Physics/ETH/data/s_channel_cms/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/SVJ_m3500_mDark40_r30_alphaPeak_cmssw.h5", 1, 1},
 };
 
-const string outputPath = "results/h5histsQCD_delphes_fixed.root";
+const string outputPath = "results/h5histsSVJ_m3500_r30_mDark40_alphaPeak_cmssw_fixed.root";
+
+//vector<tuple<string, double, int>> inputPaths = {
+//  {"/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJets_150constituents_2jets/base_3/QCD_part_1.h5"  , 1, 1},
+//  {"/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJets_150constituents_2jets/base_3/QCD_part_12.h5" , 1, 1},
+//};
+//
+//const string outputPath = "results/h5histsQCD_delphes_fixed.root";
 
 
 
