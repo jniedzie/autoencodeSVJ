@@ -1,0 +1,15 @@
+/pnfs/psi.ch/cms/trivcat/store/user/jniedzie/svjets/s_channel_delphes/delphesRoot/mMediator-1500_mDark-20_rinv-0p70_alpha-peak/m1500_mD20_r70_alphapeak-HepMC_part-1.root
+/pnfs/psi.ch/cms/trivcat/store/user/jniedzie/svjets/s_channel_delphes/delphesRoot/mMediator-1500_mDark-20_rinv-0p70_alpha-peak/m1500_mD20_r70_alphapeak-HepMC_part-13.root
+/pnfs/psi.ch/cms/trivcat/store/user/jniedzie/svjets/s_channel_delphes/delphesRoot/mMediator-1500_mDark-20_rinv-0p70_alpha-peak/m1500_mD20_r70_alphapeak-HepMC_part-14.root
+/pnfs/psi.ch/cms/trivcat/store/user/jniedzie/svjets/s_channel_delphes/delphesRoot/mMediator-1500_mDark-20_rinv-0p70_alpha-peak/m1500_mD20_r70_alphapeak-HepMC_part-15.root
+/pnfs/psi.ch/cms/trivcat/store/user/jniedzie/svjets/s_channel_delphes/delphesRoot/mMediator-1500_mDark-20_rinv-0p70_alpha-peak/m1500_mD20_r70_alphapeak-HepMC_part-2.root
+/pnfs/psi.ch/cms/trivcat/store/user/jniedzie/svjets/s_channel_delphes/delphesRoot/mMediator-1500_mDark-20_rinv-0p70_alpha-peak/m1500_mD20_r70_alphapeak-HepMC_part-3.root
+/pnfs/psi.ch/cms/trivcat/store/user/jniedzie/svjets/s_channel_delphes/delphesRoot/mMediator-1500_mDark-20_rinv-0p70_alpha-peak/m1500_mD20_r70_alphapeak-HepMC_part-4.root
+/pnfs/psi.ch/cms/trivcat/store/user/jniedzie/svjets/s_channel_delphes/delphesRoot/mMediator-1500_mDark-20_rinv-0p70_alpha-peak/m1500_mD20_r70_alphapeak-HepMC_part-5.root
+/pnfs/psi.ch/cms/trivcat/store/user/jniedzie/svjets/s_channel_delphes/delphesRoot/mMediator-1500_mDark-20_rinv-0p70_alpha-peak/m1500_mD20_r70_alphapeak-HepMC_part-6.root
+/pnfs/psi.ch/cms/trivcat/store/user/jniedzie/svjets/s_channel_delphes/delphesRoot/mMediator-1500_mDark-20_rinv-0p70_alpha-peak/m1500_mD20_r70_alphapeak-HepMC_part-7.root
+/pnfs/psi.ch/cms/trivcat/store/user/jniedzie/svjets/s_channel_delphes/delphesRoot/mMediator-1500_mDark-20_rinv-0p70_alpha-peak/m1500_mD20_r70_alphapeak-HepMC_part-8.root
+/pnfs/psi.ch/cms/trivcat/store/user/jniedzie/svjets/s_channel_delphes/delphesRoot/mMediator-1500_mDark-20_rinv-0p70_alpha-peak/m1500_mD20_r70_alphapeak-HepMC_part-9.root
+/pnfs/psi.ch/cms/trivcat/store/user/jniedzie/svjets/s_channel_delphes/delphesRoot/mMediator-1500_mDark-20_rinv-0p70_alpha-peak/m1500_mD20_r70_alphapeak-HepMC_part-10.root
+/pnfs/psi.ch/cms/trivcat/store/user/jniedzie/svjets/s_channel_delphes/delphesRoot/mMediator-1500_mDark-20_rinv-0p70_alpha-peak/m1500_mD20_r70_alphapeak-HepMC_part-11.root
+/pnfs/psi.ch/cms/trivcat/store/user/jniedzie/svjets/s_channel_delphes/delphesRoot/mMediator-1500_mDark-20_rinv-0p70_alpha-peak/m1500_mD20_r70_alphapeak-HepMC_part-12.root
