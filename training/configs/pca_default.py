@@ -17,8 +17,8 @@ results_path = output_path+"trainingRuns/"
 plots_path = output_path+"plots/"
 stat_hists_path = output_path+"stat_hists.root"
 
-# output_file_suffix = ""
-output_file_suffix = "_whiten"
+output_file_suffix = ""
+# output_file_suffix = "_whiten"
 # output_file_suffix = "_30constituents"
 
 # ---------------------------------------------
@@ -48,17 +48,13 @@ evaluation_general_settings = {
 # ---------------------------------------------
 # Path to training data
 efp_base = 3
-qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8/base_{}/*.h5".format(efp_base)
-# qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/old_training_data/qcd/base_{}/*.h5".format(efp_base)
-# qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/test_data/base_{}/*.h5".format(efp_base)
-# qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/base_{}/*.h5".format(efp_base)
-# qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituentsDelta_5jets/base_{}/*.h5".format(efp_base)
+# qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/base_{}/*.h5".format(efp_base)
+qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents0_maxJets2/base_{}/*.h5".format(efp_base)
 
 
-signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8/"
-# signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/old_training_data/all_signals/"
-# signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/"
-# signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_withConstituentsDelta_5jets/"
+# signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/"
+signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents0_maxJets2/"
+
 
 
 # Path to testing data
@@ -68,8 +64,8 @@ input_path = signals_base_path+"/*/base_{}/*.h5".format(efp_base)
 # ---------------------------------------------
 # Training parameters
 training_params = {
-    # "n_components": 60,
-    "n_components": "mle",
+    "n_components": 2,
+    # "n_components": "mle",
     "svd_solver": "full",
     "whiten": False,
 
@@ -157,8 +153,8 @@ file_name += "{}".format(output_file_suffix)
 
 # only files matching this pattern will be used for tests
 
-# test_filename_pattern = file_name+"_v"
-test_filename_pattern = "_v"
+test_filename_pattern = file_name+"_v"
+# test_filename_pattern = "_v"
 
 # ---------------------------------------------
 # Build specific training/evaluation settings dictionary (this will be passed to the specialized trainer class)

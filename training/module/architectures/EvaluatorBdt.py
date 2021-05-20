@@ -21,7 +21,7 @@ class EvaluatorBdt:
     
         mass, rinv = self.__get_mass_and_rinv_from_filename(filename)
     
-        signal_name = "{}GeV_{:3.2f}".format(mass, rinv)
+        signal_name = "{}GeV_{:3.2f}_mDark20_alphaPeak".format(mass, rinv)
         signal_path = self.signals_base_path + "/" + signal_name + "/base_3/*.h5"
     
         model = self.__get_model(summary)
@@ -45,7 +45,7 @@ class EvaluatorBdt:
     
         mass, rinv = self.__get_mass_and_rinv_from_filename(filename)
     
-        signal_name = "{}GeV_{:3.2f}".format(mass, rinv)
+        signal_name = "{}GeV_{:3.2f}_mDark20_alphaPeak".format(mass, rinv)
         signal_path = self.signals_base_path + "/" + signal_name + "/base_3/*.h5"
     
         self.__load_data(data_processor=data_processor, data_loader=data_loader, summary=summary, signal_path=signal_path)
