@@ -9,8 +9,8 @@
 
 SVJFinder::SVJFinder(char **argv)
 {
-  inputspec = argv[1];
-  cout<< "File list to open: " << inputspec << endl;
+  intputPaths = argv[1];
+  cout<< "File list to open: " << intputPaths << endl;
   
   sample = argv[2];
   cout << "Sample name: " << sample << endl;
@@ -23,7 +23,7 @@ SVJFinder::SVJFinder(char **argv)
   
   if (nMin < 0) nMin = 0;
   
-  MakeChain();
+//  MakeChain();
   
   for(CutType type : cutTypes) cutValues[type] = false;
 }
@@ -33,11 +33,11 @@ SVJFinder::~SVJFinder()
   file->Close();
 }
 
-ParallelTreeChain* SVJFinder::MakeChain()
+ParallelTreeChain* SVJFinder::MakeChain(bool readScoutingNtuples)
 {
-  cout << "Creating file chain with tree type 'Delphes'...";
+  cout << "Creating file chain with tree type "<< (readScoutingNtuples ? "HLT Scouting" : "Delphes") << endl;
   chain = new ParallelTreeChain();
-  outputTrees = chain->GetTrees(inputspec, "Delphes");
+  outputTrees = chain->GetTrees(intputPaths, readScoutingNtuples ? "Events" : "Delphes");
   
   selectionIndex.resize(outputTrees.size());
   

@@ -11,7 +11,7 @@ public:
   ~SVJFinder();
   
   // sets up paralleltreechain and returns a pointer to it
-  ParallelTreeChain* MakeChain();
+  ParallelTreeChain* MakeChain(bool readScoutingNtuples=false);
   
   // creates, assigns, and returns tlorentz vector pointer to be updated on GetEntry
   vector<TLorentzVector>* AddLorentz(string vectorName, vector<string> components);
@@ -53,7 +53,7 @@ public:
   /// PUBLIC DATA
   ///
   // general init vars, parsed from argv
-  string sample, inputspec, outputdir;
+  string sample, intputPaths, outputdir;
   
   // number of events
   Int_t nEvents, nMin, nMax;

@@ -15,6 +15,7 @@ const double minJetMt = 1500; //GeV
 const double minMetRatio = 0.25;
 
 const bool useFatJets = true;
+const bool readScoutingNtuples = true;
 
 
 int leptonCount(vector<LorentzMock>* leptons)
@@ -46,7 +47,7 @@ int main(int argc, char **argv)
   SVJFinder core(argv);
   
   // make file collection and chain
-  core.MakeChain();
+  core.MakeChain(readScoutingNtuples);
   
   // add histogram tracking
   core.AddHist(HistType::dEta, "h_dEta", "#Delta#eta(j0,j1)", 100, 0, 10);
@@ -73,18 +74,55 @@ int main(int argc, char **argv)
   // add componenets for jets (tlorentz)
   
   vector<TLorentzVector> *Jets;
+  vector<LorentzMock> *Electrons, *Muons;
+  double *metFull_Pt, *metFull_Phi;
   
-  if(useFatJets){
-    Jets = core.AddLorentz("FatJet", {"FatJet.PT","FatJet.Eta","FatJet.Phi","FatJet.Mass"});
+  if(readScoutingNtuples){
+    string jetDir = "Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018./Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018.obj";
+    vector<string> jetVars = {
+      "Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018.obj.pt_",
+      "Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018.obj.eta_",
+      "Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018.obj.phi_",
+      "Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018.obj.m_",
+    };
+    
+    Jets = core.AddLorentz(jetDir, jetVars);
+    
+    string electronDir = "Run3ScoutingElectrons_hltScoutingEgammaPacker__HLT2018./Run3ScoutingElectrons_hltScoutingEgammaPacker__HLT2018.obj";
+    vector<string> electronVars = {
+      "Run3ScoutingElectrons_hltScoutingEgammaPacker__HLT2018.obj.pt_",
+      "Run3ScoutingElectrons_hltScoutingEgammaPacker__HLT2018.obj.eta_",
+      "Run3ScoutingElectrons_hltScoutingEgammaPacker__HLT2018.obj.phi_",
+      "Run3ScoutingElectrons_hltScoutingEgammaPacker__HLT2018.obj.m_",
+    };
+    
+    Electrons = core.AddLorentzMock(electronDir, electronVars);
+    
+    string muonDir = "Run3ScoutingMuons_hltScoutingMuonPacker__HLT2018./Run3ScoutingMuons_hltScoutingMuonPacker__HLT2018.obj";
+    vector<string> muonVars = {
+      "Run3ScoutingMuons_hltScoutingMuonPacker__HLT2018.obj.pt_",
+      "Run3ScoutingMuons_hltScoutingMuonPacker__HLT2018.obj.eta_",
+      "Run3ScoutingMuons_hltScoutingMuonPacker__HLT2018.obj.phi_",
+      "Run3ScoutingMuons_hltScoutingMuonPacker__HLT2018.obj.m_",
+    };
+    
+    
+    Muons = core.AddLorentzMock(muonDir, muonVars);
+
+    metFull_Pt = core.AddVar("double_hltScoutingPFPacker_pfMetPt_HLT2018.", "double_hltScoutingPFPacker_pfMetPt_HLT2018.obj");
+    metFull_Phi = core.AddVar("double_hltScoutingPFPacker_pfMetPhi_HLT2018.","double_hltScoutingPFPacker_pfMetPhi_HLT2018.obj");
   }
   else{
-    Jets = core.AddLorentz("Jet", {"Jet.PT","Jet.Eta","Jet.Phi","Jet.Mass"});
+    if(useFatJets)  Jets = core.AddLorentz("FatJet", {"FatJet.PT","FatJet.Eta","FatJet.Phi","FatJet.Mass"});
+    else            Jets = core.AddLorentz("Jet", {"Jet.PT","Jet.Eta","Jet.Phi","Jet.Mass"});
+  
+    Electrons = core.AddLorentzMock("Electron", {"Electron.PT","Electron.Eta", "Electron.IsolationVarRhoCorr"});
+    Muons = core.AddLorentzMock("Muon", {"MuonLoose.PT", "MuonLoose.Eta", "MuonLoose.IsolationVarRhoCorr"});
+    metFull_Pt = core.AddVar("metMET", "MissingET.MET");
+    metFull_Phi = core.AddVar("metPhi", "MissingET.Phi");
   }
   
-  vector<LorentzMock>* Electrons = core.AddLorentzMock("Electron", {"Electron.PT","Electron.Eta", "Electron.IsolationVarRhoCorr"});
-  vector<LorentzMock>* Muons = core.AddLorentzMock("Muon", {"MuonLoose.PT", "MuonLoose.Eta", "MuonLoose.IsolationVarRhoCorr"});
-  double* metFull_Pt = core.AddVar("metMET", "MissingET.MET");
-  double* metFull_Phi = core.AddVar("metPhi", "MissingET.Phi");
+  
   
   // loop over the first nEntries (debug)
   // start loop timer
