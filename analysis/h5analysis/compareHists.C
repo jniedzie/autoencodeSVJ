@@ -4,7 +4,8 @@ const bool calculateAucs = false;
 
 vector<string> inputPaths = {
 //  "results/h5histsQCD_cmssw_mixed.root",
-  "results/h5histsQCD_delphes_fixed.root",
+//  "results/h5histsQCD_delphes_fixed.root",
+  "results/h5histsQCD_delphes_new.root",
   
 //  "results/h5histsQCD_delphes.root",
 //  "results/h5histsQCD_cmssw_1000to1400.root",
@@ -22,24 +23,40 @@ vector<string> inputPaths = {
 //  "h5histsSVJ_r75.root",
   
 //  "results/h5histsSVJ_m3500_r30_delphes.root",
-  "results/h5histsSVJ_m3500_r30_mDark40_alphaPeak_delphes.root",
-  "results/h5histsSVJ_m3500_r30_mDark20_alphaPeak_delphes.root",
-  "results/h5histsSVJ_m3500_r30_delphes_test.root",
-  "results/h5histsSVJ_m3500_r30_cmssw.root",
-  "results/h5histsSVJ_m3500_r30_mDark40_alphaPeak_cmssw_fixed.root",
+//  "results/h5histsSVJ_m3500_r30_mDark40_alphaPeak_delphes.root",
+//  "results/h5histsSVJ_m3500_r30_mDark20_alphaPeak_delphes.root",
+//  "results/h5histsSVJ_m3500_r30_delphes_test.root",
+//  "results/h5histsSVJ_m3500_r30_cmssw.root",
+//  "results/h5histsSVJ_m3500_r30_mDark40_alphaPeak_cmssw_fixed.root",
+//  "results/h5hists_SVJ_m2000_mDark20_r30_alphaPeak_delphes_new.root",
+//  "results/h5hists_SVJ_m3000_mDark20_r30_alphaPeak_delphes_new.root",
+//  "results/h5hists_SVJ_m4000_mDark20_r30_alphaPeak_delphes_new.root",
+  
+//  "results/h5hists_SVJ_m3000_mDark20_r30_alphaPeak_delphes_new.root",
+//  "results/h5hists_SVJ_m3000_mDark20_r50_alphaPeak_delphes_new.root",
+//  "results/h5hists_SVJ_m3000_mDark20_r70_alphaPeak_delphes_new.root",
 };
 
 map<string, tuple<string, int, int, int>> histParams = {
   // path                                           title                       color       style   width
 //  {"results/h5histsQCD_cmssw_mixed.root"                                  , {"QCD CMSSW mixed"              , kBlue       , 1     , 1   }},
-  {"results/h5histsQCD_delphes_fixed.root"                                , {"QCD Delphes"                  , kBlack      , 1     , 3   }},
+  {"results/h5histsQCD_delphes_new.root"                                , {"QCD"                  , kBlack      , 1     , 3   }},
   
 //  {"results/h5histsSVJ_m3500_r30_delphes.root"      , {"SVJ Delphes"              , kViolet     , 2     , 3   }},
-  {"results/h5histsSVJ_m3500_r30_mDark40_alphaPeak_delphes.root"          , {"SVJ Delphes mD=40, alphaPeak" , kCyan+1     , 2     , 3   }},
-  {"results/h5histsSVJ_m3500_r30_mDark20_alphaPeak_delphes.root"          , {"SVJ Delphes mD=20, alphaPeak" , kGreen+1    , 2     , 3   }},
-  {"results/h5histsSVJ_m3500_r30_delphes_test.root"                       , {"SVJ Delphes mD=20, alpha=0.1" , kViolet     , 2     , 3   }},
-  {"results/h5histsSVJ_m3500_r30_cmssw.root"                              , {"SVJ CMSSW"                    , kRed        , 2     , 1   }},
-  {"results/h5histsSVJ_m3500_r30_mDark40_alphaPeak_cmssw_fixed.root"      , {"SVJ CMSSW (fixed)"            , kBlue       , 2     , 1   }},
+  
+//  {"results/h5hists_SVJ_m2000_mDark20_r30_alphaPeak_delphes_new.root"          , {"SVJ 2000, 0.30" , kCyan+1    , 2     , 3   }},
+//  {"results/h5hists_SVJ_m3000_mDark20_r30_alphaPeak_delphes_new.root"          , {"SVJ 3000, 0.30" , kBlue      , 2     , 3   }},
+//  {"results/h5hists_SVJ_m4000_mDark20_r30_alphaPeak_delphes_new.root"          , {"SVJ 4000, 0.30" , kViolet    , 2     , 3   }},
+  
+//  {"results/h5hists_SVJ_m3000_mDark20_r30_alphaPeak_delphes_new.root"          , {"SVJ 3000, 0.30" , kBlue      , 2     , 3   }},
+//  {"results/h5hists_SVJ_m3000_mDark20_r50_alphaPeak_delphes_new.root"          , {"SVJ 3000, 0.50" , kOrange      , 2     , 3   }},
+//  {"results/h5hists_SVJ_m3000_mDark20_r70_alphaPeak_delphes_new.root"          , {"SVJ 3000, 0.70" , kRed      , 2     , 3   }},
+  
+  
+//  {"results/h5histsSVJ_m3500_r30_mDark20_alphaPeak_delphes.root"          , {"SVJ Delphes mD=20, alphaPeak" , kGreen+1    , 2     , 3   }},
+//  {"results/h5histsSVJ_m3500_r30_delphes_test.root"                       , {"SVJ Delphes mD=20, alpha=0.1" , kViolet     , 2     , 3   }},
+//  {"results/h5histsSVJ_m3500_r30_cmssw.root"                              , {"SVJ CMSSW"                    , kRed        , 2     , 1   }},
+//  {"results/h5histsSVJ_m3500_r30_mDark40_alphaPeak_cmssw_fixed.root"      , {"SVJ CMSSW (fixed)"            , kBlue       , 2     , 1   }},
   
 //  {"results/h5histsQCD_cmssw_1000to1400.root"   , {"QCD CMSSW 1000-1400 GeV" , kBlue      , 1 , 1 }  },
 //  {"results/h5histsQCD_cmssw_1400to1800.root"   , {"QCD CMSSW 1400-1800 GeV" , kCyan      , 1 , 1 }  },
@@ -69,7 +86,7 @@ vector<string> histNames1D = {
 };
 
 vector<string> histNamesJets = {
-  "pt_1", "pt_2", "mass", "PTD", "axis2", "EFP_1"
+  "pt_1_ptWeighted", "pt_2_ptWeighted", "mass_ptWeighted", "PTD_ptWeighted", "axis2_ptWeighted", "EFP_1"
 };
 
 vector<int> colors = {kBlack, kRed, kOrange+1, kViolet, kBlue, kGreen+2, kMagenta+1, kCyan+1 };
@@ -171,7 +188,7 @@ void drawHists(const map<string, vector<TH1D*>> &histsCollection, TCanvas *canva
       hists[i]->DrawNormalized(i==0 ? "" : "same");
       string aucString = "";
       
-      if(calculateAucs) string aucString = getAucString(hists[0], hists[i]);
+      if(calculateAucs) aucString = getAucString(hists[0], hists[i]);
 
       auto [name, color, lineStyle, lineWidth] = histParams[inputPaths[i]];
       
@@ -179,7 +196,7 @@ void drawHists(const map<string, vector<TH1D*>> &histsCollection, TCanvas *canva
     }
     
     canvas->cd(iPad);
-    legend->Draw();
+//    legend->Draw();
     iPad++;
   }
 }

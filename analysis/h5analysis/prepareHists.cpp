@@ -81,9 +81,9 @@ vector<tuple<string, int, double, double>> eventHistParams = {
 vector<tuple<string, int, double, double>> jetHistParams = {
   {"eta"              , 100, -3.5 , 3.5   },
   {"phi"              , 100, -3.5 , 3.5   },
-  {"pt"               , 100, 0    , 2000  },
-  {"pt_1"             , 100, 0    , 10000 },
-  {"pt_2"             , 100, 0    , 2000  },
+  {"pt"               , 100, 0    , 3000  },
+  {"pt_1"             , 100, 0    , 3000  },
+  {"pt_2"             , 100, 0    , 3000  },
   {"mass"             , 100, 0    , 800   },
   {"chargedFraction"  , 100, 0    , 1     },
   {"PTD"              , 100, 0    , 1     },
@@ -343,6 +343,24 @@ void plotAndSaveHists()
 
 }
 
+double getJetPtWeight(double pt, TH1D *inputDist, TH1D *outputDist=nullptr)
+{
+  double sumNinput = inputDist->GetEntries();
+  double nBinsInput = inputDist->GetNbinsX();
+  double nOfPtInput = inputDist->GetBinContent(inputDist->GetXaxis()->FindFixBin(pt));
+  
+  double weight = sumNinput/(nBinsInput * nOfPtInput);
+  
+  if(outputDist){
+    double sumNoutput = outputDist->GetEntries();
+    double nBinsOutput = outputDist->GetNbinsX();
+    double nOfPtoutput = outputDist->GetBinContent(outputDist->GetXaxis()->FindFixBin(pt));
+    
+    weight /= sumNoutput/(nBinsOutput * nOfPtoutput);
+  }
+  
+  return weight;
+}
 
 int main (int argc, char** argv)
 {
@@ -398,20 +416,19 @@ int main (int argc, char** argv)
       iEvent++;
       
       double eventWeight = crossSection * event->genWeight/nGenEvents;
-      eventWeight *= event->getPtWeight(eventHists["sumJetPt"]);
+      
       
       int iJet = 0;
       for(auto jet : event->jets){
         if(jet->isEmpty()) continue;
         
+        double jetWeight = getJetPtWeight(jet->pt, jetHists["pt"]);
         
-        fillJetHists(jet, iJet, eventWeight, "_ptWeighted");
-        fillConstituentHists(jet, eventWeight, "_ptWeighted");
+        fillJetHists(jet, iJet, eventWeight * jetWeight, "_ptWeighted");
+        fillConstituentHists(jet, eventWeight * jetWeight, "_ptWeighted");
         
         iJet++;
       }
-      
-      fillEventHists(event, iJet, eventWeight, "_ptWeighted");
     }
   }
   
@@ -420,6 +437,18 @@ int main (int argc, char** argv)
   cout<<"Plotting and saving histograms..."<<endl;
   outfile = new TFile(outputPath.c_str(), "recreate");
   plotAndSaveHists();
+  
+  
+  auto jetWeightsHist = new TH1D("jetWeightsHist", "jetWeightsHist", 100, 0, 2000);
+  
+  for(int i=0; i<jetHists["pt"]->GetNbinsX(); i++){
+    
+    double weight = getJetPtWeight(jetHists["pt"]->GetXaxis()->GetBinCenter(i), jetHists["pt"]);
+    jetWeightsHist->SetBinContent(i, isnormal(weight) ? weight : 1);
+  }
+  outfile->cd();
+  jetWeightsHist->Write();
+  
   outfile->Close();
   cout<<"Plotting and saving done"<<endl;
   
