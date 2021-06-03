@@ -18,7 +18,8 @@ results_path = output_path+"trainingRuns/"
 plots_path = output_path+"plots/"
 stat_hists_path = output_path+"stat_hists.root"
 
-output_file_suffix = "_noConstituents_oneEFP"
+# output_file_suffix = "_noConstituents_onlyEtaPhiEfp"
+output_file_suffix = "_noConstituents_onlyEtaPhiAxis2"
 # output_file_suffix = "_noConstituents_oneEFP_oneJet"
 # output_file_suffix = "_noConstituents_oneEFP_threeJets"
 # output_file_suffix = "_30Constituents_noEFP"
@@ -30,11 +31,13 @@ training_general_settings = {
     "validation_data_fraction": 0.0,
     "test_data_fraction": 0.2,
     "include_hlf": True,
-    "include_efp": True,
+    "include_efp": False,
     "include_constituents": False,
-    "hlf_to_drop": ["Energy", "Flavor", "ChargedFraction"],
+    # "hlf_to_drop": ["Energy", "Flavor", "ChargedFraction", "M", "Pt", "PTD", "Axis2"],
+    "hlf_to_drop": ["Energy", "Flavor", "ChargedFraction", "M", "Pt", "PTD"],
+    # "hlf_to_drop": ["Energy", "Flavor", "ChargedFraction"],
     "efp_to_drop": [str(i) for i in range(2, 13)],
-    "constituents_to_drop": ["constituent_Rapidity_*", "constituent_Eta_*", "constituent_Phi_*"] + ["constituent_*_{}".format(i) for i in range(30, 150)],
+    "constituents_to_drop": ["constituent_Rapidity_*", "constituent_Eta_*", "constituent_Phi_*"] + ["constituent_*_{}".format(i) for i in range(100, 150)],
     "max_jets": 2
 }
 

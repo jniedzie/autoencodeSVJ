@@ -69,3 +69,4 @@ for i in range(config.n_models):
     trainer.train(summaries_path=config.summary_path)
 
     print('model {} finished'.format(i))
+    

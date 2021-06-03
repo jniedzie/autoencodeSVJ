@@ -64,8 +64,8 @@ input_path = signals_base_path+"/*/base_{}/*.h5".format(efp_base)
 # ---------------------------------------------
 # Training parameters
 training_params = {
-    "n_components": 2,
-    # "n_components": "mle",
+    # "n_components": 2,
+    "n_components": "mle",
     "svd_solver": "full",
     "whiten": False,
 
@@ -117,7 +117,7 @@ normalizations = {
 
 # ---------------------------------------------
 # Once the training is done, you can specify which model was the best and use it for further tests/plotting
-best_model = 0
+best_model = 6
 
 # how many best models to include in the chi2 calculation
 fraction_of_models_for_avg_chi2 = 0.8

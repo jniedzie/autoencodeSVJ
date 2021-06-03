@@ -14,21 +14,18 @@ train_on_signal = False
 
 # ---------------------------------------------
 # Output paths
-# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_excluding_eta_phi/"
+output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_archs/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_inputs/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_losses/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_optimizers/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_epochs/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_learningRates/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_lrPatiences/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_lrFactors/"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_activations/"
-# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_small_archs/"
-# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_norms/"
-# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_1_efp/"
-# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_archs/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_batchSizes/"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_tiedWeights/"
-# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_flatAe/"
-
-# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_oldSamples/"
-# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_withConstituents/"
-# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_debugging/"
-# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_nJets/"
-output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_metrics/"
-# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_changesTests/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_scalers/"
 
 summary_path = output_path+"summary/"
 
@@ -38,6 +35,8 @@ stat_hists_path = output_path+"stat_hists.root"
 
 # output_file_suffix = "_smallConstituents"
 output_file_suffix = ""
+# output_file_suffix = "_1jet"
+# output_file_suffix = "_allEFPs"
 # output_file_suffix = "_30constituents"
 
 
@@ -53,8 +52,9 @@ training_general_settings = {
     "include_constituents": False,
     "hlf_to_drop": ['Energy', 'Flavor', "ChargedFraction"],
     "efp_to_drop": [str(i) for i in range(2, 13)],
+    # "efp_to_drop": [],
     "constituents_to_drop": ["constituent_Rapidity_*", "constituent_Eta_*", "constituent_Phi_*"] + ["constituent_*_{}".format(i) for i in range(30, 150)],
-    # "constituents_to_drop": []
+    # "constituents_to_drop": [],
     "max_jets": 2
 }
 
@@ -68,17 +68,11 @@ evaluation_general_settings = {
 # ---------------------------------------------
 # Path to training data
 efp_base = 3
-qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8/base_{}/*.h5".format(efp_base)
-# qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/old_training_data/qcd/base_{}/*.h5".format(efp_base)
-# qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/test_data/base_{}/*.h5".format(efp_base)
-# qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/base_{}/*.h5".format(efp_base)
-# qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituentsDelta_5jets/base_{}/*.h5".format(efp_base)
+# qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/base_{}/*.h5".format(efp_base)
+qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents0_maxJets2/base_{}/*.h5".format(efp_base)
 
-
-signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8/"
-# signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/old_training_data/all_signals/"
-# signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/"
-# signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_withConstituentsDelta_5jets/"
+# signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/"
+signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents0_maxJets2/"
 
 
 # Path to testing data
@@ -88,23 +82,23 @@ input_path = signals_base_path+"/*/base_{}/*.h5".format(efp_base)
 # ---------------------------------------------
 # Training parameters
 training_params = {
-    'batch_size': 256,
+    'batch_size': 256, # default, best
 
     # losses documentation
     # https://keras.io/api/losses/regression_losses
-    'loss': 'mean_absolute_error',
+    'loss': 'mean_absolute_error', # default, best
     # 'loss': 'mean_squared_error',
     # 'loss': 'mean_absolute_percentage_error',
-    # 'loss': 'mean_squared_logarithmic_error', ##
+    # 'loss': 'mean_squared_logarithmic_error',
     # 'loss': 'cosine_similarity',
     # 'loss': 'huber',
     # 'loss': 'log_cosh',
 
     # optimizers documentation
     # https://keras.io/api/optimizers/
-    # 'optimizer': 'SGD',
+    # 'optimizer': 'SGD', # best
     # 'optimizer': 'RMSprop',
-    'optimizer': 'Adam',
+    'optimizer': 'Adam', # default
     # 'optimizer': 'Adadelta',
     # 'optimizer': 'Adagrad',
     # 'optimizer': 'Adamax',
@@ -136,10 +130,15 @@ training_params = {
     
     'epochs': 200,
     
-    'learning_rate': 0.00051,
+    # 'learning_rate': 0.00051, # default
+    'learning_rate': 1e-6,  # best
+
+    'lr_patience': 9,   # default, best
+
+    'lr_factor': 0.5,   # default, best
+
     'es_patience': 12,
-    'lr_patience': 9,
-    'lr_factor': 0.5,
+
     
     # "bottleneck_size": 20,
     # "intermediate_architecture": (100, 100),
@@ -150,13 +149,13 @@ training_params = {
     # activation functions documentation
     # https://keras.io/api/layers/activations/
     # "activation": "relu",
-    "activation": "elu",
+    "activation": "elu", # default
     # "activation": "sigmoid",
     # "activation": "softmax",
     # "activation": "softplus",
     # "activation": "softsign",
     # "activation": "tanh",
-    # "activation": "selu",
+    # "activation": "selu", # best
     # "activation": "exponential",
     
     "output_activation": "linear",
@@ -166,7 +165,7 @@ training_params = {
 
 # ---------------------------------------------
 # Number of models to train
-n_models = 1
+n_models = 5
 
 # ---------------------------------------------
 # Pick normalization type (definitions below):
@@ -225,7 +224,7 @@ fraction_of_models_for_avg_chi2 = 0.8
 # masses = [2500, 3000, 3500, 4000]
 test_masses = [3000]
 # rinvs = [0.15, 0.30, 0.45, 0.60, 0.75]
-test_rinvs = [0.75]
+test_rinvs = [0.70]
 
 qcd_input_color = kGreen
 qcd_reco_color = kBlue
@@ -256,9 +255,9 @@ file_name += "_maxJets_{}".format(training_general_settings["max_jets"])
 file_name += "_metric_{}".format(training_params["metric"])
 file_name += "{}".format(output_file_suffix)
 
-# test_filename_pattern = file_name+"_v"
+test_filename_pattern = file_name+"_v0"
 # test_filename_pattern = "hlf_efp_3_bottle_5_arch_10__10_loss_mean_absolute_error_optimizer_Adam_batch_size_256_scaler_StandardScaler_activation_elu_v0"
-test_filename_pattern = "_v"
+# test_filename_pattern = "_v"
 
 # ---------------------------------------------
 # Build specific training/evaluation settings dictionary (this will be passed to the specialized trainer class)

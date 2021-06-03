@@ -13,7 +13,7 @@ bins = {
     "PTD": (0, 1, 100),
     "Axis2": (0, 0.2, 100),
     "eflow": (0, 1, 100),
-    "loss": (0.0, 15, 50),
+    "loss": (0.0, 30, 50),
     "latent": (-1, 4, 150),
 }
 
@@ -53,7 +53,7 @@ def get_signal_paths(config):
     
     for mass in config.test_masses:
         for rinv in config.test_rinvs:
-            path = "{}{}GeV_{:1.2f}/base_{}/*.h5".format(config.signals_base_path, mass, rinv, config.efp_base)
+            path = "{}{}GeV_{:1.2f}_mDark20_alphaPeak/base_{}/*.h5".format(config.signals_base_path, mass, rinv, config.efp_base)
             signal_paths.append(path)
     
     return signal_paths
