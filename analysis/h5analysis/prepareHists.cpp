@@ -18,17 +18,17 @@ const int maxEvents = 999999999;
 
 //const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/training_data/qcd/base_3/data_0_data.h5";
 
-//vector<tuple<string, double, int>> inputPaths = {
-//  {"/Users/Jeremi/Documents/Physics/ETH/data/backgrounds/qcd/h5_no_lepton_veto_fat_jets_dr0p8_withConstituents/base_3/QCD_part_1.h5", 1, 1},
-//};
-//
-//const string outputPath = "results/h5histsSVJ_m3500_r30_delphes_test.root";
-
 vector<tuple<string, double, int>> inputPaths = {
-  {"/Users/Jeremi/Documents/Physics/ETH/data/s_channel_cms/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/SVJ_m3500_mDark40_r30_alphaPeak_cmssw.h5", 1, 1},
+  {"/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/base_3/QCD_part_0.h5", 1, 1},
 };
 
-const string outputPath = "results/h5histsSVJ_m3500_r30_mDark40_alphaPeak_cmssw_fixed.root";
+const string outputPath = "results/h5histsQCD_delphes_new.root";
+
+//vector<tuple<string, double, int>> inputPaths = {
+//  {"/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/3000GeV_0.70_mDark20_alphaPeak/base_3/SVJ_m3000_mDark20_r70_alphaPeak.h5", 1, 1},
+//};
+//
+//const string outputPath = "results/h5hists_SVJ_m3000_mDark20_r70_alphaPeak_delphes_new.root";
 
 //vector<tuple<string, double, int>> inputPaths = {
 //  {"/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJets_150constituents_2jets/base_3/QCD_part_1.h5"  , 1, 1},
@@ -75,11 +75,12 @@ vector<tuple<string, int, double, double>> eventHistParams = {
   {"MT"     , 100, 0    , 5000  },
   {"Mjj"    , 100, 0    , 5000  },
   {"nJets"  , 20 , 0    , 20    },
+  {"sumJetPt", 100, 0   , 10000 },
 };
 
 vector<tuple<string, int, double, double>> jetHistParams = {
-  {"eta"              , 100, -3.5   , 3.5     },
-  {"phi"              , 100, -3.5   , 3.5     },
+  {"eta"              , 100, -3.5 , 3.5   },
+  {"phi"              , 100, -3.5 , 3.5   },
   {"pt"               , 100, 0    , 2000  },
   {"pt_1"             , 100, 0    , 10000 },
   {"pt_2"             , 100, 0    , 2000  },
@@ -126,34 +127,34 @@ vector<shared_ptr<Event>> getEventsFromFile(string inputPath)
   return eventProcessor->getValues(eventFeaturesGroup, jetEFPsGroup, jetFeaturesGroup, jetConstituentsGroup);
 }
 
-void fillEventHists(const shared_ptr<Event> event, int nJets, double eventWeight)
+void fillEventHists(const shared_ptr<Event> event, int nJets, double eventWeight, string suffix="")
 {
-  eventHists["MET"]->Fill(event->MET, eventWeight);
-  eventHists["METeta"]->Fill(event->METeta, eventWeight);
-  eventHists["METphi"]->Fill(event->METphi, eventWeight);
-  eventHists["MT"]->Fill(event->MT, eventWeight);
-  eventHists["Mjj"]->Fill(event->Mjj, eventWeight);
-  
-  eventHists["nJets"]->Fill(nJets, eventWeight);
+  eventHists["MET"+suffix]->Fill(event->MET, eventWeight);
+  eventHists["METeta"+suffix]->Fill(event->METeta, eventWeight);
+  eventHists["METphi"+suffix]->Fill(event->METphi, eventWeight);
+  eventHists["MT"+suffix]->Fill(event->MT, eventWeight);
+  eventHists["Mjj"+suffix]->Fill(event->Mjj, eventWeight);
+  eventHists["nJets"+suffix]->Fill(nJets, eventWeight);
+  eventHists["sumJetPt"+suffix]->Fill(event->getSumJetPt(), eventWeight);
 }
 
-void fillJetHists(const shared_ptr<Jet> jet, int iJet, double eventWeight)
+void fillJetHists(const shared_ptr<Jet> jet, int iJet, double eventWeight, string suffix="")
 {
-  jetHists["eta"]->Fill(jet->eta, eventWeight);
-  jetHists["phi"]->Fill(jet->phi, eventWeight);
-  jetHists["pt"]->Fill(jet->pt, eventWeight);
-  if(iJet==0) jetHists["pt_1"]->Fill(jet->pt, eventWeight);
-  if(iJet==1) jetHists["pt_2"]->Fill(jet->pt, eventWeight);
-  jetHists["mass"]->Fill(jet->mass, eventWeight);
-  jetHists["chargedFraction"]->Fill(jet->chargedFraction, eventWeight);
-  jetHists["PTD"]->Fill(jet->PTD, eventWeight);
-  jetHists["axis2"]->Fill(jet->axis2, eventWeight);
-  jetHists["flavor"]->Fill(jet->flavor, eventWeight);
-  jetHists["energy"]->Fill(jet->energy, eventWeight);
+  jetHists["eta"+suffix]->Fill(jet->eta, eventWeight);
+  jetHists["phi"+suffix]->Fill(jet->phi, eventWeight);
+  jetHists["pt"+suffix]->Fill(jet->pt, eventWeight);
+  if(iJet==0) jetHists["pt_1"+suffix]->Fill(jet->pt, eventWeight);
+  if(iJet==1) jetHists["pt_2"+suffix]->Fill(jet->pt, eventWeight);
+  jetHists["mass"+suffix]->Fill(jet->mass, eventWeight);
+  jetHists["chargedFraction"+suffix]->Fill(jet->chargedFraction, eventWeight);
+  jetHists["PTD"+suffix]->Fill(jet->PTD, eventWeight);
+  jetHists["axis2"+suffix]->Fill(jet->axis2, eventWeight);
+  jetHists["flavor"+suffix]->Fill(jet->flavor, eventWeight);
+  jetHists["energy"+suffix]->Fill(jet->energy, eventWeight);
   
   double recoMass = jet->pt * sqrt(0.1*jet->EFPs[1]/2);
   hists2d["efpVErification"]->Fill(jet->mass, recoMass, eventWeight);
-  jetHists["efpMass"]->Fill(recoMass, eventWeight);
+  jetHists["efpMass"+suffix]->Fill(recoMass, eventWeight);
 }
 
 void fillEfpHists(const shared_ptr<Jet> jet, double eventWeight)
@@ -163,7 +164,7 @@ void fillEfpHists(const shared_ptr<Jet> jet, double eventWeight)
   }
 }
 
-void fillConstituentHists(const shared_ptr<Jet> jet, double eventWeight)
+void fillConstituentHists(const shared_ptr<Jet> jet, double eventWeight, string suffix="")
 {
   shared_ptr<Constituent> previousConstituent = nullptr;
   
@@ -188,13 +189,13 @@ void fillConstituentHists(const shared_ptr<Jet> jet, double eventWeight)
     double dR = jetVector.DeltaR(constituentVector);
     
     hists2d["constituentsDetaDphi"]->Fill(dEta, dPhi, eventWeight);
-    constituentHists["constituentsDr"]->Fill(dR, eventWeight);
+    constituentHists["constituentsDr"+suffix]->Fill(dR, eventWeight);
     
     sumDr += dR;
     nSumDr++;
     
-    constituentHists["constituentsDrCorrected"]->Fill(dR, eventWeight);
-    constituentHists["constituentsPt"]->Fill(constituent->pt, eventWeight);
+    constituentHists["constituentsDrCorrected"+suffix]->Fill(dR, eventWeight);
+    constituentHists["constituentsPt"+suffix]->Fill(constituent->pt, eventWeight);
     
     if(previousConstituent){
       TLorentzVector previousConstituentVector;
@@ -204,22 +205,22 @@ void fillConstituentHists(const shared_ptr<Jet> jet, double eventWeight)
       double dPtPrevious  = constituent->pt - previousConstituent->pt;
       double dRprevious = constituentVector.DeltaR(previousConstituentVector);
       
-      constituentHists["constituentsDrFromPrevious"]->Fill(dRprevious, eventWeight);
+      constituentHists["constituentsDrFromPrevious"+suffix]->Fill(dRprevious, eventWeight);
       sumDrPrevious += dRprevious;
       nSumDrPrevious++;
       
-      constituentHists["constituentsDptFromPrevious"]->Fill(dPtPrevious, eventWeight);
+      constituentHists["constituentsDptFromPrevious"+suffix]->Fill(dPtPrevious, eventWeight);
     }
     
     previousConstituent = constituent;
     nConstit++;
   }
   
-  constituentHists["constituentsSumDr"]->Fill(sumDr, eventWeight);
-  constituentHists["constituentsSumDrPrevious"]->Fill(sumDrPrevious, eventWeight);
-  constituentHists["constituentsAvgDr"]->Fill(sumDr/nSumDr, eventWeight);
-  constituentHists["constituentsAvgDrPrevious"]->Fill(sumDrPrevious/nSumDrPrevious, eventWeight);
-  constituentHists["nConstituents"]->Fill(nConstit, eventWeight);
+  constituentHists["constituentsSumDr"+suffix]->Fill(sumDr, eventWeight);
+  constituentHists["constituentsSumDrPrevious"+suffix]->Fill(sumDrPrevious, eventWeight);
+  constituentHists["constituentsAvgDr"+suffix]->Fill(sumDr/nSumDr, eventWeight);
+  constituentHists["constituentsAvgDrPrevious"+suffix]->Fill(sumDrPrevious/nSumDrPrevious, eventWeight);
+  constituentHists["nConstituents"+suffix]->Fill(nConstit, eventWeight);
 }
 
 void produceCorrectedHists()
@@ -247,13 +248,19 @@ void initHists()
 {
   for(auto &[name, nBins, min, max] : eventHistParams){
     eventHists[name] = new TH1D(name.c_str(), name.c_str(), nBins, min, max);
+    name += "_ptWeighted";
+    eventHists[name] = new TH1D(name.c_str(), name.c_str(), nBins, min, max);
   }
   
   for(auto &[name, nBins, min, max] : jetHistParams){
     jetHists[name] = new TH1D(name.c_str(), name.c_str(), nBins, min, max);
+    name += "_ptWeighted";
+    jetHists[name] = new TH1D(name.c_str(), name.c_str(), nBins, min, max);
   }
   
   for(auto &[name, nBins, min, max] : constituentHistParams){
+    constituentHists[name] = new TH1D(name.c_str(), name.c_str(), nBins, min, max);
+    name += "_ptWeighted";
     constituentHists[name] = new TH1D(name.c_str(), name.c_str(), nBins, min, max);
   }
   
@@ -276,6 +283,8 @@ void plotAndSaveHists()
   for(auto &[name, hist] : eventHists){
     canvasEvents->cd(iPad++);
     hist->DrawNormalized();
+    outfile->cd();
+    hist->Write();
   }
   
   TCanvas *canvasJets = new TCanvas("Jets", "Jets", 2000, 1500);
@@ -359,7 +368,6 @@ int main (int argc, char** argv)
       sumGenWeights += event->genWeight;
       
       int iJet = 0;
-      
       for(auto jet : event->jets){
         if(jet->isEmpty()) continue;
         
@@ -377,6 +385,35 @@ int main (int argc, char** argv)
   }
   
   produceCorrectedHists();
+  
+  for(auto &[inputPath, crossSection, nGenEvents] : inputPaths){
+    
+    auto events = getEventsFromFile(inputPath);
+    
+    cout<<"Looping over events..."<<endl;
+    
+    for(auto event : events){
+      
+      if(iEvent >= maxEvents) break;
+      iEvent++;
+      
+      double eventWeight = crossSection * event->genWeight/nGenEvents;
+      eventWeight *= event->getPtWeight(eventHists["sumJetPt"]);
+      
+      int iJet = 0;
+      for(auto jet : event->jets){
+        if(jet->isEmpty()) continue;
+        
+        
+        fillJetHists(jet, iJet, eventWeight, "_ptWeighted");
+        fillConstituentHists(jet, eventWeight, "_ptWeighted");
+        
+        iJet++;
+      }
+      
+      fillEventHists(event, iJet, eventWeight, "_ptWeighted");
+    }
+  }
   
   cout<<"Processed "<<iEvent<<" events"<<endl;
   

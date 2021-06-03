@@ -21,7 +21,10 @@ public:
   double genWeight;
   vector<shared_ptr<Jet>> jets;
   
+  double getSumJetPt();
   void print();
+  
+  double getPtWeight(TH1D *ptDistribution);
 };
 
 #endif /* Event_hpp */
