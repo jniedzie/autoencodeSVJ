@@ -2,9 +2,10 @@
 string weightsPath = "results/weights_qcd_flatPtHat_to_flatJetPt.root";
 
 
-string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_cmssw/qcd/scoutingAtHlt/QCD_flat_ntuples_part0.root";
+//string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_cmssw/qcd/scoutingAtHlt/QCD_flat_ntuples_part0.root";
+string inputPath = "/eos/cms/store/group/phys_exotica/svjets/backgrounds_cmssw/qcd/scoutingAtHlt/QCD_flat_ntuples_merged.root";
 
-int maxEvents = 999999;
+int maxEvents = 999999999;
 
 vector<tuple<string, int, double, double>> jetHistParams = {
   {"eta"              , 100, -3.5 , 3.5   },
