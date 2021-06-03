@@ -1,12 +1,10 @@
 
-string inputPathSource = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_cmssw/qcd/scoutingAtHlt/QCD_flat_ntuples_part0.root";
-//string inputPathDestination = "";
-string inputPathDestination = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/delphes/qcd_highpT_13TeV_300.root";
+//string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_cmssw/qcd/scoutingAtHlt/QCD_flat_ntuples_part0.root";
+string inputPath = "/eos/cms/store/group/phys_exotica/svjets/backgrounds_cmssw/qcd/scoutingAtHlt/QCD_flat_ntuples_merged.root";
 
-//string outputPath = "results/weights_qcd_flatPtHat_to_flatJetPt.root";
-string outputPath = "results/weights_qcd_flatPtHat_to_realistic.root";
+string outputPath = "results/weights_qcd_flatPtHat_to_flatJetPt.root";
 
-int maxEvents = 500;
+int maxEvents = 99999999;
 
 double getJetPtWeight(double pt, TH1D *inputDist, TH1D *outputDist=nullptr)
 {
@@ -27,31 +25,10 @@ double getJetPtWeight(double pt, TH1D *inputDist, TH1D *outputDist=nullptr)
   return weight;
 }
 
-TH1D* getPtDist(TTree *tree, bool isDelphes)
+void produceWeightsHist()
 {
-  TLeaf *jetPt = nullptr;
   
-  if(isDelphes) jetPt = tree->FindLeaf("FatJet.PT");
-  else          jetPt = tree->FindLeaf("Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018.obj.pt_");
-  
-  auto histJetPt = new TH1D("jet pt", "jet pt", 100, 0, 3000);
-  
-  for(int iEvent=0; iEvent<tree->GetEntries(); iEvent++){
-    if(iEvent == maxEvents) break;
-    tree->GetEntry(iEvent);
-    if(iEvent%100==0) cout<<"Event: "<<iEvent<<endl;
-    
-    int nJets = jetPt->GetLen();
-    for(int iJet=0; iJet<nJets; iJet++) histJetPt->Fill(jetPt->GetValue(iJet));
-  }
-  
-  return histJetPt;
-}
-
-tuple<TTree*, bool> getTree(string path)
-{
-  auto inFile = TFile::Open(path.c_str());
-  
+  auto inFile = TFile::Open(inputPath.c_str());
 
   auto tree = (TTree*)inFile->Get("Delphes");
   bool isDelphes = true;
@@ -62,29 +39,26 @@ tuple<TTree*, bool> getTree(string path)
   }
 
   if(!tree){
-    cout<<"Couldn't find tree Delphes nor Events..."<<endl;
+    cout<<"Couldn't find tree Delphes not Events..."<<endl;
     exit(0);
   }
-  
-  return {tree, isDelphes};
-}
 
-void produceWeightsHist()
-{
-  auto [treeSource, isSourceDelphes] = getTree(inputPathSource);
-  TH1D *histJetPt = getPtDist(treeSource, isSourceDelphes);
+  TLeaf *jetPt = tree->FindLeaf("Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018.obj.pt_");
   
-  TH1D *histJetPtDestination = nullptr;
-  
-  if(inputPathDestination != ""){
-    auto [treeDest, isDestDelphes] = getTree(inputPathDestination);
-    histJetPtDestination = getPtDist(treeDest, isDestDelphes);
-  }
-  
+  auto histJetPt = new TH1D("jet pt", "jet pt", 100, 0, 3000);
   auto histJetPtWeights = new TH1D("histJetPtWeights", "histJetPtWeights", 100, 0, 3000);
   
+  for(int iEvent=0; iEvent<tree->GetEntries(); iEvent++){
+    if(iEvent == maxEvents) break;
+    tree->GetEntry(iEvent);
+    if(iEvent%100==0) cout<<"Event: "<<iEvent<<endl;
+    
+    int nJets = jetPt->GetLen();
+    for(int iJet=0; iJet<nJets; iJet++) histJetPt->Fill(jetPt->GetValue(iJet));
+  }
+  
   for(int i=0; i<histJetPt->GetNbinsX(); i++){
-    double weight = getJetPtWeight(histJetPt->GetXaxis()->GetBinCenter(i), histJetPt, histJetPtDestination);
+    double weight = getJetPtWeight(histJetPt->GetXaxis()->GetBinCenter(i), histJetPt);
     histJetPtWeights->SetBinContent(i, isnormal(weight) ? weight : 1);
   }
   
@@ -92,4 +66,5 @@ void produceWeightsHist()
   outFile->cd();
   histJetPtWeights->Write();
   outFile->Close();
+  
 }
