@@ -19,10 +19,16 @@ plots_path = output_path+"plots/"
 stat_hists_path = output_path+"stat_hists.root"
 
 # output_file_suffix = "_noConstituents_onlyEtaPhiEfp"
-output_file_suffix = "_noConstituents_onlyEtaPhiAxis2"
+# output_file_suffix = "_noConstituents_onlyEtaPhiAxis2"
+# output_file_suffix = "_noConstituents_onlyEtaPhiPtd"
+# output_file_suffix = "_noConstituents_onlyEtaPhiPt"
+# output_file_suffix = "_noConstituents_onlyEtaPhiMass"
+# output_file_suffix = "_noConstituents_oneEFP_balancedSignal"
+# output_file_suffix = "_noConstituents_oneEFP"
 # output_file_suffix = "_noConstituents_oneEFP_oneJet"
 # output_file_suffix = "_noConstituents_oneEFP_threeJets"
 # output_file_suffix = "_30Constituents_noEFP"
+output_file_suffix = "_100Constituents_noEFP"
 
 # ---------------------------------------------
 # General training/evaluation settings
