@@ -1,16 +1,29 @@
 
-string inputPathSource = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_cmssw/qcd/scoutingAtHlt/QCD_flat_ntuples_part0.root";
-//string inputPathSource = "/eos/cms/store/group/phys_exotica/svjets/backgrounds_cmssw/qcd/scoutingAtHlt/QCD_flat_ntuples_merged.root";
+//string inputPathSource = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_cmssw/qcd/scoutingAtHlt/QCD_flat_ntuples_part0.root";
+string inputPathSource = "/eos/cms/store/group/phys_exotica/svjets/backgrounds_cmssw/qcd/scoutingAtHlt/QCD_flat_ntuples_merged.root";
+//string inputPathSource = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/delphes/qcd_highpT_13TeV_300.root";
 
 //string inputPathDestination = "";
 string inputPathDestination = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/delphes/qcd_highpT_13TeV_300.root";
+//string inputPathDestination = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/delphes/qcd_highpT_13TeV_300.root";
 
-//string outputPath = "results/weights_qcd_flatPtHat_to_flatJetPt_small.root";
-string outputPath = "results/weights_qcd_flatPtHat_to_realisticPt_small.root";
-
+string outputPath = "results/weights_qcd_flatPtHat_to_realisticJetPt_small";
+//string outputPath = "results/weights_qcd_flatPtHat_to_realisticPt_small.root";
 //string outputPath = "results/weights_qcd_flatPtHat_to_realisticPt.root";
+//string outputPath = "results/weights_qcd_realistic_to_flatJetPt";
 
-int maxEvents = 100;
+const int maxEvents = 10000;
+const int nBins = 100;
+const double maxPt = 3000;
+
+
+
+void setupOutputPath(){
+  outputPath += "_events"+to_string(maxEvents);
+  outputPath += "_nBins"+to_string(nBins);
+  outputPath += "_maxPt"+to_string(maxPt);
+  outputPath += ".root";
+}
 
 double getJetPtWeight(double pt, TH1D *sourceDist, TH1D *destinationDist=nullptr)
 {
@@ -56,7 +69,7 @@ TH1D* getPtHist(TTree *tree)
   TLeaf *jetPt = tree->FindLeaf("Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018.obj.pt_");
   if(!jetPt) jetPt = tree->FindLeaf("FatJet.PT");
   
-  auto histJetPt = new TH1D("jet pt", "jet pt", 100, 0, 3000);
+  auto histJetPt = new TH1D("jet pt", "jet pt", nBins, 0, maxPt);
   
   for(int iEvent=0; iEvent<tree->GetEntries(); iEvent++){
     if(iEvent == maxEvents) break;
@@ -72,6 +85,8 @@ TH1D* getPtHist(TTree *tree)
 
 void produceWeightsHist()
 {
+  setupOutputPath();
+  
   TTree *treeSource = getTree(inputPathSource);
   TH1D *histJetPtSource = getPtHist(treeSource);
   
@@ -82,15 +97,17 @@ void produceWeightsHist()
     histJetPtDestination = getPtHist(treeDestination);
   }
   
-  auto histJetPtWeights = new TH1D("histJetPtWeights", "histJetPtWeights", 100, 0, 3000);
+  auto histJetPtWeights = new TH1D("histJetPtWeights", "histJetPtWeights", nBins, 0, maxPt);
   for(int i=0; i<histJetPtSource->GetNbinsX(); i++){
     double weight = getJetPtWeight(histJetPtSource->GetXaxis()->GetBinCenter(i), histJetPtSource, histJetPtDestination);
-    histJetPtWeights->SetBinContent(i, isnormal(weight) ? weight : 1);
+    histJetPtWeights->SetBinContent(i, isnormal(weight) ? weight : histJetPtWeights->GetBinContent(i-1));
   }
   
   auto outFile = new TFile(outputPath.c_str(), "recreate");
   outFile->cd();
   histJetPtWeights->Write();
   outFile->Close();
+  
+  cout<<"Weights stored in file: "<<outputPath<<endl;
   
 }
