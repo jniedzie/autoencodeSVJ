@@ -1,15 +1,16 @@
 
 //string inputPathSource = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_cmssw/qcd/scoutingAtHlt/QCD_flat_ntuples_part0.root";
-string inputPathSource = "/eos/cms/store/group/phys_exotica/svjets/backgrounds_cmssw/qcd/scoutingAtHlt/QCD_flat_ntuples_merged.root";
-//string inputPathSource = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/delphes/qcd_highpT_13TeV_300.root";
+//string inputPathSource = "/eos/cms/store/group/phys_exotica/svjets/backgrounds_cmssw/qcd/scoutingAtHlt/QCD_flat_ntuples_merged.root";
+string inputPathSource = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/delphes/qcd_highpT_13TeV_300.root";
 
 //string inputPathDestination = "";
-string inputPathDestination = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/delphes/qcd_highpT_13TeV_300.root";
+//string inputPathDestination = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/delphes/qcd_highpT_13TeV_300.root";
+string inputPathDestination = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/delphes/m3000_mD20_r30_alphapeak-HepMC_part-1.root";
 //string inputPathDestination = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/delphes/qcd_highpT_13TeV_300.root";
 
-string outputPath = "results/weights_qcd_flatPtHat_to_realisticJetPt_small";
-//string outputPath = "results/weights_qcd_flatPtHat_to_realisticPt_small.root";
-//string outputPath = "results/weights_qcd_flatPtHat_to_realisticPt.root";
+string outputPath = "results/weights_qcd_realisticQCD_to_realisticSVJ_small";
+//string outputPath = "results/weights_qcd_flatPtHat_to_realisticPt_small";
+//string outputPath = "results/weights_qcd_flatPtHat_to_realisticPt";
 //string outputPath = "results/weights_qcd_realistic_to_flatJetPt";
 
 const int maxEvents = 10000;
