@@ -14,7 +14,8 @@ train_on_signal = False
 
 # ---------------------------------------------
 # Output paths
-output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_archs/"
+output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_weighting/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_archs/"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_inputs/"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_losses/"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_optimizers/"
@@ -34,7 +35,8 @@ plots_path = output_path+"plots/"
 stat_hists_path = output_path+"stat_hists.root"
 
 # output_file_suffix = "_smallConstituents"
-output_file_suffix = ""
+output_file_suffix = "_noPt_weighted"
+# output_file_suffix = "_weighted"
 # output_file_suffix = "_1jet"
 # output_file_suffix = "_allEFPs"
 # output_file_suffix = "_30constituents"
@@ -50,12 +52,13 @@ training_general_settings = {
     "include_hlf": True,
     "include_efp": True,
     "include_constituents": False,
-    "hlf_to_drop": ['Energy', 'Flavor', "ChargedFraction"],
+    "hlf_to_drop": ['Energy', 'Flavor', "ChargedFraction", "Pt"],
     "efp_to_drop": [str(i) for i in range(2, 13)],
     # "efp_to_drop": [],
     "constituents_to_drop": ["constituent_Rapidity_*", "constituent_Eta_*", "constituent_Phi_*"] + ["constituent_*_{}".format(i) for i in range(30, 150)],
     # "constituents_to_drop": [],
-    "max_jets": 2
+    "max_jets": 2,
+    "qcd_weights_path": "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/weighting/results/weights_qcd_realisticQCD_to_realisticSVJ_small_events10000_nBins100_maxPt3000.000000.root"
 }
 
 evaluation_general_settings = {
@@ -165,7 +168,7 @@ training_params = {
 
 # ---------------------------------------------
 # Number of models to train
-n_models = 5
+n_models = 1
 
 # ---------------------------------------------
 # Pick normalization type (definitions below):
@@ -224,7 +227,7 @@ fraction_of_models_for_avg_chi2 = 0.8
 # masses = [2500, 3000, 3500, 4000]
 test_masses = [3000]
 # rinvs = [0.15, 0.30, 0.45, 0.60, 0.75]
-test_rinvs = [0.70]
+test_rinvs = [0.30]
 
 qcd_input_color = kGreen
 qcd_reco_color = kBlue

@@ -24,6 +24,7 @@ class Trainer:
                  efp_to_drop,
                  constituents_to_drop,
                  max_jets,
+                 qcd_weights_path,
                  # arguments that will be passed to the specialized trainer class
                  **training_settings):
         """
@@ -44,6 +45,7 @@ class Trainer:
         self.efp_to_drop = efp_to_drop
         self.constituents_to_drop = constituents_to_drop
         self.max_jets = max_jets
+        self.qcd_weights_path = qcd_weights_path
 
         # Draw, set and save random seed
         self.seed = np.random.randint(0, 99999999)
@@ -62,7 +64,8 @@ class Trainer:
                                include_constituents=include_constituents,
                                hlf_to_drop=hlf_to_drop, efp_to_drop=efp_to_drop,
                                constituents_to_drop=constituents_to_drop,
-                               max_jets=max_jets)
+                               max_jets=max_jets,
+                               qcd_weights_path=qcd_weights_path)
 
         # Initialize specialized trainer object
         self.model_trainer = self.model_class(data_processor=data_processor,
@@ -142,6 +145,7 @@ class Trainer:
             'max_jets': self.max_jets,
             'start_time': str(self.start_timestamp),
             'end_time': str(self.end_timestamp),
+            'qcd_weights_path': self.qcd_weights_path
         }
         
         return summary_dict

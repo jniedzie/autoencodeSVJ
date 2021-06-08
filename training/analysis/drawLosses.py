@@ -8,7 +8,7 @@ from module.Evaluator import Evaluator
 
 import importlib, argparse
 from pathlib import Path
-from ROOT import TH1D, kGreen, kBlue, TCanvas, gApplication, gStyle, TLegend, kRed, gPad, kOrange
+from ROOT import TCanvas, gApplication, gStyle, TLegend, gPad
 
 # ------------------------------------------------------------------------------------------------
 # This script will draw input and reconstructed variables for signal found in the
@@ -26,8 +26,8 @@ config = importlib.import_module(config_path)
 saved_plots = []
 
 
-def get_loss_histograms(background_data, signals_data, suffix=""):
-    hist_background = get_histogram(background_data, "loss", config.qcd_input_color, suffix="QCD_"+suffix)
+def get_loss_histograms(background_data, signals_data, suffix="", qcd_weights=None):
+    hist_background = get_histogram(background_data, "loss", config.qcd_input_color, suffix="QCD_"+suffix, weights=qcd_weights)
     
     hists_signal = []
     for i, signal_data in enumerate(signals_data):
@@ -57,7 +57,9 @@ def draw_plots(summary, evaluator):
     version = summaryProcessor.get_version(summary.summary_path)
     
     qcd_loss, signals_losses = get_qcd_and_signal_losses(summary, evaluator)
-    hist_background, hists_signal = get_loss_histograms(qcd_loss, signals_losses, suffix="v"+str(version))
+    qcd_weights = evaluator.get_qcd_weights(summary=summary, test_data_only=True)
+    
+    hist_background, hists_signal = get_loss_histograms(qcd_loss, signals_losses, suffix="v"+str(version), qcd_weights=qcd_weights)
     
     hist_background.SetTitle("v" + str(version))
     hist_background.GetXaxis().SetTitle("loss")

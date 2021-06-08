@@ -18,13 +18,13 @@ bins = {
 }
 
 
-def get_histogram(data, variable_name, color=None, suffix=""):
+def get_histogram(data, variable_name, color=None, suffix="", weights=None):
     """
     Returns TH1D filled with data for the specified variable.
     """
     
     hist = __initialize_histogram(variable_name, suffix)
-    __fill_histogram(hist, data, variable_name)
+    __fill_histogram(hist, data, variable_name, weights)
     if color is not None:
         hist.SetLineColor(color)
     return hist
@@ -96,7 +96,7 @@ def __initialize_histogram_2d(variable_name_x, variable_name_y, suffix=""):
     title = variable_name_x + variable_name_y + suffix
     return TH2D(title, title, n_bins_x, min_x, max_x, n_bins_y, min_y, max_y)
 
-def __fill_histogram(histogram, data, variable_name):
+def __fill_histogram(histogram, data, variable_name, weights=None):
     """
     Fills provided histogram with data.
     """
@@ -106,8 +106,13 @@ def __fill_histogram(histogram, data, variable_name):
         values = data[int(variable_name.replace("latent_", ""))].tolist()
     else:
         values = data[variable_name].tolist()
-    for value in values:
-        histogram.Fill(value)
+        
+    if weights is not None:
+        for value, weight in zip(values, weights):
+            histogram.Fill(value, weight)
+    else:
+        for value in values:
+            histogram.Fill(value)
 
 def __fill_histogram_2d(histogram, data, variable_name_x, variable_name_y):
     """

@@ -19,24 +19,34 @@ class EvaluatorAutoEncoder:
         for path in glob.glob(input_path):
             key = path.split("/")[-3]
             self.signal_dict[key] = path
+
+        self.qcd_data = None
+        self.qcd_test_weights = None
     
     def get_weights(self, summary):
         model = self.__load_model(summary)
         return model.get_weights()
 
-    
     def get_qcd_data(self, summary, data_processor, data_loader, normalize=False, test_data_only=True):
         
-        (data, _, _) = data_loader.load_all_data(globstring=summary.qcd_path, name="QCD")
+        (self.qcd_data, _, _) = data_loader.load_all_data(globstring=summary.qcd_path, name="QCD")
+        
         if test_data_only:
-            (_, _, data) = data_processor.split_to_train_validate_test(data)
+            (_, _, self.qcd_data, _, _, self.qcd_test_weights) = data_processor.split_to_train_validate_test(self.qcd_data)
 
         if normalize:
-            data = data_processor.normalize(data_table=data,
+            self.qcd_data = data_processor.normalize(data_table=self.qcd_data,
                                             normalization_type=summary.norm_type,
                                             norm_args=summary.norm_args)
         
-        return data
+        return self.qcd_data
+
+    def get_qcd_weights(self, data_loader, test_data_only=True):
+    
+        if test_data_only:
+            return self.qcd_test_weights
+    
+        return data_loader.weights
     
     def get_signal_data(self, name, path, summary, data_processor, data_loader, normalize=False, scaler=None, test_data_only=True):
         

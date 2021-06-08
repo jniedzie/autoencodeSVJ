@@ -16,26 +16,39 @@ class DataProcessor():
             self.test_fraction = summary.test_split
             self.seed = summary.seed
 
-    def split_to_train_validate_test(self, data_table):
+    def split_to_train_validate_test(self, data_table, weights=None):
         
-        train_idx, test_idx = train_test_split(data_table.df.index, test_size=self.test_fraction, random_state=self.seed)
+        train_idx, test_idx = train_test_split(data_table.df.index,
+                                               test_size=self.test_fraction,
+                                               random_state=self.seed)
         train = np.asarray([train_idx]).T.flatten()
         test = np.asarray([test_idx]).T.flatten()
         
         train_and_validation_data = DataTable(data_table.df.loc[train])
         test_data = DataTable(data_table.df.loc[test], name="test")
+        
+        test_weights = np.take(weights, test_idx) if weights is not None else None
 
         if self.validation_fraction > 0:
-            train, validation = train_test_split(train_and_validation_data,
+            train_idx, validation_idx = train_test_split(train_and_validation_data.df.index,
                                                  test_size=self.validation_fraction,
                                                  random_state=self.seed)
-            train_data = DataTable(train, name="train")
-            validation_data = DataTable(validation, name="validation")
+
+            train = np.asarray([train_idx]).T.flatten()
+            validation = np.asarray([validation_idx]).T.flatten()
+
+            train_data = DataTable(train_and_validation_data.df.loc[train])
+            validation_data = DataTable(train_and_validation_data.df.loc[validation], name="validation")
+            
+            train_weights = np.take(weights, train_idx) if weights is not None else None
+            validation_weights = np.take(weights, train_idx) if weights is not None else None
         else:
             train_data = DataTable(train_and_validation_data, name="train")
             validation_data = None
+            train_weights = np.take(weights, train_idx) if weights is not None else None
+            validation_weights = None
   
-        return train_data, validation_data, test_data
+        return train_data, validation_data, test_data, train_weights, validation_weights, test_weights
 
     def normalize(self, data_table, normalization_type, inverse=False,
                   data_ranges=None, norm_args=None, means=None, stds=None,

@@ -4,7 +4,7 @@ from collections import OrderedDict as odict
 import h5py
 import numpy as np
 import os, glob, subprocess, chardet
-
+from ROOT import TFile
 
 class DataLoader:
     """
@@ -17,6 +17,7 @@ class DataLoader:
         self.sample_keys = None
         self.data = odict()
         self.labels = odict()
+        self.weights = None
 
         self.include_hlf = None
         self.include_eflow = None
@@ -26,7 +27,7 @@ class DataLoader:
         self.constituents_to_drop = None
         self.max_jets = None
 
-    def set_params(self, include_hlf, include_eflow, include_constituents, hlf_to_drop, efp_to_drop, constituents_to_drop, max_jets):
+    def set_params(self, include_hlf, include_eflow, include_constituents, hlf_to_drop, efp_to_drop, constituents_to_drop, max_jets, qcd_weights_path):
         self.include_hlf = include_hlf
         self.include_eflow = include_eflow
         self.include_constituents = include_constituents
@@ -34,6 +35,7 @@ class DataLoader:
         self.efp_to_drop = efp_to_drop
         self.constituents_to_drop = constituents_to_drop
         self.max_jets = int(max_jets)
+        self.qcd_weights_path = qcd_weights_path
         
     def load_all_data(self, globstring, name):
     
@@ -70,20 +72,14 @@ class DataLoader:
                                hlf_to_drop=self.hlf_to_drop,
                                efp_to_drop=self.efp_to_drop,
                                constituents_to_drop=self.constituents_to_drop,
-                               max_jets=self.max_jets)
+                               max_jets=self.max_jets,
+                               qcd_weights_path=self.qcd_weights_path)
         
         for f in files:
             data_loader.add_sample(f)
     
-        train_modify = None
-    
-        # if self.include_hlf and self.include_eflow:
-        train_modify = lambda *args, **kwargs: self.all_modify(*args, **kwargs)
-        # elif self.include_hlf:
-        #     train_modify = lambda *args, **kwargs: self.hlf_modify(*args, **kwargs)
-        # else:
-        #     train_modify = self.eflow_modify
-        #
+        
+        
         event = data_loader.make_table('event_features', name + ' event features')
 
         newNames = dict()
@@ -95,13 +91,17 @@ class DataLoader:
 
         event.df.rename(columns=newNames, inplace=True)
         event.headers = list(event.df.columns)
-        
-        data = train_modify(data_loader.make_tables(to_include, name, 'stack'))
-        flavors = data_loader.make_table('jet_features', name + ' jet flavor', 'stack').cfilter("Flavor")
 
+        data = data_loader.make_tables(to_include, name, 'stack')
+        data = self.__update_names(data)
         print("Getting rid of empty jets...", end="")
         data.drop(data[data.Eta == 0].index, inplace=True)
         print("done.")
+        
+        self.__calculate_weights(data)
+        
+        data = self.__drop_columns(data)
+        flavors = data_loader.make_table('jet_features', name + ' jet flavor', 'stack').cfilter("Flavor")
 
         return data, event, flavors
 
@@ -120,12 +120,26 @@ class DataLoader:
     
         return files
 
-    def all_modify(self, tables):
+    def __calculate_weights(self, data):
+        if self.qcd_weights_path is None:
+            return
+    
+        weights_file = TFile.Open(self.qcd_weights_path)
+        weights_hist = weights_file.Get("histJetPtWeights")
+    
+        print("Calculating weights...", end="")
+        weights = [weights_hist.GetBinContent(weights_hist.GetXaxis().FindFixBin(entry.Pt)) for _, entry in
+                   data.df.iterrows()]
+        print("done")
+        self.weights = np.array(weights)
+
+    def __update_names(self, tables):
+    
         if not isinstance(tables, list) or isinstance(tables, tuple):
             tables = [tables]
+    
         for i, table in enumerate(tables):
-            tables[i].cdrop(['0'] + self.hlf_to_drop + self.efp_to_drop + self.constituents_to_drop, inplace=True)
-        
+            
             newNames = dict()
         
             for column in table.df.columns:
@@ -147,23 +161,14 @@ class DataLoader:
             return tables[0]
         return tables
 
-    def hlf_modify(self, tables):
+    def __drop_columns(self, tables):
+        
         if not isinstance(tables, list) or isinstance(tables, tuple):
             tables = [tables]
+            
         for i, table in enumerate(tables):
-            tables[i].cdrop(self.hlf_to_drop, inplace=True)
-        if len(tables) == 1:
-            return tables[0]
-        return tables
-
-    def eflow_modify(self, tables):
-        if not isinstance(tables, list) or isinstance(tables, tuple):
-            tables = [tables]
-        for i, table in enumerate(tables):
-            tables[i].cdrop(['0'] + self.efp_to_drop, inplace=True)
-            tables[i].df.rename(columns=dict([(c, "eflow {}".format(c)) for c in tables[i].df.columns if c.isdigit()]),
-                                inplace=True)
-            tables[i].headers = list(tables[i].df.columns)
+            tables[i].cdrop(['0'] + self.hlf_to_drop + self.efp_to_drop + self.constituents_to_drop, inplace=True)
+        
         if len(tables) == 1:
             return tables[0]
         return tables

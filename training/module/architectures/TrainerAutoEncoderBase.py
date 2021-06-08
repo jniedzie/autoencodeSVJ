@@ -1,4 +1,6 @@
+import numpy as np
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TerminateOnNaN, ModelCheckpoint, CSVLogger
+from ROOT import TFile
 
 
 class TrainerAutoEncoderBase:
@@ -34,6 +36,7 @@ class TrainerAutoEncoderBase:
         self.norm_type = norm_type
         self.norm_args = norm_args
         self.verbose = verbose
+        self.weights = None
         
         # Load and split the data
         self.__load_data()
@@ -49,9 +52,10 @@ class TrainerAutoEncoderBase:
         Loading and splitting the data for the training, using data loader and data processor.
         """
         (self.qcd, _, _) = self.data_loader.load_all_data(self.qcd_path, "QCD")
-        (self.train_data, self.validation_data, _) = self.data_processor.split_to_train_validate_test(
-            data_table=self.qcd)
-    
+        self.weights = self.data_loader.weights
+        (self.train_data, self.validation_data, _, self.weights, _, _) = self.data_processor.split_to_train_validate_test(
+            data_table=self.qcd, weights=self.weights)
+        
     def __normalize_data(self):
         """
         Preparing normalized version of the training data
@@ -93,7 +97,8 @@ class TrainerAutoEncoderBase:
             epochs=self.training_params["epochs"],
             batch_size=self.training_params["batch_size"],
             verbose=self.verbose,
-            callbacks=callbacks
+            callbacks=callbacks,
+            sample_weight = self.weights
         )
         
         print("\ntrained {} epochs!", self.training_params["epochs"], "\n")
