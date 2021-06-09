@@ -35,8 +35,8 @@ plots_path = output_path+"plots/"
 stat_hists_path = output_path+"stat_hists.root"
 
 # output_file_suffix = "_smallConstituents"
-output_file_suffix = "_noPt_weighted"
-# output_file_suffix = "_weighted"
+# output_file_suffix = "_noPt_notWeighted"
+output_file_suffix = "_withPt_weighted"
 # output_file_suffix = "_1jet"
 # output_file_suffix = "_allEFPs"
 # output_file_suffix = "_30constituents"
@@ -58,7 +58,8 @@ training_general_settings = {
     "constituents_to_drop": ["constituent_Rapidity_*", "constituent_Eta_*", "constituent_Phi_*"] + ["constituent_*_{}".format(i) for i in range(30, 150)],
     # "constituents_to_drop": [],
     "max_jets": 2,
-    "qcd_weights_path": "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/weighting/results/weights_qcd_realisticQCD_to_realisticSVJ_small_events10000_nBins100_maxPt3000.000000.root"
+    # "qcd_weights_path": "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/weighting/results/weights_qcd_realisticQCD_to_realisticSVJ_small_events10000_nBins100_maxPt3000.000000.root"
+    "qcd_weights_path": ""
 }
 
 evaluation_general_settings = {
@@ -133,8 +134,8 @@ training_params = {
     
     'epochs': 200,
     
-    # 'learning_rate': 0.00051, # default
-    'learning_rate': 1e-6,  # best
+    'learning_rate': 0.00051, # default
+    # 'learning_rate': 1e-6,  # best
 
     'lr_patience': 9,   # default, best
 
@@ -168,7 +169,7 @@ training_params = {
 
 # ---------------------------------------------
 # Number of models to train
-n_models = 1
+n_models = 5
 
 # ---------------------------------------------
 # Pick normalization type (definitions below):
@@ -258,7 +259,7 @@ file_name += "_maxJets_{}".format(training_general_settings["max_jets"])
 file_name += "_metric_{}".format(training_params["metric"])
 file_name += "{}".format(output_file_suffix)
 
-test_filename_pattern = file_name+"_v0"
+test_filename_pattern = file_name+"_v"
 # test_filename_pattern = "hlf_efp_3_bottle_5_arch_10__10_loss_mean_absolute_error_optimizer_Adam_batch_size_256_scaler_StandardScaler_activation_elu_v0"
 # test_filename_pattern = "_v"
 

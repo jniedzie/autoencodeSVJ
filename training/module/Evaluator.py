@@ -182,8 +182,7 @@ class Evaluator:
 
     def get_qcd_weights(self, summary, test_data_only=True):
         utils.set_random_seed(summary.seed)
-        data_loader = self.__get_data_loader(summary)
-        return self.model_evaluator.get_qcd_weights(data_loader, test_data_only)
+        return self.model_evaluator.get_qcd_weights(test_data_only)
 
     def get_signal_data(self, name, path, summary, test_data_only):
         utils.set_random_seed(summary.seed)
@@ -215,7 +214,5 @@ class Evaluator:
                                hlf_to_drop=summary.hlf_to_drop,
                                efp_to_drop=summary.efp_to_drop,
                                constituents_to_drop=summary.constituents_to_drop,
-                               max_jets=summary.max_jets,
-                               qcd_weights_path=summary.qcd_weights_path
-                               )
+                               max_jets=summary.max_jets)
         return data_loader

@@ -22,7 +22,7 @@ class EvaluatorPca:
 
     def get_qcd_data(self, summary, data_processor, data_loader, normalize=False, test_data_only=True):
         
-        (data, _, _) = data_loader.load_all_data(globstring=summary.qcd_path, name="QCD")
+        (data, _, _) = data_loader.load_all_data(data_path=summary.qcd_path, name="QCD")
         if test_data_only:
             (_, _, data) = data_processor.split_to_train_validate_test(data)
 
@@ -35,7 +35,7 @@ class EvaluatorPca:
     
     def get_signal_data(self, name, path, summary, data_processor, data_loader, normalize=False, scaler=None, test_data_only=True):
         
-        (data, _, _) = data_loader.load_all_data(globstring=path, name=name)
+        (data, _, _) = data_loader.load_all_data(data_path=path, name=name)
         
         if test_data_only:
             (_, _, data) = data_processor.split_to_train_validate_test(data)

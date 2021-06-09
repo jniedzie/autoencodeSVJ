@@ -3,22 +3,23 @@ from ROOT import TLegend, TH1D, TCanvas, gApplication, TGraph, TGraphErrors
 from ROOT import kRed, kOrange, kGreen, kBlue, kViolet, kBlack
 import glob
 
-show_plots = False
+show_plots = True
 
 input_paths = [
-    (glob.glob("../trainingResults_activations/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_SGD_batchSize_256_StandardScaler_activation_selu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_v*"), kBlue, "(7, 7), BN: 1"),
-
-    (glob.glob("../trainingResults_archs/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_v*"), kBlue, "(7, 7), BN: 1"),
-
-    (glob.glob("../trainingResults_pca/aucs/efp_3_nComponents_mle_svdSolver_full_MinMaxScaler_maxJets_2_v*"), kBlue, "(7, 7), BN: 1"),
-
-(glob.glob("../trainingResults_bdt/aucs/efp_3_norm_None_algo_SAMME_nEstimators_800_learningRate_0.5_noConstituents_oneEFP_v*"), kBlue, "(7, 7), BN: 1"),
+    (glob.glob("../trainingResults_weighting/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_withPt_notWeighted_v*"), kBlue, "(7, 7), BN: 1"),
+    (glob.glob("../trainingResults_weighting/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_withPt_weighted_v*"), kBlue, "(7, 7), BN: 1"),
+    (glob.glob("../trainingResults_weighting/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_noPt_notWeighted_v*"), kBlue, "(7, 7), BN: 1"),
+    (glob.glob("../trainingResults_weighting/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_noPt_weighted_v*"), kBlue, "(7, 7), BN: 1"),
 ]
 
 draw_auc_distributions = False
 
-r_invs = [0.15, 0.30, 0.45, 0.60, 0.75]
-masses = [1500, 2000, 2500, 3000, 3500, 4000]
+# r_invs = [0.15, 0.30, 0.45, 0.60, 0.75]
+# masses = [1500, 2000, 2500, 3000, 3500, 4000]
+
+r_invs = [0.30]
+masses = [3000]
+
 colors = [kRed, kOrange, kGreen, kGreen+2, kBlue, kViolet, kBlack]
 
 xMin = 0.0
@@ -35,33 +36,33 @@ min_max = {
 }
 
 
-def getHistogramForVariable(stats, variableValue, forMass):
+def get_histogram_for_variable(stats, variable_value, for_mass):
 
-    title = "mass" if forMass else "r_inv"
-    title += " hist" + str(variableValue)
-    hist = TH1D(title, title,  nBinsMass if forMass else nBinsRinv, xMin, xMax)
+    title = "mass" if for_mass else "r_inv"
+    title += " hist" + str(variable_value)
+    hist = TH1D(title, title,  nBinsMass if for_mass else nBinsRinv, xMin, xMax)
 
     for stat in stats:
 
         for result in stat:
-            if (result[0] if forMass else result[1]) == variableValue:
+            if (result[0] if for_mass else result[1]) == variable_value:
                 hist.Fill(result[2])
     return hist
 
 
-def drawHistsForVariable(stats, forMass):
+def draw_hists_for_variable(stats, for_mass):
     
     leg = TLegend(0.1, 0.6, 0.5, 0.9)
 
-    var_name = "mass" if forMass else "r_inv"
+    var_name = "mass" if for_mass else "r_inv"
     print("AUCs per ", var_name, ": ")
     print("mean\tmeanErr\twidth\twidthErr\tmax\tmaxErr")
 
     hists = []
 
-    for i in range(len(masses) if forMass else len(r_invs)):
+    for i in range(len(masses) if for_mass else len(r_invs)):
     
-        hist = getHistogramForVariable(stats,  masses[i] if forMass else r_invs[i], forMass)
+        hist = get_histogram_for_variable(stats,  masses[i] if for_mass else r_invs[i], for_mass)
         hist.Sumw2()
         hist.SetLineColor(colors[i])
         
@@ -70,16 +71,17 @@ def drawHistsForVariable(stats, forMass):
             hist.GetXaxis().SetTitle("AUC")
             hist.GetYaxis().SetTitle("# trainings")
 
-        value = masses[i] if forMass else r_invs[i]
+        value = masses[i] if for_mass else r_invs[i]
         hists.append({"value": value, "hist": hist})
 
-        if forMass:
+        if for_mass:
             title = "m = " + str(masses[i]) + " GeV"
         else:
             title = "r_{inv} = " + str(r_invs[i])
         leg.AddEntry(hist, title, "l")
 
     return hists, leg
+    
     
 def print_average_auc_for_files(paths):
     
@@ -128,7 +130,7 @@ def print_average_auc_for_files(paths):
     print("Avg auc for file: ", paths[0], "is: ", avg_auc/n_models_to_check)
         
 
-def get_auc_params(csv_file_paths, forMass):
+def get_auc_params(csv_file_paths, for_mass):
     model_stats = []
 
     for csv_file_path in csv_file_paths:
@@ -148,12 +150,12 @@ def get_auc_params(csv_file_paths, forMass):
                 rinv = float(values[1])
                 auc = float(values[2])
 
-    
-                model_stats.append((mass, rinv, auc))
+                if mass in masses and rinv in r_invs:
+                    model_stats.append((mass, rinv, auc))
     
                 # print(mass, "\t", rinv, "\t", auc)
 
-    hists, leg = drawHistsForVariable([model_stats], forMass)
+    hists, leg = draw_hists_for_variable([model_stats], for_mass)
 
     if draw_auc_distributions:
         canvas = TCanvas("", "", 800, 600)
@@ -191,8 +193,8 @@ def get_auc_params(csv_file_paths, forMass):
         
     return auc_params
 
-def get_graphs_from_path(path, forMass):
-    auc_params = get_auc_params(path, forMass=forMass)
+def get_graphs_from_path(path, for_mass):
+    auc_params = get_auc_params(path, for_mass=for_mass)
     
     graphs = {
         "mean": TGraphErrors(),
@@ -226,8 +228,8 @@ if __name__ == "__main__":
             print("Can't load AUC's, maybe you forgot to run produceMissingAucs.py ?")
             continue
 
-        graphs_per_path_per_rinv[path[0]] = get_graphs_from_path(path, forMass=True)
-        graphs_per_path_per_mass[path[0]] = get_graphs_from_path(path, forMass=False)
+        graphs_per_path_per_rinv[path[0]] = get_graphs_from_path(path, for_mass=True)
+        graphs_per_path_per_mass[path[0]] = get_graphs_from_path(path, for_mass=False)
         
         print_average_auc_for_files(path)
 

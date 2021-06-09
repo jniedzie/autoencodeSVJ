@@ -6,6 +6,7 @@ import numpy as np
 import os, glob, subprocess, chardet
 from ROOT import TFile
 
+
 class DataLoader:
     """
     data loader/handler/merger for h5 files with the general format of this repository
@@ -17,7 +18,7 @@ class DataLoader:
         self.sample_keys = None
         self.data = odict()
         self.labels = odict()
-        self.weights = None
+        self.weights = {}
 
         self.include_hlf = None
         self.include_eflow = None
@@ -27,7 +28,7 @@ class DataLoader:
         self.constituents_to_drop = None
         self.max_jets = None
 
-    def set_params(self, include_hlf, include_eflow, include_constituents, hlf_to_drop, efp_to_drop, constituents_to_drop, max_jets, qcd_weights_path):
+    def set_params(self, include_hlf, include_eflow, include_constituents, hlf_to_drop, efp_to_drop, constituents_to_drop, max_jets):
         self.include_hlf = include_hlf
         self.include_eflow = include_eflow
         self.include_constituents = include_constituents
@@ -35,21 +36,24 @@ class DataLoader:
         self.efp_to_drop = efp_to_drop
         self.constituents_to_drop = constituents_to_drop
         self.max_jets = int(max_jets)
-        self.qcd_weights_path = qcd_weights_path
         
-    def load_all_data(self, globstring, name):
-    
-        """returns...
-            - data: full data matrix wrt variables
-            - jets: list of data matricies, in order of jet order (leading, subleading, etc.)
-            - event: event-specific variable data matrix, information on MET and MT etc.
-            - flavors: matrix of jet flavors to (later) split your data with
+    def load_all_data(self, data_path, name, weights_path=None):
+        """
+        Args:
+            data_path (str): parameter description
+            name (str): desc
+            weights_path (str): desc
+
+        Returns:
+            (tuple): tuple containing:
+                servers(list) servers to use
+                msg (str): logging message string
         """
     
-        files = self.__glob_in_repo(globstring)
+        files = self.__glob_in_repo(data_path)
     
         if len(files) == 0:
-            print("\n\nERROR -- no files found in ", globstring, "\n\n")
+            print("\n\nERROR -- no files found in ", data_path, "\n\n")
             raise AttributeError
     
         to_include = []
@@ -72,24 +76,21 @@ class DataLoader:
                                hlf_to_drop=self.hlf_to_drop,
                                efp_to_drop=self.efp_to_drop,
                                constituents_to_drop=self.constituents_to_drop,
-                               max_jets=self.max_jets,
-                               qcd_weights_path=self.qcd_weights_path)
+                               max_jets=self.max_jets)
         
         for f in files:
             data_loader.add_sample(f)
     
-        
-        
         event = data_loader.make_table('event_features', name + ' event features')
 
-        newNames = dict()
+        new_names = dict()
 
         for column in event.df.columns:
             if type(column) is bytes:
                 encoding = chardet.detect(column)["encoding"]
-                newNames[column] = column.decode(encoding)
+                new_names[column] = column.decode(encoding)
 
-        event.df.rename(columns=newNames, inplace=True)
+        event.df.rename(columns=new_names, inplace=True)
         event.headers = list(event.df.columns)
 
         data = data_loader.make_tables(to_include, name, 'stack')
@@ -98,7 +99,7 @@ class DataLoader:
         data.drop(data[data.Eta == 0].index, inplace=True)
         print("done.")
         
-        self.__calculate_weights(data)
+        self.__calculate_weights(data, weights_path, name)
         
         data = self.__drop_columns(data)
         flavors = data_loader.make_table('jet_features', name + ' jet flavor', 'stack').cfilter("Flavor")
@@ -120,18 +121,19 @@ class DataLoader:
     
         return files
 
-    def __calculate_weights(self, data):
-        if self.qcd_weights_path is None:
+    def __calculate_weights(self, data, path, name):
+        if path is None or path == "":
+            self.weights[name] = None
             return
     
-        weights_file = TFile.Open(self.qcd_weights_path)
+        weights_file = TFile.Open(path)
         weights_hist = weights_file.Get("histJetPtWeights")
     
         print("Calculating weights...", end="")
         weights = [weights_hist.GetBinContent(weights_hist.GetXaxis().FindFixBin(entry.Pt)) for _, entry in
                    data.df.iterrows()]
         print("done")
-        self.weights = np.array(weights)
+        self.weights[name] = np.array(weights)
 
     def __update_names(self, tables):
     
