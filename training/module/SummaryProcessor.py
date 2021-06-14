@@ -50,7 +50,7 @@ def get_summaries_from_path(path):
             d['time'] = datetime.datetime.fromtimestamp(os.path.getmtime(f))
             data.append(d)
     
-    if len(data)==0:
+    if len(data) == 0:
         print("WARNING - no summary files found!!")
         return None
     
