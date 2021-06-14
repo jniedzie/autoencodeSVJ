@@ -14,7 +14,8 @@ train_on_signal = False
 
 # ---------------------------------------------
 # Output paths
-output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_weighting/"
+output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_test/"
+# output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_weighting/"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_archs/"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_inputs/"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_losses/"
@@ -34,9 +35,10 @@ results_path = output_path+"trainingRuns/"
 plots_path = output_path+"plots/"
 stat_hists_path = output_path+"stat_hists.root"
 
+output_file_suffix = ""
 # output_file_suffix = "_smallConstituents"
 # output_file_suffix = "_noPt_notWeighted"
-output_file_suffix = "_withPt_weighted"
+# output_file_suffix = "_withPt_weighted"
 # output_file_suffix = "_1jet"
 # output_file_suffix = "_allEFPs"
 # output_file_suffix = "_30constituents"
@@ -45,18 +47,23 @@ output_file_suffix = "_withPt_weighted"
 # ---------------------------------------------
 # Build general training/evaluation settings dictionary
 
+def __get_variables_to_drop():
+    to_drop = ["MET", "METEta", "METPhi", "MT", "Mjj", "genWeight"]
+    
+    to_drop.extend(["efp 0", "Energy", "Flavor", "ChargedFraction", "Pt"])
+
+    to_drop.extend(["efp {}".format(i) for i in range(2, 13)])
+    to_drop.extend(["constituent_Rapidity_*", "constituent_Eta_*", "constituent_Phi_*"])
+    to_drop.extend(["constituent_*_{}".format(i) for i in range(30, 150)])
+
+    return to_drop
+
+
 training_general_settings = {
     "model_trainer_path": "module/architectures/TrainerAutoEncoder.py",
     "validation_data_fraction": 0.15,
     "test_data_fraction": 0.15,
-    "include_hlf": True,
-    "include_efp": True,
-    "include_constituents": False,
-    "hlf_to_drop": ['Energy', 'Flavor', "ChargedFraction", "Pt"],
-    "efp_to_drop": ["efp {}".format(i) for i in range(2, 13)],
-    # "efp_to_drop": [],
-    "constituents_to_drop": ["constituent_Rapidity_*", "constituent_Eta_*", "constituent_Phi_*"] + ["constituent_*_{}".format(i) for i in range(30, 150)],
-    # "constituents_to_drop": [],
+    "variables_to_drop": __get_variables_to_drop(),
     "max_jets": 2,
     # "qcd_weights_path": "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/weighting/results/weights_qcd_realisticQCD_to_realisticSVJ_small_events10000_nBins100_maxPt3000.000000.root"
     "qcd_weights_path": ""
@@ -87,62 +94,62 @@ input_path = signals_base_path+"/*/base_{}/*.h5".format(efp_base)
 # ---------------------------------------------
 # Training parameters
 training_params = {
-    'batch_size': 256, # default, best
+    "batch_size": 256, # default, best
 
     # losses documentation
     # https://keras.io/api/losses/regression_losses
-    'loss': 'mean_absolute_error', # default, best
-    # 'loss': 'mean_squared_error',
-    # 'loss': 'mean_absolute_percentage_error',
-    # 'loss': 'mean_squared_logarithmic_error',
-    # 'loss': 'cosine_similarity',
-    # 'loss': 'huber',
-    # 'loss': 'log_cosh',
+    "loss": "mean_absolute_error", # default, best
+    # "loss": "mean_squared_error",
+    # "loss": "mean_absolute_percentage_error",
+    # "loss": "mean_squared_logarithmic_error",
+    # "loss": "cosine_similarity",
+    # "loss": "huber",
+    # "loss": "log_cosh",
 
     # optimizers documentation
     # https://keras.io/api/optimizers/
-    # 'optimizer': 'SGD', # best
-    # 'optimizer': 'RMSprop',
-    'optimizer': 'Adam', # default
-    # 'optimizer': 'Adadelta',
-    # 'optimizer': 'Adagrad',
-    # 'optimizer': 'Adamax',
-    # 'optimizer': 'Nadam',
-    # 'optimizer': 'Ftrl',
+    # "optimizer": "SGD", # best
+    # "optimizer": "RMSprop",
+    "optimizer": "Adam", # default
+    # "optimizer": "Adadelta",
+    # "optimizer": "Adagrad",
+    # "optimizer": "Adamax",
+    # "optimizer": "Nadam",
+    # "optimizer": "Ftrl",
 
     # metrics documentation
     # https://keras.io/api/metrics/
-    'metric': 'accuracy',
-    # 'metric': 'binary_accuracy',
-    # 'metric': 'categorical_accuracy',
-    # 'metric': 'top_k_categorical_accuracy',
-    # 'metric': 'sparse_top_k_categorical_accuracy', # doesn't work
+    "metric": "accuracy",
+    # "metric": "binary_accuracy",
+    # "metric": "categorical_accuracy",
+    # "metric": "top_k_categorical_accuracy",
+    # "metric": "sparse_top_k_categorical_accuracy", # doesn"t work
 
-    # 'metric': 'binary_crossentropy',
-    # 'metric': 'categorical_crossentropy',
-    # 'metric': 'sparse_categorical_crossentropy',  # doesn't work
-    # 'metric': 'kullback_leibler_divergence', # can't restore model
-    # 'metric': 'poisson',
+    # "metric": "binary_crossentropy",
+    # "metric": "categorical_crossentropy",
+    # "metric": "sparse_categorical_crossentropy",  # doesn"t work
+    # "metric": "kullback_leibler_divergence", # can"t restore model
+    # "metric": "poisson",
 
-    # 'metric': 'mean_squared_error',
-    # 'metric': 'root_mean_squared_error', # doesn't work
-    # 'metric': 'mean_absolute_error',
-    # 'metric': 'mean_absolute_percentage_error',
-    # 'metric': 'mean_squared_logarithmic_error',
-    # 'metric': 'cosine_similarity',
-    # 'metric': 'logcosh', # can't restore model
+    # "metric": "mean_squared_error",
+    # "metric": "root_mean_squared_error", # doesn"t work
+    # "metric": "mean_absolute_error",
+    # "metric": "mean_absolute_percentage_error",
+    # "metric": "mean_squared_logarithmic_error",
+    # "metric": "cosine_similarity",
+    # "metric": "logcosh", # can"t restore model
 
     
-    'epochs': 200,
+    "epochs": 10,
     
-    'learning_rate': 0.00051, # default
-    # 'learning_rate': 1e-6,  # best
+    "learning_rate": 0.00051, # default
+    # "learning_rate": 1e-6,  # best
 
-    'lr_patience': 9,   # default, best
+    "lr_patience": 9,   # default, best
 
-    'lr_factor': 0.5,   # default, best
+    "lr_factor": 0.5,   # default, best
 
-    'es_patience': 12,
+    "es_patience": 12,
 
     
     # "bottleneck_size": 20,
@@ -170,7 +177,7 @@ training_params = {
 
 # ---------------------------------------------
 # Number of models to train
-n_models = 5
+n_models = 1
 
 # ---------------------------------------------
 # Pick normalization type (definitions below):

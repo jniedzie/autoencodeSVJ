@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+
 from sklearn.ensemble import AdaBoostClassifier
 
 
@@ -17,7 +18,6 @@ class TrainerBdt:
             EFP_base=None,
             norm_type=None,
             norm_args=None,
-            hlf_to_drop=None,
     ):
         """
         @mandatory
@@ -38,7 +38,6 @@ class TrainerBdt:
         self.EFP_base = EFP_base
         self.norm_type = norm_type
         self.norm_args = norm_args
-        self.hlf_to_drop = hlf_to_drop
         
         # Load and split the data
         self.__load_data()
@@ -62,8 +61,8 @@ class TrainerBdt:
         Loading and splitting the data for the training, using data loader and data processor.
         """
         
-        (QCD, _, _) = self.data_loader.load_all_data(self.qcd_path, "QCD")
-        (SVJ, _, _) = self.data_loader.load_all_data(self.signal_path, "SVJ")
+        QCD = self.data_loader.get_data(self.qcd_path, "QCD")
+        SVJ = self.data_loader.get_data(self.signal_path, "SVJ")
         
         (QCD_X_train, _, _) = self.data_processor.split_to_train_validate_test(data_table=QCD)
         (SVJ_X_train, _, _) = self.data_processor.split_to_train_validate_test(data_table=SVJ)

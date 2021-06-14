@@ -30,10 +30,9 @@ class EvaluatorAutoEncoder:
 
     def get_qcd_data(self, summary, data_processor, data_loader, normalize=False, test_data_only=True):
         
-        (self.qcd_data, _, _) = data_loader.load_all_data(data_path=summary.qcd_path,
-                                                          name="QCD",
-                                                          weights_path=summary.qcd_weights_path
-                                                          )
+        self.qcd_data = data_loader.get_data(data_path=summary.qcd_path,
+                                             name="QCD",
+                                             weights_path=summary.qcd_weights_path)
         self.qcd_weights = data_loader.weights["QCD"]
         
         if test_data_only:
@@ -68,7 +67,7 @@ class EvaluatorAutoEncoder:
     
     def get_signal_data(self, name, path, summary, data_processor, data_loader, normalize=False, scaler=None, test_data_only=True):
         
-        (data, _, _) = data_loader.load_all_data(data_path=path, name=name)
+        data = data_loader.get_data(data_path=path, name=name)
         
         if test_data_only:
             (_, _, data, _, _, _) = data_processor.split_to_train_validate_test(data)
@@ -327,8 +326,6 @@ class EvaluatorAutoEncoder:
         Returns:
 
         """
-        
-        data_loader.load_all_data()
         
         normed = self.__get_normalized_data(summary, data_processor, data_loader, test_key)
         

@@ -207,12 +207,4 @@ class Evaluator:
         return self.model_evaluator.get_latent_space_values(input_data, summary, data_processor, scaler)
 
     def __get_data_loader(self, summary):
-        data_loader = DataLoader()
-        data_loader.set_params(include_hlf=summary.include_hlf,
-                               include_efp=summary.include_efp,
-                               include_constituents=summary.include_constituents,
-                               hlf_to_drop=summary.hlf_to_drop,
-                               efp_to_drop=summary.efp_to_drop,
-                               constituents_to_drop=summary.constituents_to_drop,
-                               max_jets=summary.max_jets)
-        return data_loader
+        return DataLoader(summary.variables_to_drop, summary.max_jets)

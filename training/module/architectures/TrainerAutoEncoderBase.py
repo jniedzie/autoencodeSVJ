@@ -1,6 +1,9 @@
 import numpy as np
+
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TerminateOnNaN, ModelCheckpoint, CSVLogger
 from ROOT import TFile
+
+from module.DataLoader import DataLoader
 
 
 class TrainerAutoEncoderBase:
@@ -51,7 +54,7 @@ class TrainerAutoEncoderBase:
         """
         Loading and splitting the data for the training, using data loader and data processor.
         """
-        (self.qcd, _) = self.data_loader.load_all_data(self.qcd_path, "QCD")
+        self.qcd = self.data_loader.get_data(self.qcd_path, "QCD")
         self.weights = self.data_loader.weights["QCD"]
         (self.train_data, self.validation_data, _, self.weights, _, _) = self.data_processor.split_to_train_validate_test(
             data_table=self.qcd, weights=self.weights)

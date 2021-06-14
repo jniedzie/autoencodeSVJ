@@ -26,7 +26,7 @@ class DataProcessor():
         test = np.asarray([test_idx]).T.flatten()
         
         train_and_validation_data = DataTable(data_table.df.loc[train])
-        test_data = DataTable(data_table.df.loc[test], name="test")
+        test_data = DataTable(data_table.df.loc[test])
         
         test_weights = np.take(weights, test_idx) if weights is not None else None
 
@@ -39,12 +39,12 @@ class DataProcessor():
             validation = np.asarray([validation_idx]).T.flatten()
 
             train_data = DataTable(train_and_validation_data.df.loc[train])
-            validation_data = DataTable(train_and_validation_data.df.loc[validation], name="validation")
+            validation_data = DataTable(train_and_validation_data.df.loc[validation])
             
             train_weights = np.take(weights, train_idx) if weights is not None else None
             validation_weights = np.take(weights, train_idx) if weights is not None else None
         else:
-            train_data = DataTable(train_and_validation_data, name="train")
+            train_data = DataTable(train_and_validation_data)
             validation_data = None
             train_weights = np.take(weights, train_idx) if weights is not None else None
             validation_weights = None

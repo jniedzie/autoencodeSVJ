@@ -17,12 +17,7 @@ class Trainer:
                  model_trainer_path,
                  validation_data_fraction,
                  test_data_fraction,
-                 include_hlf,
-                 include_efp,
-                 include_constituents,
-                 hlf_to_drop,
-                 efp_to_drop,
-                 constituents_to_drop,
+                 variables_to_drop,
                  max_jets,
                  qcd_weights_path,
                  # arguments that will be passed to the specialized trainer class
@@ -38,12 +33,7 @@ class Trainer:
         # Save general training arguments
         self.validation_data_fraction = validation_data_fraction
         self.test_data_fraction = test_data_fraction
-        self.include_hlf = include_hlf
-        self.include_efp = include_efp
-        self.include_constituents = include_constituents
-        self.hlf_to_drop = hlf_to_drop
-        self.efp_to_drop = efp_to_drop
-        self.constituents_to_drop = constituents_to_drop
+        self.variables_to_drop = variables_to_drop
         self.max_jets = max_jets
         self.qcd_weights_path = qcd_weights_path
 
@@ -59,12 +49,7 @@ class Trainer:
                                        test_fraction=test_data_fraction,
                                        seed=self.seed)
 
-        data_loader = DataLoader()
-        data_loader.set_params(include_hlf=include_hlf, include_efp=include_efp,
-                               include_constituents=include_constituents,
-                               hlf_to_drop=hlf_to_drop, efp_to_drop=efp_to_drop,
-                               constituents_to_drop=constituents_to_drop,
-                               max_jets=max_jets)
+        data_loader = DataLoader(variables_to_drop, max_jets)
 
         # Initialize specialized trainer object
         self.model_trainer = self.model_class(data_processor=data_processor,
@@ -133,18 +118,13 @@ class Trainer:
         summary_dict = {
             "model_type": str(self.model_class),
             "seed": self.seed,
-            'val_split': self.validation_data_fraction,
-            'test_split': self.test_data_fraction,
-            'include_hlf': self.include_hlf,
-            'include_efp': self.include_efp,
-            'include_constituents': self.include_constituents,
-            'hlf_to_drop': tuple(self.hlf_to_drop),
-            'efp_to_drop': tuple(self.efp_to_drop),
-            'constituents_to_drop': tuple(self.constituents_to_drop),
-            'max_jets': self.max_jets,
-            'start_time': str(self.start_timestamp),
-            'end_time': str(self.end_timestamp),
-            'qcd_weights_path': self.qcd_weights_path
+            "val_split": self.validation_data_fraction,
+            "test_split": self.test_data_fraction,
+            "variables_to_drop": tuple(self.variables_to_drop),
+            "max_jets": self.max_jets,
+            "start_time": str(self.start_timestamp),
+            "end_time": str(self.end_timestamp),
+            "qcd_weights_path": self.qcd_weights_path
         }
         
         return summary_dict

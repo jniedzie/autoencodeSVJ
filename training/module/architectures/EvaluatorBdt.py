@@ -100,7 +100,7 @@ class EvaluatorBdt:
 
     def __get_data(self, data_path, is_background, data_processor, data_loader, summary):
     
-        (data, _, _) = data_loader.load_all_data(data_path, "")
+        data = data_loader.get_data(data_path, "")
         (_, _, data_X_test) = data_processor.split_to_train_validate_test(data_table=data)
     
         fun = np.zeros if is_background else np.ones

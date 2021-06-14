@@ -8,7 +8,8 @@ import numpy as np
 
 
 class DataTable:
-    """Wrapper for the pandas data table.
+    """
+    Wrapper for the pandas data table, allowing data normalization and providing additional columns manipulations.
     """
     
     class NormTypes(Enum):
@@ -19,12 +20,19 @@ class DataTable:
 
     table_count = 0
     
-    def __init__(self, data, headers=None, name=None):
+    def __init__(self, data, headers=None):
+        """ DataTable constructor.
         
-        self.name = name or "untitled {}".format(DataTable.table_count)
+        Args:
+            data: Data to be put in this data table (supports multiple types)
+            headers: (Optional) Names of columns
+        """
+        
+        self.name = "Table {}".format(DataTable.table_count)
         self.scaler = None
         DataTable.table_count += 1
         
+        # TODO: this can clearly be further simplified...
         if headers is not None:
             self.headers = headers
             data = np.asarray(data)
@@ -38,13 +46,6 @@ class DataTable:
             self.headers = data.headers
             self.data = data.df.values
             self.name = data.name
-        else:
-            data = np.asarray(data)
-            if len(data.shape) < 2:
-                data = np.expand_dims(data, 1)
-            
-            self.headers = ["dist " + str(i + 1) for i in range(data.shape[1])]
-            self.data = data
         
         assert len(self.data.shape) == 2, "data must be matrix!"
         assert len(self.headers) == self.data.shape[1], "n columns must be equal to n column headers"
@@ -103,10 +104,7 @@ class DataTable:
             scaler = self.scaler
         
         data = scaler.inverse_transform(self.df) if inverse else scaler.transform(self.df)
-        name = "{} inverse normed" if inverse else "{} norm"
-        name = name.format(self.name)
-        
-        return DataTable(pd.DataFrame(data, columns=self.df.columns, index=self.df.index), name=name)
+        return DataTable(pd.DataFrame(data, columns=self.df.columns, index=self.df.index))
 
     def drop_columns(self, columns_to_drop):
         """ Removes specified columns from this data table
@@ -120,19 +118,18 @@ class DataTable:
         self.headers = list(self.df.columns)
         self.data = np.asarray(self.df)
 
-    def merge_columns(self, other, out_name):
+    def merge_columns(self, other):
         """ Appends columns of other data table to this one
 
         Args:
             other (DataTable): Data table to append to this one
-            out_name (str): Name of the output data table
 
         Returns:
             (DataTable): Merged data table
         """
     
         assert self.shape[0] == other.shape[0], 'data tables must have same number of samples'
-        return DataTable(self.df.join(other.df), name=out_name)
+        return DataTable(self.df.join(other.df))
         
     def __find_matching_names(self, input_list):
         """ Finds elements of provided list matching names of columns in this data table.
@@ -153,7 +150,7 @@ class DataTable:
         return list(match)
     
     def __update_column_names(self):
-        """ Adds 'efp' prefix to EFP columns and makes decodes byte strings for other columns.
+        """ Adds 'efp' prefix to EFP columns and decodes byte strings for other columns.
         """
         
         new_names = dict()

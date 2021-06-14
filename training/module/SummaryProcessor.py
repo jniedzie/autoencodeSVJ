@@ -59,7 +59,7 @@ def get_summaries_from_path(path):
         print("WARNING - no summary files found!!")
         return None
     
-    return DataTable(pd.DataFrame(data), name='summary')
+    return DataTable(pd.DataFrame(data))
 
 
 def get_summary_from_path(path):
@@ -68,7 +68,7 @@ def get_summary_from_path(path):
         data = json.load(to_read)
         data['time'] = datetime.datetime.fromtimestamp(os.path.getmtime(path))
     
-    return DataTable(pd.DataFrame([data]), name='summary')
+    return DataTable(pd.DataFrame([data]))
 
 def get_last_summary_file_version(summary_path, filename):
     summary_search_path = summary_path + filename + "_v*"

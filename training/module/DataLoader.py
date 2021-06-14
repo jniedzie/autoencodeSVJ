@@ -10,82 +10,53 @@ from module.DataTable import DataTable
 
 class DataLoader:
     """
-    data loader/handler/merger for h5 files with the general format of this repository
+    Allows to load data from h5 files as data table, dropping unused variables and limiting number of jets per event.
     """
     
-    def __init__(self, name=""):
-        self.name = name
-        self.samples = OrderedDict()
+    def __init__(self, variables_to_drop, max_jets):
+        """ DataLoader constructor.
+        
+        Args:
+            variables_to_drop (List[str]): List of variables to drop.
+            max_jets (int): Maximum number of jets per event to load.
+        """
+        
+        self.variables_to_drop = variables_to_drop
+        self.max_jets = max_jets
+        
         self.sample_keys = None
         self.data = OrderedDict()
         self.labels = OrderedDict()
         self.weights = {}
-
-        self.include_hlf = None
-        self.include_epf = None
-        self.include_constituents = None
-        self.hlf_to_drop = None
-        self.efp_to_drop = None
-        self.constituents_to_drop = None
-        self.max_jets = None
-
-    def set_params(self,
-                   include_hlf, include_efp, include_constituents,
-                   hlf_to_drop, efp_to_drop, constituents_to_drop, max_jets):
-        self.include_hlf = include_hlf
-        self.include_epf = include_efp
-        self.include_constituents = include_constituents
-        self.hlf_to_drop = hlf_to_drop
-        self.efp_to_drop = efp_to_drop
-        self.constituents_to_drop = constituents_to_drop
-        self.max_jets = int(max_jets)
+        self.already_added_paths = []
         
-    def load_all_data(self, data_path, name, weights_path=None):
-        """
+    def get_data(self, data_path, name, weights_path=None, per_event=False):
+        """ Loads data from provided path and returns as a data table
         Args:
             data_path (str): Path to data to load (can contain wildcards)
-            name (str): desc
-            weights_path (str): desc
+            name (str): Output data table name
+            weights_path (str): If specified, will load weights histogram and calculate weights that can be later
+                                accessed via self.weights
+            per_event (Bool): If true, data table will be organized per-event rather than per-jet
 
         Returns:
-            (tuple): tuple containing:
-                servers(list) servers to use
-                msg (str): logging message string
+            (DataTable)
         """
+
+        keys_to_skip = [] if per_event else ["event_features"]
     
-        to_include = []
-        if self.include_hlf:
-            to_include.append("jet_features")
+        for f in DataLoader.__get_files_from_path(data_path):
+            self.__add_sample(f, keys_to_skip)
     
-        if self.include_epf:
-            to_include.append("jet_eflow_variables")
-
-        if self.include_constituents:
-            to_include.append("jet_constituents")
-
-        if not (self.include_hlf or self.include_epf):
-            raise AttributeError
+        if per_event:
+            data = self.__make_table("event_features")
+        else:
+            data = self.__make_tables()
+            data.drop(data[data.Eta == 0].index, inplace=True)  # removes empty jets
+            self.__calculate_weights(data, weights_path, name)
+            data.drop_columns(self.variables_to_drop)
     
-        files = glob(data_path)
-
-        if len(files) == 0:
-            print("\n\nERROR -- no files found in ", data_path, "\n\n")
-            raise AttributeError
-        
-        for f in files:
-            self.__add_sample(f)
-    
-        event = self.__make_table('event_features', name + ' event features')
-
-        data = self.__make_tables(to_include, name)
-        data.drop(data[data.Eta == 0].index, inplace=True)
-        
-        self.__calculate_weights(data, weights_path, name)
-        
-        columns_to_drop = ['efp 0'] + self.hlf_to_drop + self.efp_to_drop + self.constituents_to_drop
-        data.drop_columns(columns_to_drop)
-
-        return data, event
+        return data
 
     def __calculate_weights(self, data, weights_path, name):
         """ Calculates jet weights and stores them in self.weights
@@ -109,25 +80,24 @@ class DataLoader:
         print("done")
         self.weights[name] = np.array(weights)
     
-    def __add_sample(self, sample_path):
+    def __add_sample(self, sample_path, keys_to_skip):
         """
+        Adds data from h5 file to self.samples dict. Stores h5 keys in self.sample_keys, or checks that
+        they are consistent with the existing ones.
         
         Args:
-            sample_path (str):
-
-        Returns:
-            (void)
+            sample_path (str): Path to h5 file to be added.
         """
         
-        if sample_path in self.samples:
+        if sample_path in self.already_added_paths:
             return
             
-        with h5py.File(sample_path, mode="r") as f:
+        with h5py.File(sample_path, mode="r") as h5_file:
             
             print("Adding sample ", sample_path)
-            self.samples[sample_path] = f
+            self.already_added_paths.append(sample_path)
             
-            keys = set(f.keys())
+            keys = set(h5_file.keys())
             
             if self.sample_keys is None:
                 self.sample_keys = keys
@@ -135,23 +105,35 @@ class DataLoader:
                 print("ERROR -- different h5 samples seem to have different groups/keys")
                 exit()
             
-            self.__update_data(f)
+            self.__add_data_and_labels(h5_file, keys_to_skip)
     
-    def __make_table(self, key, name=None):
-        """ stack, combine, or split """
+    def __make_table(self, key):
+        """
+        Creates a data table for given key, reshaping depending on whether these are event-level, jet-level
+        or constituent-level variables.
+        
+        Args:
+            key (str): Key to process (e.g. jet_features)
+
+        Returns:
+            (DataTable): Properly shaped data table
+        """
         assert key in self.sample_keys
         
         data = self.data[key]
         labels = self.labels[key]
-        name = name or self.name
         
         if len(data.shape) == 1:
-            return DataTable(np.expand_dims(data, 1), headers=labels, name=name)
+            # some per-sample variables (?)
+            return DataTable(np.expand_dims(data, 1), headers=labels)
         elif len(data.shape) == 2:
-            return DataTable(data, headers=labels, name=name)
+            # events features (?)
+            return DataTable(data, headers=labels)
         elif len(data.shape) == 3:
-            return DataTable(np.vstack(data), headers=labels, name=name)
+            # jet features
+            return DataTable(np.vstack(data), headers=labels)
         elif len(data.shape) == 4:
+            # jet constituents
 
             constituents_labels = []
             for i_constituent in range(len(data[0][0])):
@@ -163,50 +145,94 @@ class DataLoader:
             stacked_data = np.vstack(stacked_data)
             stacked_data = stacked_data.transpose()
 
-            return DataTable(stacked_data, headers=constituents_labels, name=name)
-
+            return DataTable(stacked_data, headers=constituents_labels)
         else:
             raise AttributeError
     
-    def __make_tables(self, key_list, name):
-        """Prepares a table containing all information matching provided key_list
+    def __make_tables(self):
+        """Prepares a table containing all jet-level information
         
-        Args:
-            key_list (list): List of h5 file keys to include in the output table
-            name: Name of the output table
-
         Returns:
-            (DataTable): Table containing all information matching provided key_list
+            (DataTable): Table containing all jet-level information
         """
         
-        tables = [self.__make_table(k) for k in key_list]
+        tables = [self.__make_table(k) for k in self.sample_keys if k != "event_features"]
 
         ret, tables = tables[0], tables[1:]
         for table in tables:
-            ret = ret.merge_columns(table, name)
+            ret = ret.merge_columns(table)
         return ret
        
-    def __update_data(self, sample_file):
+    def __add_data_and_labels(self, h5_file, keys_to_skip):
+        """ Adds data and labels (variable names) from h5 file
         
-        for key in sample_file.keys():
-            if 'data' not in sample_file[key] or 'labels' not in sample_file[key]:
-                print("ERROR -- group ", key, " doesn't contain 'data' or 'labels'")
-                exit()
+        Args:
+            h5_file: h5 file to be added
+        """
+        keys = [k for k in h5_file.keys() if k not in keys_to_skip]
+        
+        for key in keys:
+            DataLoader.__check_file_ok(h5_file, key)
             
             if key not in self.labels:
-                self.labels[key] = np.asarray(sample_file[key]['labels'])
-            else:
-                assert (self.labels[key] == np.asarray(sample_file[key]['labels'])).all()
+                self.labels[key] = np.asarray(h5_file[key]['labels'])
 
-            sample_data = sample_file[key]['data']
-
-            if key == "jet_features" or key == "jet_eflow_variables":
-                sample_data = sample_data[:, 0:self.max_jets, :]
-
-            if key == "jet_constituents":
-                sample_data = sample_data[:, 0:self.max_jets, :, :]
-
+            sample_data = h5_file[key]['data']
+            sample_data = self.__h5_to_array(sample_data, key)
+            
             if key not in self.data:
                 self.data[key] = np.asarray(sample_data)
             else:
                 self.data[key] = np.concatenate([self.data[key], sample_data])
+
+    def __h5_to_array(self, data, key):
+        """ Converts h5 dataset to array, limiting number of jets per event to self.max_jets
+        
+        Args:
+            data: Input h5 dataset
+            key (str): h5 group this dataset belongs to
+
+        Returns:
+            (np.ndarray)
+        """
+        
+        if key in ["jet_features", "jet_eflow_variables"]:
+            return data[:, 0:self.max_jets, :]
+        if key == "jet_constituents":
+            return data[:, 0:self.max_jets, :, :]
+
+        print("ERROR -- no known way to reshape group ", key)
+        exit()
+
+    @staticmethod
+    def __check_file_ok(h5_file, key):
+        """ Verifies that h5 file looks healthy for given key. If not, quits application.
+        Args:
+            h5_file: h5 file to test
+            key (str): h5 key to check
+        """
+        
+        if 'data' not in h5_file[key] or 'labels' not in h5_file[key]:
+            print("ERROR -- group ", key, " doesn't contain 'data' or 'labels'")
+            exit()
+
+    @staticmethod
+    def __get_files_from_path(path):
+        """
+        Returns global paths to files from provided path (can contain wildcards).
+        If no files were found, quits application.
+        
+        Args:
+            path (str): Path to files
+
+        Returns:
+            (List[str]): List of global paths to files
+        """
+        
+        files = glob(path)
+    
+        if len(files) == 0:
+            print("ERROR -- no files found in ", path)
+            exit()
+            
+        return files
