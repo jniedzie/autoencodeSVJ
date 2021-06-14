@@ -1,52 +1,47 @@
-from module.DataTable import DataTable
-
+from pathlib import Path
 import os
 import json
-import glob
+from glob import glob
 import datetime
+
 import pandas as pd
 
-from collections import OrderedDict
-from pathlib import Path
+from module.DataTable import DataTable
 
 
-def dump_summary_json(*dicts, output_path):
-    summary_dict = OrderedDict()
+def dump_summary_json(summary_dict, output_path):
+    """
     
-    for d in dicts:
-        summary_dict.update(d)
+    Stores dictionary in a JSON file. If path doesn't exist, it will be created.
+    The full summary path will be added to the dictionary before saving.
     
-    assert 'training_output_path' in summary_dict, 'NEED to include a filename arg, so we can save the dict!'
+    Args:
+        summary_dict (dict[str, Any]): Dictionary to be dumped to json.
+        output_path (str): Output path.
+    """
     
     if not os.path.exists(output_path):
         Path(output_path).mkdir(parents=True, exist_ok=False)
     
-    fpath = os.path.join(output_path, summary_dict['training_output_path'].split("/")[-1] + '.summary')
-    
-    print("summary path: ", fpath)
-    
-    if os.path.exists(fpath):
-        newpath = fpath
-        
-        while os.path.exists(newpath):
-            newpath = fpath.replace(".summary", "_1.summary")
-        
-        # just a check
-        assert not os.path.exists(newpath)
-        fpath = newpath
-    
-    summary_dict['summary_path'] = fpath
+    summary_path = os.path.join(output_path, summary_dict["training_output_path"].split("/")[-1] + ".summary")
+    summary_dict["summary_path"] = summary_path
 
-    
-    
-    with open(fpath, "w+") as f:
+    with open(summary_path, "w+") as f:
         json.dump(summary_dict, f)
-    
-    return summary_dict
 
 
 def get_summaries_from_path(path):
-    files = glob.glob(path + "/*.summary")
+    """
+    Builds a data table containing all summaries from given path.
+    
+    Args:
+        path (str): Summaries path (can contain wild cards)
+
+    Returns:
+        (DataTable): Data table with all summaries from specified path
+    """
+    
+    files = glob(path + "/*.summary")
     
     data = []
     for f in files:
@@ -62,41 +57,34 @@ def get_summaries_from_path(path):
     return DataTable(pd.DataFrame(data))
 
 
-def get_summary_from_path(path):
-    
-    with open(path) as to_read:
-        data = json.load(to_read)
-        data['time'] = datetime.datetime.fromtimestamp(os.path.getmtime(path))
-    
-    return DataTable(pd.DataFrame([data]))
-
 def get_last_summary_file_version(summary_path, filename):
+    """
+    Finds version number of the most recent summary in given path matching given file name
+    Args:
+        summary_path (str): Path to summaries directory (can contain wildcards)
+        filename (str): Base name of summary files (without extension and version, can contain wildcards)
+
+    Returns:
+        (int): latest summary version number
+    """
+    
     summary_search_path = summary_path + filename + "_v*"
-    summary_files = glob.glob(summary_search_path)
+    summary_files = glob(summary_search_path)
     
-    existing_ids = []
-    
-    for file in summary_files:
-        version_number = os.path.basename(file).rstrip('.summary').split('_')[-1].lstrip('v')
-        
-        existing_ids.append(int(version_number))
-    
+    existing_ids = [get_version(s) for s in summary_files]
     assert len(existing_ids) == len(set(existing_ids)), "no duplicate ids"
-    id_set = set(existing_ids)
-    version = 0
-    while version in id_set:
-        version += 1
     
-    return version - 1
+    return len(existing_ids) - 1
 
 
 def get_version(summary_path):
+    """ Finds summary version number.
+    
+    Args:
+        summary_path (str): Full path to summary
+
+    Returns:
+        (int): Summary version number
+    """
+    
     return int(os.path.basename(summary_path).rstrip('.summary').split('_')[-1].lstrip('v'))
-
-
-def get_latest_summary_file_path(summaries_path, file_name_base, version=None):
-    if version is None:
-        version = get_last_summary_file_version(summaries_path, file_name_base)
-
-    input_summary_path = summaries_path+"/{}_v{}.summary".format(file_name_base, version)
-    return input_summary_path

@@ -66,13 +66,13 @@ class TrainerAutoEncoderBase:
         print("Trainer scaler: ", self.norm_type)
         print("Trainer scaler args: ", self.norm_args)
         
-        self.train_data_normalized = DataProcessor.normalize(data_table=self.train_data,
-                                                                   normalization_type=self.norm_type,
-                                                                   norm_args=self.norm_args)
+        self.train_data_normalized = DataProcessor.normalize(data=self.train_data,
+                                                             normalization_type=self.norm_type,
+                                                             norm_args=self.norm_args)
         
-        self.validation_data_normalized = DataProcessor.normalize(data_table=self.validation_data,
-                                                                        normalization_type=self.norm_type,
-                                                                        norm_args=self.norm_args)
+        self.validation_data_normalized = DataProcessor.normalize(data=self.validation_data,
+                                                                  normalization_type=self.norm_type,
+                                                                  norm_args=self.norm_args)
     
     def train(self):
         """
@@ -114,8 +114,6 @@ class TrainerAutoEncoderBase:
         summary_dict = {
             'training_output_path': self.training_output_path,
             'qcd_path': self.qcd_path,
-            'include_hlf': True,
-            'include_efp': True,
             'efp_base': self.efp_base,
             'norm_type': self.norm_type,
             'norm_args': self.norm_args,

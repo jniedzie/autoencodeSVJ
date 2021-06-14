@@ -1,4 +1,5 @@
-import glob, os
+import glob
+import os
 import tensorflow as tf
 import keras
 from keras.models import model_from_json
@@ -38,7 +39,7 @@ class EvaluatorAutoEncoder:
             (_, _, self.qcd_data) = data_processor.split_to_train_validate_test(self.qcd_data)
 
         if normalize:
-            self.qcd_data = DataProcessor.normalize(data_table=self.qcd_data,
+            self.qcd_data = DataProcessor.normalize(data=self.qcd_data,
                                             normalization_type=summary.norm_type,
                                             norm_args=summary.norm_args)
         
@@ -52,7 +53,7 @@ class EvaluatorAutoEncoder:
             (_, _, data) = data_processor.split_to_train_validate_test(data)
         
         if normalize:
-            data = DataProcessor.normalize(data_table=data,
+            data = DataProcessor.normalize(data=data,
                                             normalization_type=summary.norm_type,
                                             norm_args=summary.norm_args,
                                             scaler=scaler)
@@ -61,10 +62,10 @@ class EvaluatorAutoEncoder:
         
     def get_reconstruction(self, input_data, summary, data_processor, scaler):
     
-        input_data_normed = DataProcessor.normalize(data_table=input_data,
-                                                     normalization_type=summary.norm_type,
-                                                     norm_args=summary.norm_args,
-                                                     scaler=scaler)
+        input_data_normed = DataProcessor.normalize(data=input_data,
+                                                    normalization_type=summary.norm_type,
+                                                    norm_args=summary.norm_args,
+                                                    scaler=scaler)
 
         model = self.__load_model(summary)
         
@@ -73,22 +74,24 @@ class EvaluatorAutoEncoder:
                                      index=input_data_normed.index,
                                      dtype="float64")
 
+        reconstructed = DataTable(reconstructed)
+
         descaler = input_data.scaler if scaler is None else scaler
 
-        reconstructed_denormed = DataProcessor.normalize(data_table=reconstructed,
-                                                          normalization_type=summary.norm_type,
-                                                          norm_args=summary.norm_args,
-                                                          scaler=descaler,
-                                                          inverse=True)
+        reconstructed_denormed = DataProcessor.normalize(data=reconstructed,
+                                                         normalization_type=summary.norm_type,
+                                                         norm_args=summary.norm_args,
+                                                         scaler=descaler,
+                                                         inverse=True)
         
         return reconstructed_denormed
 
-    def get_latent_space_values(self, input_data, summary, data_processor, scaler):
-
-        input_data_normed = DataProcessor.normalize(data_table=input_data,
-                                                     normalization_type=summary.norm_type,
-                                                     norm_args=summary.norm_args,
-                                                     scaler=scaler)
+    def get_latent_space_values(self, input_data, summary, scaler):
+    
+        input_data_normed = DataProcessor.normalize(data=input_data,
+                                                    normalization_type=summary.norm_type,
+                                                    norm_args=summary.norm_args,
+                                                    scaler=scaler)
 
         model = self.__load_model(summary)
 

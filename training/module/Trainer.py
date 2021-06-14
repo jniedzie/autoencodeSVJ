@@ -1,13 +1,15 @@
-from module.DataProcessor import DataProcessor
-from module.DataLoader import DataLoader
-import module.SummaryProcessor as summaryProcessor
-import module.utils as utils
-
-import numpy as np
 import datetime
 from pathlib import Path
-import os, pickle
+import os
+import pickle
+
+import numpy as np
 import tensorflow as tf
+
+from module.DataProcessor import DataProcessor
+from module.DataLoader import DataLoader
+from module.SummaryProcessor import dump_summary_json
+import module.utils as utils
 
 
 class Trainer:
@@ -72,8 +74,8 @@ class Trainer:
 
         summary_dict = self.model_trainer.get_summary()
         summary_dict = {**summary_dict, **self.__get_summary()}
-        summaryProcessor.dump_summary_json(summary_dict, output_path=summaries_path)
-      
+        dump_summary_json(summary_dict, output_path=summaries_path)
+    
     def __save_model(self):
         """
         Attempts to save the model using different approaches

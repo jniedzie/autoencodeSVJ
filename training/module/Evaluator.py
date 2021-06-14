@@ -203,8 +203,7 @@ class Evaluator:
 
     def get_latent_space_values(self, input_data, summary, scaler=None):
         utils.set_random_seed(summary.seed)
-        data_processor = DataProcessor(summary=summary)
-        return self.model_evaluator.get_latent_space_values(input_data, summary, data_processor, scaler)
+        return self.model_evaluator.get_latent_space_values(input_data, summary, scaler)
 
     def __get_data_loader(self, summary):
         return DataLoader(summary.variables_to_drop, summary.max_jets)
