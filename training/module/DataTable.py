@@ -10,6 +10,7 @@ import numpy as np
 class DataTable:
     """
     Wrapper for the pandas data table, allowing data normalization and providing additional columns manipulations.
+    It can also store weights for rows in the table.
     """
     
     class NormTypes(Enum):
@@ -58,6 +59,7 @@ class DataTable:
             self.df = pd.DataFrame(self.data, columns=self.headers)
             
         self.__update_column_names()
+        self.weights = None
     
     def __getattr__(self, attr):
         if hasattr(self.df, attr):

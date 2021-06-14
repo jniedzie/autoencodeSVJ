@@ -1,7 +1,8 @@
-from sklearn.decomposition import PCA
-
 import pandas as pd
 import numpy as np
+from sklearn.decomposition import PCA
+
+from module.DataProcessor import DataProcessor
 
 
 class TrainerPca:
@@ -104,11 +105,11 @@ class TrainerPca:
         print("Trainer scaler: ", self.norm_type)
         print("Trainer scaler args: ", self.norm_args)
         
-        self.train_data_normalized = self.data_processor.normalize(data_table=self.train_data,
+        self.train_data_normalized = DataProcessor.normalize(data_table=self.train_data,
                                                                    normalization_type=self.norm_type,
                                                                    norm_args=self.norm_args)
 
-        self.validation_data_normalized = self.data_processor.normalize(data_table=self.validation_data,
+        self.validation_data_normalized = DataProcessor.normalize(data_table=self.validation_data,
                                                                         normalization_type=self.norm_type,
                                                                         norm_args=self.norm_args)
 

@@ -27,7 +27,6 @@ class DataLoader:
         self.sample_keys = None
         self.data = OrderedDict()
         self.labels = OrderedDict()
-        self.weights = {}
         self.already_added_paths = []
         
     def get_data(self, data_path, name, weights_path=None, per_event=False):
@@ -68,7 +67,7 @@ class DataLoader:
         """
         
         if weights_path is None or weights_path == "":
-            self.weights[name] = None
+            data.weights = None
             return
     
         weights_file = TFile.Open(weights_path)
@@ -78,7 +77,7 @@ class DataLoader:
         weights = [weights_hist.GetBinContent(weights_hist.GetXaxis().FindFixBin(entry.Pt)) for _, entry in
                    data.df.iterrows()]
         print("done")
-        self.weights[name] = np.array(weights)
+        data.weights = np.array(weights)
     
     def __add_sample(self, sample_path, keys_to_skip):
         """

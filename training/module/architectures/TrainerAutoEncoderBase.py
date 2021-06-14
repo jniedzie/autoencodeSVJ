@@ -1,9 +1,9 @@
 import numpy as np
 
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TerminateOnNaN, ModelCheckpoint, CSVLogger
-from ROOT import TFile
 
 from module.DataLoader import DataLoader
+from module.DataProcessor import DataProcessor
 
 
 class TrainerAutoEncoderBase:
@@ -55,9 +55,8 @@ class TrainerAutoEncoderBase:
         Loading and splitting the data for the training, using data loader and data processor.
         """
         self.qcd = self.data_loader.get_data(self.qcd_path, "QCD")
-        self.weights = self.data_loader.weights["QCD"]
-        (self.train_data, self.validation_data, _, self.weights, _, _) = self.data_processor.split_to_train_validate_test(
-            data_table=self.qcd, weights=self.weights)
+        
+        (self.train_data, self.validation_data, _) = self.data_processor.split_to_train_validate_test(self.qcd)
         
     def __normalize_data(self):
         """
@@ -67,11 +66,11 @@ class TrainerAutoEncoderBase:
         print("Trainer scaler: ", self.norm_type)
         print("Trainer scaler args: ", self.norm_args)
         
-        self.train_data_normalized = self.data_processor.normalize(data_table=self.train_data,
+        self.train_data_normalized = DataProcessor.normalize(data_table=self.train_data,
                                                                    normalization_type=self.norm_type,
                                                                    norm_args=self.norm_args)
         
-        self.validation_data_normalized = self.data_processor.normalize(data_table=self.validation_data,
+        self.validation_data_normalized = DataProcessor.normalize(data_table=self.validation_data,
                                                                         normalization_type=self.norm_type,
                                                                         norm_args=self.norm_args)
     
@@ -101,7 +100,7 @@ class TrainerAutoEncoderBase:
             batch_size=self.training_params["batch_size"],
             verbose=self.verbose,
             callbacks=callbacks,
-            sample_weight = self.weights
+            sample_weight = self.train_data_normalized.weights
         )
         
         print("\ntrained {} epochs!", self.training_params["epochs"], "\n")

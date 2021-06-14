@@ -43,7 +43,7 @@ class Evaluator:
             if test_file_name not in filename:
                 continue
 
-            weights[filename] = self.model_evaluator.get_weights(summary)
+            weights[filename] = self.model_evaluator.get_model_weights(summary)
     
         return weights
     

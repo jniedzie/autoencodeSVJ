@@ -3,6 +3,8 @@ import pandas as pd
 
 from sklearn.ensemble import AdaBoostClassifier
 
+from module.DataProcessor import DataProcessor
+
 
 class TrainerBdt:
     
@@ -64,8 +66,8 @@ class TrainerBdt:
         QCD = self.data_loader.get_data(self.qcd_path, "QCD")
         SVJ = self.data_loader.get_data(self.signal_path, "SVJ")
         
-        (QCD_X_train, _, _) = self.data_processor.split_to_train_validate_test(data_table=QCD)
-        (SVJ_X_train, _, _) = self.data_processor.split_to_train_validate_test(data_table=SVJ)
+        (QCD_X_train, _, _) = self.data_processor.split_to_train_validate_test(QCD)
+        (SVJ_X_train, _, _) = self.data_processor.split_to_train_validate_test(SVJ)
         
         SVJ_Y_train = pd.DataFrame(np.ones((len(SVJ_X_train.df), 1)), index=SVJ_X_train.index, columns=['tag'])
         QCD_Y_train = pd.DataFrame(np.zeros((len(QCD_X_train.df), 1)), index=QCD_X_train.index, columns=['tag'])
@@ -81,7 +83,7 @@ class TrainerBdt:
         print("Trainer scaler: ", self.norm_type)
         print("Trainer scaler args: ", self.norm_args)
     
-        self.train_data_normalized = self.data_processor.normalize(data_table=self.train_data,
+        self.train_data_normalized = DataProcessor.normalize(data_table=self.train_data,
                                                                    normalization_type=self.norm_type,
                                                                    norm_args=self.norm_args)
     

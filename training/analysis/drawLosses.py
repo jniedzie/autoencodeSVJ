@@ -40,6 +40,7 @@ def get_loss_histograms(background_data, signals_data, suffix="", qcd_weights=No
 def get_qcd_and_signal_losses(summary, evaluator):
     qcd_data = evaluator.get_qcd_data(summary=summary, test_data_only=True)
     qcd_loss = evaluator.get_error(qcd_data, summary=summary)
+    qcd_weights = qcd_data.weights
     
     scaler = qcd_data.scaler
 
@@ -50,14 +51,13 @@ def get_qcd_and_signal_losses(summary, evaluator):
         signal_loss = evaluator.get_error(signal_data, summary=summary, scaler=scaler)
         signals_losses.append(signal_loss)
     
-    return qcd_loss, signals_losses
+    return qcd_loss, signals_losses, qcd_weights
 
 
 def draw_plots(summary, evaluator):
     version = summaryProcessor.get_version(summary.summary_path)
     
-    qcd_loss, signals_losses = get_qcd_and_signal_losses(summary, evaluator)
-    qcd_weights = evaluator.get_qcd_weights(summary=summary, test_data_only=True)
+    qcd_loss, signals_losses, qcd_weights = get_qcd_and_signal_losses(summary, evaluator)
     
     hist_background, hists_signal = get_loss_histograms(qcd_loss, signals_losses, suffix="v"+str(version), qcd_weights=qcd_weights)
     

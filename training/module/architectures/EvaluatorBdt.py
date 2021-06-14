@@ -101,7 +101,7 @@ class EvaluatorBdt:
     def __get_data(self, data_path, is_background, data_processor, data_loader, summary):
     
         data = data_loader.get_data(data_path, "")
-        (_, _, data_X_test) = data_processor.split_to_train_validate_test(data_table=data)
+        (_, _, data_X_test) = data_processor.split_to_train_validate_test(data)
     
         fun = np.zeros if is_background else np.ones
         data_Y_test = pd.DataFrame(fun((len(data_X_test.df), 1)), index=data_X_test.index, columns=['tag'])

@@ -1,13 +1,15 @@
-import glob, os
+import glob
+import os
+import pickle
+
+import pandas as pd
+import numpy as np
 import tensorflow as tf
-import keras
 from keras.models import model_from_json
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
-import pandas as pd
-import pickle
 
-import numpy as np
+from module.DataProcessor import DataProcessor
 
 
 class EvaluatorPca:
@@ -27,7 +29,7 @@ class EvaluatorPca:
             (_, _, data) = data_processor.split_to_train_validate_test(data)
 
         if normalize:
-            data = data_processor.normalize(data_table=data,
+            data = DataProcessor.normalize(data_table=data,
                                             normalization_type=summary.norm_type,
                                             norm_args=summary.norm_args)
         
@@ -41,7 +43,7 @@ class EvaluatorPca:
             (_, _, data) = data_processor.split_to_train_validate_test(data)
         
         if normalize:
-            data = data_processor.normalize(data_table=data,
+            data = DataProcessor.normalize(data_table=data,
                                             normalization_type=summary.norm_type,
                                             norm_args=summary.norm_args,
                                             scaler=scaler)
@@ -50,7 +52,7 @@ class EvaluatorPca:
         
     def get_reconstruction(self, input_data, summary, data_processor, scaler):
     
-        input_data_normed = data_processor.normalize(data_table=input_data,
+        input_data_normed = DataProcessor.normalize(data_table=input_data,
                                                      normalization_type=summary.norm_type,
                                                      norm_args=summary.norm_args,
                                                      scaler=scaler)

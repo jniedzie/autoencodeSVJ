@@ -8,6 +8,7 @@ import pandas as pd
 import pickle
 
 from module.DataLoader import DataLoader
+from module.DataProcessor import *
 from module.architectures.DenseTiedLayer import DenseTiedLayer
 
 
@@ -22,9 +23,8 @@ class EvaluatorAutoEncoder:
             self.signal_dict[key] = path
 
         self.qcd_data = None
-        self.qcd_test_weights = None
     
-    def get_weights(self, summary):
+    def get_model_weights(self, summary):
         model = self.__load_model(summary)
         return model.get_weights()
 
@@ -33,47 +33,26 @@ class EvaluatorAutoEncoder:
         self.qcd_data = data_loader.get_data(data_path=summary.qcd_path,
                                              name="QCD",
                                              weights_path=summary.qcd_weights_path)
-        self.qcd_weights = data_loader.weights["QCD"]
         
         if test_data_only:
-            (_, _, self.qcd_data, _, _, self.qcd_test_weights) = data_processor.split_to_train_validate_test(self.qcd_data,
-                                                                                                             weights=self.qcd_weights)
+            (_, _, self.qcd_data) = data_processor.split_to_train_validate_test(self.qcd_data)
 
         if normalize:
-            self.qcd_data = data_processor.normalize(data_table=self.qcd_data,
+            self.qcd_data = DataProcessor.normalize(data_table=self.qcd_data,
                                             normalization_type=summary.norm_type,
                                             norm_args=summary.norm_args)
         
         return self.qcd_data
-
-    def get_qcd_weights(self, test_data_only=True):
-        """
-        Parameters
-        ----------
-        test_data_only: bool, optional
-            Get weights for test part of the data only
-        
-        Returns
-        -------
-        dict[str, float]
-            weights
-
-        """
-    
-        if test_data_only:
-            return self.qcd_test_weights
-    
-        return self.qcd_weights
     
     def get_signal_data(self, name, path, summary, data_processor, data_loader, normalize=False, scaler=None, test_data_only=True):
         
         data = data_loader.get_data(data_path=path, name=name)
         
         if test_data_only:
-            (_, _, data, _, _, _) = data_processor.split_to_train_validate_test(data)
+            (_, _, data) = data_processor.split_to_train_validate_test(data)
         
         if normalize:
-            data = data_processor.normalize(data_table=data,
+            data = DataProcessor.normalize(data_table=data,
                                             normalization_type=summary.norm_type,
                                             norm_args=summary.norm_args,
                                             scaler=scaler)
@@ -82,7 +61,7 @@ class EvaluatorAutoEncoder:
         
     def get_reconstruction(self, input_data, summary, data_processor, scaler):
     
-        input_data_normed = data_processor.normalize(data_table=input_data,
+        input_data_normed = DataProcessor.normalize(data_table=input_data,
                                                      normalization_type=summary.norm_type,
                                                      norm_args=summary.norm_args,
                                                      scaler=scaler)
@@ -96,7 +75,7 @@ class EvaluatorAutoEncoder:
 
         descaler = input_data.scaler if scaler is None else scaler
 
-        reconstructed_denormed = data_processor.normalize(data_table=reconstructed,
+        reconstructed_denormed = DataProcessor.normalize(data_table=reconstructed,
                                                           normalization_type=summary.norm_type,
                                                           norm_args=summary.norm_args,
                                                           scaler=descaler,
@@ -106,7 +85,7 @@ class EvaluatorAutoEncoder:
 
     def get_latent_space_values(self, input_data, summary, data_processor, scaler):
 
-        input_data_normed = data_processor.normalize(data_table=input_data,
+        input_data_normed = DataProcessor.normalize(data_table=input_data,
                                                      normalization_type=summary.norm_type,
                                                      norm_args=summary.norm_args,
                                                      scaler=scaler)
@@ -123,7 +102,6 @@ class EvaluatorAutoEncoder:
 
         return latent_values
 
-        
     def get_error(self, input_data, summary, data_processor, scaler):
         recon = self.get_reconstruction(input_data, summary, data_processor, scaler)
         
@@ -333,7 +311,7 @@ class EvaluatorAutoEncoder:
 
         background_errors = errors[test_key]
         background_labels = [0] * len(background_errors)
-        background_weights = self.get_qcd_weights(test_data_only=True)
+        background_weights = normed[test_key].weights
     
         if background_weights is None:
             background_weights = [1] * len(background_errors)
