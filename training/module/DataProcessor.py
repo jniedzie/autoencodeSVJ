@@ -1,7 +1,8 @@
-from module.DataTable import DataTable
+import numpy as np
 
 from sklearn.model_selection import train_test_split
-import numpy as np
+
+from module.DataTable import DataTable
 
 
 class DataProcessor():
@@ -50,38 +51,22 @@ class DataProcessor():
   
         return train_data, validation_data, test_data, train_weights, validation_weights, test_weights
 
-    def normalize(self, data_table, normalization_type, inverse=False,
-                  data_ranges=None, norm_args=None, means=None, stds=None,
-                  scaler=None):
+    def normalize(self, data_table, normalization_type, inverse=False, norm_args=None, scaler=None):
         
         if not isinstance(data_table, DataTable):
             data_table = DataTable(data_table)
         
-        if normalization_type == "Custom":
-            if data_ranges is None:
-                print("Custom normalization selected, but no data ranges were provided!")
-                exit(0)
-            
-            if not inverse:
-                return data_table.normalize_in_range(rng=data_ranges)
-            else:
-                return data_table.inverse_normalize_in_range(rng=data_ranges)
-        
-        elif normalization_type in ["RobustScaler", "MinMaxScaler", "StandardScaler", "MaxAbsScaler"]:
-            if scaler is None:
-                data_table.setup_scaler(norm_type=normalization_type, scaler_args=norm_args)
-                normalized = data_table.normalize(inverse=inverse)
-                normalized.scaler = data_table.scaler
-                return normalized
-            else:
-                return data_table.normalize(inverse=inverse, scaler=scaler)
-        elif normalization_type == "CustomStandard":
-            if means is None or stds is None:
-                print("Custom standard normalization selected, but means or stds not provided!")
-                exit(0)
-            return data_table.custom_standard_normalize(means=means, stds=stds, inverse=inverse)
-        elif normalization_type == "None":
+        if normalization_type == "None":
             return data_table
-        else:
-            print("ERROR -- Normalization not implemented: ", normalization_type)
-            exit(0)
+        
+        if normalization_type in ["RobustScaler", "MinMaxScaler", "StandardScaler", "MaxAbsScaler"]:
+            if scaler is not None:
+                return data_table.normalize(inverse=inverse, scaler=scaler)
+            
+            data_table.setup_scaler(norm_type=normalization_type, scaler_args=norm_args)
+            normalized = data_table.normalize(inverse=inverse)
+            normalized.scaler = data_table.scaler
+            return normalized
+        
+        print("ERROR -- Normalization not implemented: ", normalization_type)
+        exit(0)

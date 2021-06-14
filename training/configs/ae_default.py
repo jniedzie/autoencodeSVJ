@@ -53,7 +53,7 @@ training_general_settings = {
     "include_efp": True,
     "include_constituents": False,
     "hlf_to_drop": ['Energy', 'Flavor', "ChargedFraction", "Pt"],
-    "efp_to_drop": [str(i) for i in range(2, 13)],
+    "efp_to_drop": ["efp {}".format(i) for i in range(2, 13)],
     # "efp_to_drop": [],
     "constituents_to_drop": ["constituent_Rapidity_*", "constituent_Eta_*", "constituent_Phi_*"] + ["constituent_*_{}".format(i) for i in range(30, 150)],
     # "constituents_to_drop": [],
@@ -73,7 +73,8 @@ evaluation_general_settings = {
 # Path to training data
 efp_base = 3
 # qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/base_{}/*.h5".format(efp_base)
-qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents0_maxJets2/base_{}/*.h5".format(efp_base)
+# qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents0_maxJets2/base_{}/*.h5".format(efp_base)
+qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents0_maxJets2/base_{}/QCD_part_0.h5".format(efp_base)
 
 # signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/"
 signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents0_maxJets2/"
@@ -177,10 +178,6 @@ norm_type = "StandardScaler"
 
 # Set parameters for the selected normalization
 normalizations = {
-    # Custom implementation of robust scaler
-    "Custom": {
-        "norm_percentile": 25
-    },
     # https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html#sklearn.preprocessing.RobustScaler
     "RobustScaler": {
         "quantile_range": (0.25, 0.75),
@@ -202,9 +199,6 @@ normalizations = {
     # https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MaxAbsScaler.html#sklearn.preprocessing.MaxAbsScaler
     "MaxAbsScaler": {
         "copy": True,
-    },
-    # Custom implementation of the StandardScaler
-    "CustomStandard": {
     },
     # Don't apply any scaling at all
     "None": {

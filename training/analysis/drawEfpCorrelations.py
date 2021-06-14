@@ -29,15 +29,15 @@ saved_plots = []
 def get_plots_for_all_efp_combinations(data, suffix=""):
     plots = [[]]
 
-    eflow_variables = [int(x.replace("eflow ", "")) for x in data.keys() if "eflow" in x]
-    eflow_variables.sort()
+    efp_variables = [int(x.replace("efp ", "")) for x in data.keys() if "efp" in x]
+    efp_variables.sort()
 
-    for eflow_x in eflow_variables:
-        print("Preparing hists for eflow: ", eflow_x)
+    for efp_x in efp_variables:
+        print("Preparing hists for efp: ", efp_x)
         plots_row = []
 
-        for eflow_y in eflow_variables:
-            hist = get_histogram_2d(data, "eflow "+str(eflow_x), "eflow "+str(eflow_y), suffix)
+        for efp_y in efp_variables:
+            hist = get_histogram_2d(data, "efp "+str(efp_x), "efp "+str(efp_y), suffix)
             plots_row.append(hist)
         plots.append(plots_row)
     
@@ -47,8 +47,8 @@ def get_plots_for_all_efp_combinations(data, suffix=""):
 def drop_efp_variables(variables, min):
     new_variables = []
     for var in variables:
-        if "eflow" in var:
-            efp_number = int(var.replace("eflow ", ""))
+        if "efp" in var:
+            efp_number = int(var.replace("efp ", ""))
             if efp_number < min:
                 new_variables.append(var)
         else:

@@ -209,7 +209,7 @@ class Evaluator:
     def __get_data_loader(self, summary):
         data_loader = DataLoader()
         data_loader.set_params(include_hlf=summary.include_hlf,
-                               include_eflow=summary.include_efp,
+                               include_efp=summary.include_efp,
                                include_constituents=summary.include_constituents,
                                hlf_to_drop=summary.hlf_to_drop,
                                efp_to_drop=summary.efp_to_drop,

@@ -60,12 +60,11 @@ class Trainer:
                                        seed=self.seed)
 
         data_loader = DataLoader()
-        data_loader.set_params(include_hlf=include_hlf, include_eflow=include_efp,
+        data_loader.set_params(include_hlf=include_hlf, include_efp=include_efp,
                                include_constituents=include_constituents,
                                hlf_to_drop=hlf_to_drop, efp_to_drop=efp_to_drop,
                                constituents_to_drop=constituents_to_drop,
-                               max_jets=max_jets,
-                               qcd_weights_path=qcd_weights_path)
+                               max_jets=max_jets)
 
         # Initialize specialized trainer object
         self.model_trainer = self.model_class(data_processor=data_processor,

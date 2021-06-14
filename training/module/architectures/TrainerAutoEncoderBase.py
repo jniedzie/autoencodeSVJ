@@ -32,7 +32,7 @@ class TrainerAutoEncoderBase:
         self.qcd_path = qcd_path
         self.training_params = training_params
         self.training_output_path = training_output_path
-        self.EFP_base = EFP_base
+        self.efp_base = EFP_base
         self.norm_type = norm_type
         self.norm_args = norm_args
         self.verbose = verbose
@@ -51,8 +51,8 @@ class TrainerAutoEncoderBase:
         """
         Loading and splitting the data for the training, using data loader and data processor.
         """
-        (self.qcd, _, _) = self.data_loader.load_all_data(self.qcd_path, "QCD")
-        self.weights = self.data_loader.weights
+        (self.qcd, _) = self.data_loader.load_all_data(self.qcd_path, "QCD")
+        self.weights = self.data_loader.weights["QCD"]
         (self.train_data, self.validation_data, _, self.weights, _, _) = self.data_processor.split_to_train_validate_test(
             data_table=self.qcd, weights=self.weights)
         
@@ -112,9 +112,9 @@ class TrainerAutoEncoderBase:
         summary_dict = {
             'training_output_path': self.training_output_path,
             'qcd_path': self.qcd_path,
-            'hlf': True,
-            'eflow': True,
-            'eflow_base': self.EFP_base,
+            'include_hlf': True,
+            'include_efp': True,
+            'efp_base': self.efp_base,
             'norm_type': self.norm_type,
             'norm_args': self.norm_args,
             'input_dim': self.input_size,

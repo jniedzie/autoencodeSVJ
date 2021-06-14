@@ -111,7 +111,7 @@ class TrainerBdt:
         summary_dict = {
             'training_output_path': self.training_output_path,
             'qcd_path': self.qcd_path,
-            'eflow_base': self.EFP_base,
+            'efp_base': self.EFP_base,
             'norm_type': self.norm_type,
             'norm_args': self.norm_args,
         }

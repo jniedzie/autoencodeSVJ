@@ -12,7 +12,7 @@ bins = {
     "ChargedFraction": (0, 1, 100),
     "PTD": (0, 1, 100),
     "Axis2": (0, 0.2, 100),
-    "eflow": (0, 1, 100),
+    "efp": (0, 1, 100),
     "loss": (0.0, 30, 50),
     "latent": (-1, 4, 150),
 }
@@ -64,7 +64,7 @@ def __get_binning_for_variable(variable_name):
     Returns (n_bins, min, max) for a histogram, based on the variable name
     """
 
-    special_keys = ["eflow", "latent", "Eta", "Phi", "constituent_PT", "constituent_Energy", "Rapidity"]
+    special_keys = ["efp", "latent", "Eta", "Phi", "constituent_PT", "constituent_Energy", "Rapidity"]
 
     for key in special_keys:
         if key in variable_name:
