@@ -3,8 +3,8 @@
 
 //string weightsPath = "results/weights_qcd_flatPtHat_to_flatJetPt.root";
 //string weightsPath = "results/weights_qcd_flatPtHat_to_realisticJetPt_small_events10000_nBins100_maxPt3000.000000.root";
-string weightsPath = "results/weights_qcd_realisticQCD_to_realisticSVJ_small_events10000_nBins100_maxPt3000.000000.root";
-//string weightsPath = "results/weights_qcd_realistic_to_flatJetPt_events10000_nBins100_maxPt3000.000000.root";
+//string weightsPath = "results/weights_qcd_realisticQCD_to_realisticSVJ_small_events10000_nBins100_maxPt3000.000000.root";
+string weightsPath = "results/weights_qcd_realistic_to_flatJetPt_events100000_nBins100_maxPt2000.000000.root";
 
 
 //string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_cmssw/qcd/scoutingAtHlt/QCD_flat_ntuples_part0.root";
@@ -12,7 +12,8 @@ string weightsPath = "results/weights_qcd_realisticQCD_to_realisticSVJ_small_eve
 string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/delphes/qcd_highpT_13TeV_300.root";
 
 //string referencePath = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/delphes/qcd_highpT_13TeV_300.root";
-string referencePath = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/delphes/m3000_mD20_r30_alphapeak-HepMC_part-1.root";
+//string referencePath = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/delphes/m3000_mD20_r30_alphapeak-HepMC_part-1.root";
+string referencePath = "";
 
 int maxEvents = 10000;
 double minFitPt = 200;
@@ -198,9 +199,12 @@ void compareWeightedDists()
   fillHists(inputTree, values, weightsHist, fitFun);
   
   // Prepare reference hists
-  auto [referenceTree, isReferenceDelphes] = getTree(referencePath);
-  map<string, TLeaf*> valuesReference = getValues(referenceTree, isReferenceDelphes);
-  fillReferenceHists(referenceTree, valuesReference);
+  
+  if(referencePath != ""){
+    auto [referenceTree, isReferenceDelphes] = getTree(referencePath);
+    map<string, TLeaf*> valuesReference = getValues(referenceTree, isReferenceDelphes);
+    fillReferenceHists(referenceTree, valuesReference);
+  }
   
   TCanvas *canvasWeights = new TCanvas("canvasWeights", "canvasWeights", 800, 600);
   canvasWeights->Divide(1, 2);
