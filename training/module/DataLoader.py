@@ -3,7 +3,6 @@ from glob import glob
 
 import h5py
 import numpy as np
-from ROOT import TFile
 
 from module.DataTable import DataTable
 
@@ -13,7 +12,7 @@ class DataLoader:
     Allows to load data from h5 files as data table, dropping unused variables and limiting number of jets per event.
     """
     
-    def __init__(self, variables_to_drop, max_jets):
+    def __init__(self, variables_to_drop=None, max_jets=None, summary=None):
         """ DataLoader constructor.
         
         Args:
@@ -21,25 +20,28 @@ class DataLoader:
             max_jets (int): Maximum number of jets per event to load.
         """
         
-        self.variables_to_drop = variables_to_drop
-        self.max_jets = max_jets
+        if summary is not None:
+            self.variables_to_drop = summary.variables_to_drop
+            self.max_jets = summary.max_jets
+        else:
+            self.variables_to_drop = variables_to_drop
+            self.max_jets = max_jets
         
         self.sample_keys = None
         self.data = OrderedDict()
         self.labels = OrderedDict()
         self.already_added_paths = []
         
-    def get_data(self, data_path, name, weights_path=None, per_event=False):
+    def get_data(self, data_path, weights_path=None, per_event=False):
         """ Loads data from provided path and returns as a data table
         Args:
             data_path (str): Path to data to load (can contain wildcards)
-            name (str): Output data table name
             weights_path (str): If specified, will load weights histogram and calculate weights that can be later
                                 accessed via self.weights
             per_event (Bool): If true, data table will be organized per-event rather than per-jet
 
         Returns:
-            (DataTable)
+            DataTable
         """
 
         keys_to_skip = [] if per_event else ["event_features"]
@@ -52,33 +54,11 @@ class DataLoader:
         else:
             data = self.__make_tables()
             data.drop(data[data.Eta == 0].index, inplace=True)  # removes empty jets
-            self.__calculate_weights(data, weights_path, name)
+            data.calculate_weights(weights_path)
             data.drop_columns(self.variables_to_drop)
     
         return data
 
-    def __calculate_weights(self, data, weights_path, name):
-        """ Calculates jet weights and stores them in self.weights
-        
-        Args:
-            data (DataTable): Table of jets for which weights will be calculated
-            weights_path (str): Path to the ROOT file with weights
-            name (str): Name of the sample under which jet weights will be stored
-        """
-        
-        if weights_path is None or weights_path == "":
-            data.weights = None
-            return
-    
-        weights_file = TFile.Open(weights_path)
-        weights_hist = weights_file.Get("histJetPtWeights")
-    
-        print("Calculating weights...", end="")
-        weights = [weights_hist.GetBinContent(weights_hist.GetXaxis().FindFixBin(entry.Pt)) for _, entry in
-                   data.df.iterrows()]
-        print("done")
-        data.weights = np.array(weights)
-    
     def __add_sample(self, sample_path, keys_to_skip):
         """
         Adds data from h5 file to self.samples dict. Stores h5 keys in self.sample_keys, or checks that
@@ -117,6 +97,7 @@ class DataLoader:
         Returns:
             (DataTable): Properly shaped data table
         """
+        
         assert key in self.sample_keys
         
         data = self.data[key]
@@ -154,13 +135,17 @@ class DataLoader:
         Returns:
             (DataTable): Table containing all jet-level information
         """
-        
+        print("Creating data tables... ", end="")
         tables = [self.__make_table(k) for k in self.sample_keys if k != "event_features"]
+        print("done")
 
-        ret, tables = tables[0], tables[1:]
+        print("Merging tables... ", end="")
+        merged, tables = tables[0], tables[1:]
         for table in tables:
-            ret = ret.merge_columns(table)
-        return ret
+            merged = merged.merge_columns(table)
+        print("done")
+        
+        return merged
        
     def __add_data_and_labels(self, h5_file, keys_to_skip):
         """ Adds data and labels (variable names) from h5 file
@@ -192,7 +177,7 @@ class DataLoader:
             key (str): h5 group this dataset belongs to
 
         Returns:
-            (np.ndarray)
+            np.ndarray
         """
         
         if key in ["jet_features", "jet_eflow_variables"]:

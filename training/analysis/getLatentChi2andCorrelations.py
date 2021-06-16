@@ -62,7 +62,7 @@ def get_qcd_and_signal_reco_plots(summary, evaluator):
     signals_latent_plots = []
 
     for path in get_signal_paths(config):
-        signal_input_data = evaluator.get_signal_data(name="", path=path, summary=summary, test_data_only=False)
+        signal_input_data = evaluator.get_signal_data(path=path, summary=summary, test_data_only=False)
         signal_reco_data = evaluator.get_latent_space_values(input_data=signal_input_data, summary=summary, scaler=scaler)
 
         signal_latent_plot = get_plots_for_all_variables(signal_reco_data, color=config.signal_reco_color, suffix="SVJ")

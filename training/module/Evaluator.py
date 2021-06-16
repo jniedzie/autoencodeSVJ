@@ -1,8 +1,9 @@
 import os
 from pathlib import Path
+from collections import OrderedDict as odict
 
 import matplotlib.pyplot as plt
-from collections import OrderedDict as odict
+
 import numpy as np
 
 
@@ -47,7 +48,7 @@ class Evaluator:
     
         return weights
     
-    def save_aucs(self, test_filename_pattern="*"):
+    def save_aucs(self, test_filename_pattern="*", use_qcd_weights_for_signal=False):
     
         summaries = summaryProcessor.get_summaries_from_path(self.summary_path)
 
@@ -63,14 +64,15 @@ class Evaluator:
 
             utils.set_random_seed(summary.seed)
             data_processor = DataProcessor(summary=summary)
-            data_loader = self.__get_data_loader(summary)
+            data_loader = DataLoader(summary=summary)
             
             auc_params = self.model_evaluator.get_aucs(summary=summary,
                                                        AUCs_path=self.aucs_path,
                                                        filename=filename,
                                                        data_processor=data_processor,
                                                        data_loader=data_loader,
-                                                       )
+                                                       use_qcd_weights_for_signal=use_qcd_weights_for_signal)
+            
             if auc_params is None:
                 continue
             
@@ -91,7 +93,7 @@ class Evaluator:
 
         plotting_args = {k: v for k, v in kwargs.items() if k not in ["signals", "signals_base_path"] }
 
-        fig, ax_begin, ax_end, plt_end, colors = self.__get_plot_params(n_plots=1, **plotting_args)
+        ax_begin, ax_end, plt_end, colors = self.__get_plot_params(n_plots=1, **plotting_args)
         ax = ax_begin(0)
         
         for _, summary in summaries.df.iterrows():
@@ -102,15 +104,14 @@ class Evaluator:
             utils.set_random_seed(summary.seed)
             filename = summary.training_output_path.split("/")[-1]
             data_processor = DataProcessor(summary=summary)
-            data_loader = self.__get_data_loader(summary)
+            data_loader = DataLoader(summary=summary)
             
             self.model_evaluator.draw_roc_curves(summary=summary,
                                                  filename=filename,
                                                  data_processor=data_processor,
                                                  data_loader=data_loader,
                                                  ax=ax,
-                                                 colors=colors
-                                                 )
+                                                 colors=colors)
 
         x = [i for i in np.arange(0, 1.1, 0.1)]
         ax.plot(x, x, '--', c='black')
@@ -139,7 +140,7 @@ class Evaluator:
         if not isinstance(figsize, tuple):
             figsize = (figsize, rows * float(figsize) / cols)
     
-        fig = plt.figure(figsize=figsize)
+        plt.figure(figsize=figsize)
     
         def on_axis_begin(i):
             return plt.subplot(rows, cols, i + 1)
@@ -172,23 +173,19 @@ class Evaluator:
             print("too many plots for specified colors. overriding with RAINbow")
             import matplotlib.cm as cm
             colors = cm.rainbow(np.linspace(0, 1, n_plots))
-        return fig, on_axis_begin, on_axis_end, on_plot_end, colors
+        return on_axis_begin, on_axis_end, on_plot_end, colors
 
     def get_qcd_data(self, summary, normalize=False, test_data_only=True):
         utils.set_random_seed(summary.seed)
         data_processor = DataProcessor(summary=summary)
-        data_loader = self.__get_data_loader(summary)
+        data_loader = DataLoader(summary=summary)
         return self.model_evaluator.get_qcd_data(summary, data_processor, data_loader, normalize, test_data_only)
 
-    def get_qcd_weights(self, summary, test_data_only=True):
-        utils.set_random_seed(summary.seed)
-        return self.model_evaluator.get_qcd_weights(test_data_only)
-
-    def get_signal_data(self, name, path, summary, test_data_only):
+    def get_signal_data(self, path, summary, test_data_only):
         utils.set_random_seed(summary.seed)
         data_processor = DataProcessor(summary=summary)
-        data_loader = self.__get_data_loader(summary)
-        return self.model_evaluator.get_signal_data(name, path, summary, data_processor, data_loader,
+        data_loader = DataLoader(summary=summary)
+        return self.model_evaluator.get_signal_data(path, summary, data_processor, data_loader,
                                                     normalize=False, scaler=None, test_data_only=test_data_only)
 
     def get_reconstruction(self, input_data, summary, scaler=None):
@@ -204,6 +201,3 @@ class Evaluator:
     def get_latent_space_values(self, input_data, summary, scaler=None):
         utils.set_random_seed(summary.seed)
         return self.model_evaluator.get_latent_space_values(input_data, summary, scaler)
-
-    def __get_data_loader(self, summary):
-        return DataLoader(summary.variables_to_drop, summary.max_jets)

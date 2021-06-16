@@ -24,38 +24,38 @@ class EvaluatorPca:
 
     def get_qcd_data(self, summary, data_processor, data_loader, normalize=False, test_data_only=True):
         
-        data = data_loader.get_data(data_path=summary.qcd_path, name="QCD")
+        data = data_loader.get_data(data_path=summary.qcd_path)
         if test_data_only:
             (_, _, data) = data_processor.split_to_train_validate_test(data)
 
         if normalize:
-            data = DataProcessor.normalize(data_table=data,
-                                            normalization_type=summary.norm_type,
-                                            norm_args=summary.norm_args)
+            data = DataProcessor.normalize(data=data,
+                                           normalization_type=summary.norm_type,
+                                           norm_args=summary.norm_args)
         
         return data
     
     def get_signal_data(self, name, path, summary, data_processor, data_loader, normalize=False, scaler=None, test_data_only=True):
         
-        data = data_loader.get_data(data_path=path, name=name)
+        data = data_loader.get_data(data_path=path)
         
         if test_data_only:
             (_, _, data) = data_processor.split_to_train_validate_test(data)
         
         if normalize:
-            data = DataProcessor.normalize(data_table=data,
-                                            normalization_type=summary.norm_type,
-                                            norm_args=summary.norm_args,
-                                            scaler=scaler)
+            data = DataProcessor.normalize(data=data,
+                                           normalization_type=summary.norm_type,
+                                           norm_args=summary.norm_args,
+                                           scaler=scaler)
         
         return data
         
     def get_reconstruction(self, input_data, summary, data_processor, scaler):
     
-        input_data_normed = DataProcessor.normalize(data_table=input_data,
-                                                     normalization_type=summary.norm_type,
-                                                     norm_args=summary.norm_args,
-                                                     scaler=scaler)
+        input_data_normed = DataProcessor.normalize(data=input_data,
+                                                    normalization_type=summary.norm_type,
+                                                    norm_args=summary.norm_args,
+                                                    scaler=scaler)
 
         model = self.__load_model(summary)
 

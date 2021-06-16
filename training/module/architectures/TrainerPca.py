@@ -93,7 +93,7 @@ class TrainerPca:
         """
         Loading and splitting the data for the training, using data loader and data processor.
         """
-        self.qcd = self.data_loader.get_data(self.qcd_path, "QCD")
+        self.qcd = self.data_loader.get_data(self.qcd_path)
         (self.train_data, self.validation_data, _) = self.data_processor.split_to_train_validate_test(
             data_table=self.qcd)
 

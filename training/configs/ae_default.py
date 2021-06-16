@@ -14,7 +14,7 @@ train_on_signal = False
 
 # ---------------------------------------------
 # Output paths
-output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_test/"
+output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_v1/"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_weighting/"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_archs/"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_inputs/"
@@ -35,7 +35,7 @@ results_path = output_path+"trainingRuns/"
 plots_path = output_path+"plots/"
 stat_hists_path = output_path+"stat_hists.root"
 
-output_file_suffix = ""
+output_file_suffix = "_noPt_oneEFP_noConstituents_weighted"
 # output_file_suffix = "_smallConstituents"
 # output_file_suffix = "_noPt_notWeighted"
 # output_file_suffix = "_withPt_weighted"
@@ -53,8 +53,9 @@ def __get_variables_to_drop():
     to_drop.extend(["efp 0", "Energy", "Flavor", "ChargedFraction", "Pt"])
 
     to_drop.extend(["efp {}".format(i) for i in range(2, 13)])
-    to_drop.extend(["constituent_Rapidity_*", "constituent_Eta_*", "constituent_Phi_*"])
-    to_drop.extend(["constituent_*_{}".format(i) for i in range(30, 150)])
+    # to_drop.extend(["constituent_Rapidity_*", "constituent_Eta_*", "constituent_Phi_*"])
+    # to_drop.extend(["constituent_*_{}".format(i) for i in range(30, 150)])
+    to_drop.extend(["constituent_*"])
 
     return to_drop
 
@@ -65,8 +66,6 @@ training_general_settings = {
     "test_data_fraction": 0.15,
     "variables_to_drop": __get_variables_to_drop(),
     "max_jets": 2,
-    # "qcd_weights_path": "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/weighting/results/weights_qcd_realisticQCD_to_realisticSVJ_small_events10000_nBins100_maxPt3000.000000.root"
-    "qcd_weights_path": ""
 }
 
 evaluation_general_settings = {
@@ -79,12 +78,12 @@ evaluation_general_settings = {
 # ---------------------------------------------
 # Path to training data
 efp_base = 3
-# qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/base_{}/*.h5".format(efp_base)
+qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/base_{}/*.h5".format(efp_base)
 # qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents0_maxJets2/base_{}/*.h5".format(efp_base)
-qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents0_maxJets2/base_{}/QCD_part_0.h5".format(efp_base)
+# qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/base_{}/QCD_part_0.h5".format(efp_base)
 
-# signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/"
-signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents0_maxJets2/"
+signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/"
+# signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents0_maxJets2/"
 
 
 # Path to testing data
@@ -140,7 +139,7 @@ training_params = {
     # "metric": "logcosh", # can"t restore model
 
     
-    "epochs": 10,
+    "epochs": 200,
     
     "learning_rate": 0.00051, # default
     # "learning_rate": 1e-6,  # best
@@ -155,8 +154,8 @@ training_params = {
     # "bottleneck_size": 20,
     # "intermediate_architecture": (100, 100),
 
-    "bottleneck_size": 5,
-    "intermediate_architecture": (8, 8),
+    "bottleneck_size": 3,
+    "intermediate_architecture": (6, 6),
 
     # activation functions documentation
     # https://keras.io/api/layers/activations/
@@ -177,7 +176,7 @@ training_params = {
 
 # ---------------------------------------------
 # Number of models to train
-n_models = 1
+n_models = 5
 
 # ---------------------------------------------
 # Pick normalization type (definitions below):
@@ -272,6 +271,8 @@ training_settings = {
     "EFP_base": efp_base,
     "norm_type": norm_type,
     "norm_args": normalizations[norm_type],
+    "qcd_weights_path": "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/weighting/results/weights_qcd_realistic_to_flatJetPt_events100000_nBins100_maxPt2000.000000.root"
+    # "qcd_weights_path": ""
 }
 
 evaluation_settings = {

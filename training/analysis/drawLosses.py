@@ -47,7 +47,7 @@ def get_qcd_and_signal_losses(summary, evaluator):
     signals_losses = []
     
     for path in get_signal_paths(config):
-        signal_data = evaluator.get_signal_data(name="", path=path, summary=summary, test_data_only=False)
+        signal_data = evaluator.get_signal_data(path=path, summary=summary, test_data_only=False)
         signal_loss = evaluator.get_error(signal_data, summary=summary, scaler=scaler)
         signals_losses.append(signal_loss)
     

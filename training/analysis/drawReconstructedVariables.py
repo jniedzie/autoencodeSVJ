@@ -64,7 +64,7 @@ def get_qcd_and_signal_reco_plots(summary, evaluator):
 
     print("Preparing SVJ plots")
     for path in get_signal_paths(config):
-        signal_input_data = evaluator.get_signal_data(name="", path=path, summary=summary, test_data_only=False)
+        signal_input_data = evaluator.get_signal_data(path=path, summary=summary, test_data_only=False)
         signal_reco_data = evaluator.get_reconstruction(input_data=signal_input_data, summary=summary, scaler=scaler)
         
         signal_input_plot = get_plots_for_all_variables(signal_input_data, color=config.signal_input_color, suffix="SVJ_input")

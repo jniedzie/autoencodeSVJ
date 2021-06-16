@@ -31,32 +31,33 @@ class EvaluatorAutoEncoder:
 
     def get_qcd_data(self, summary, data_processor, data_loader, normalize=False, test_data_only=True):
         
-        self.qcd_data = data_loader.get_data(data_path=summary.qcd_path,
-                                             name="QCD",
-                                             weights_path=summary.qcd_weights_path)
+        self.qcd_data = data_loader.get_data(data_path=summary.qcd_path, weights_path=summary.qcd_weights_path)
         
         if test_data_only:
             (_, _, self.qcd_data) = data_processor.split_to_train_validate_test(self.qcd_data)
 
         if normalize:
             self.qcd_data = DataProcessor.normalize(data=self.qcd_data,
-                                            normalization_type=summary.norm_type,
-                                            norm_args=summary.norm_args)
+                                                    normalization_type=summary.norm_type,
+                                                    norm_args=summary.norm_args)
         
         return self.qcd_data
     
-    def get_signal_data(self, name, path, summary, data_processor, data_loader, normalize=False, scaler=None, test_data_only=True):
+    def get_signal_data(self, path, summary, data_processor, data_loader, normalize=False, scaler=None,
+                        test_data_only=True, use_qcd_weights=False):
         
-        data = data_loader.get_data(data_path=path, name=name)
+        weights_path = summary.qcd_weights_path if use_qcd_weights else None
+        
+        data = data_loader.get_data(data_path=path, weights_path=weights_path)
         
         if test_data_only:
             (_, _, data) = data_processor.split_to_train_validate_test(data)
         
         if normalize:
             data = DataProcessor.normalize(data=data,
-                                            normalization_type=summary.norm_type,
-                                            norm_args=summary.norm_args,
-                                            scaler=scaler)
+                                           normalization_type=summary.norm_type,
+                                           norm_args=summary.norm_args,
+                                           scaler=scaler)
         
         return data
         
@@ -115,7 +116,7 @@ class EvaluatorAutoEncoder:
         
         return losses.tolist()
         
-    def get_aucs(self, summary, AUCs_path, filename, data_processor, data_loader):
+    def get_aucs(self, summary, AUCs_path, filename, data_processor, data_loader, use_qcd_weights_for_signal=False):
         
         auc_path = AUCs_path + "/" + filename
     
@@ -141,8 +142,8 @@ class EvaluatorAutoEncoder:
                                data_processor=data_processor,
                                data_loader=data_loader,
                                model=model,
-                               loss_function=summary.loss
-                               )
+                               loss_function=summary.loss,
+                               use_qcd_weights_for_signal=use_qcd_weights_for_signal)
         
         print("aucs: ", aucs)
         
@@ -151,30 +152,14 @@ class EvaluatorAutoEncoder:
         
         return (aucs, auc_path, append, write_header)
 
-    def draw_roc_curves(self, summary, data_processor, data_loader, ax, colors, signals, test_key="qcd", **kwargs):
-
-        normed = {
-            test_key: self.get_qcd_data(summary, data_processor, data_loader, normalize=True, test_data_only=True)
-        }
-
-        for name, path in signals.items():
-            normed[name] = self.get_signal_data(name, path, summary, data_processor, data_loader,
-                                                normalize=True, scaler = normed[test_key].scaler)
-        
-        errors = {}
+    def draw_roc_curves(self, summary, data_processor, data_loader, ax, colors, **kwargs):
         model = self.__load_model(summary)
 
-        for key, data in normed.items():
-            recon = pd.DataFrame(model.predict(data.data), columns=data.columns, index=data.index, dtype="float64")
-            func = getattr(keras.losses, summary.loss)
-            losses = keras.backend.eval(func(data.data, recon))
-            errors[key] = losses.tolist()
-
-        signals_errors = {}
+        test_key = "qcd"
+        normed = self.__get_normalized_data(summary, data_processor, data_loader, test_key)
+        errors = self.__get_losses(normed, model, summary.loss)
         
-        for signal in signals:
-            signals_errors[signal] = errors[signal]
-
+        signals_errors = {k: v for k, v in errors.items() if k != test_key}
         qcd_errors = errors[test_key]
 
         self.__roc_auc_plot(qcd_errors, signals_errors, ax, colors)
@@ -265,7 +250,8 @@ class EvaluatorAutoEncoder:
             
             self.signal_dict[name] = new_path
          
-    def __get_normalized_data(self, summary, data_processor, data_loader, test_key="qcd"):
+    def __get_normalized_data(self, summary, data_processor, data_loader,
+                              test_key="qcd", use_qcd_weights_for_signal=False):
         normed = {
             test_key: self.get_qcd_data(summary, data_processor, data_loader, normalize=True, test_data_only=True)
         }
@@ -275,10 +261,11 @@ class EvaluatorAutoEncoder:
         for name, path in self.signal_dict.items():
             if name == test_key: continue
         
-            normed[name] = self.get_signal_data(name=name, path=path,
+            normed[name] = self.get_signal_data(path=path,
                                                 summary=summary,
                                                 data_processor=data_processor, data_loader=data_loader,
-                                                normalize=True, scaler=normed[test_key].scaler)
+                                                normalize=True, scaler=normed[test_key].scaler,
+                                                use_qcd_weights=use_qcd_weights_for_signal)
             
         return normed
         
@@ -293,7 +280,8 @@ class EvaluatorAutoEncoder:
             
         return losses
         
-    def __get_aucs(self, summary, data_processor, data_loader, model, loss_function, test_key='qcd'):
+    def __get_aucs(self, summary, data_processor, data_loader, model, loss_function,
+                   test_key='qcd', use_qcd_weights_for_signal=False):
         """
         
         Args:
@@ -308,8 +296,7 @@ class EvaluatorAutoEncoder:
 
         """
         
-        normed = self.__get_normalized_data(summary, data_processor, data_loader, test_key)
-        
+        normed = self.__get_normalized_data(summary, data_processor, data_loader, test_key, use_qcd_weights_for_signal)
         errors = self.__get_losses(normed, model, loss_function)
 
         background_errors = errors[test_key]

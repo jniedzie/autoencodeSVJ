@@ -44,11 +44,11 @@ class DataProcessor:
                 provided data table, respectively.
         """
         
-        train_idx, test_idx = train_test_split(input_data.df.index,
-                                               test_size=self.test_fraction,
-                                               random_state=self.seed)
+        train_and_validation_idx, test_idx = train_test_split(input_data.df.index,
+                                                              test_size=self.test_fraction,
+                                                              random_state=self.seed)
         
-        train_and_validation_data = DataProcessor.__get_datatable_from_indices(input_data, train_idx)
+        train_and_validation_data = DataProcessor.__get_datatable_from_indices(input_data, train_and_validation_idx)
         
         test_data = DataProcessor.__get_datatable_from_indices(input_data, test_idx)
 
@@ -57,10 +57,10 @@ class DataProcessor:
                                                          test_size=self.validation_fraction,
                                                          random_state=self.seed)
 
-            train_data = DataProcessor.__get_datatable_from_indices(train_and_validation_data, train_idx)
-            validation_data = DataProcessor.__get_datatable_from_indices(train_and_validation_data, validation_idx)
+            train_data = DataProcessor.__get_datatable_from_indices(train_and_validation_data, train_idx, input_data.weights)
+            validation_data = DataProcessor.__get_datatable_from_indices(train_and_validation_data, validation_idx, input_data.weights)
         else:
-            train_data = DataTable(train_and_validation_data)
+            train_data = DataProcessor.__get_datatable_from_indices(train_and_validation_data, train_and_validation_idx, input_data.weights)
             validation_data = None
             
         return train_data, validation_data, test_data
@@ -97,7 +97,7 @@ class DataProcessor:
         exit(0)
 
     @staticmethod
-    def __get_datatable_from_indices(input_data, indices):
+    def __get_datatable_from_indices(input_data, indices, weights=None):
         """
         Selects rows in data table corresponding to provided indices. Takes care of setting weights as well.
         
@@ -109,7 +109,13 @@ class DataProcessor:
             (DataTable)
         """
         data = DataTable(input_data.df.loc[np.asarray([indices]).T.flatten()])
-        if input_data.weights is not None:
-            data.weights = np.take(input_data.weights, indices)
+        
+        if weights is None:
+            weights = input_data.weights
+        
+        if weights is not None:
+            data.weights = np.take(weights, indices)
+        
+        data.df.reset_index()
         
         return data

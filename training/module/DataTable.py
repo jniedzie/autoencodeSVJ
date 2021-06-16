@@ -5,6 +5,7 @@ import chardet
 import sklearn.preprocessing as prep
 import pandas as pd
 import numpy as np
+from ROOT import TFile
 
 
 class DataTable:
@@ -132,7 +133,35 @@ class DataTable:
     
         assert self.shape[0] == other.shape[0], 'data tables must have same number of samples'
         return DataTable(self.df.join(other.df))
-        
+
+    def calculate_weights(self, weights_path):
+        """Calculates jet weights and stores them in self.weights
+
+        Args:
+            weights_path (str): Path to the ROOT file with weights
+        """
+    
+        if weights_path is None or weights_path == "":
+            self.weights = None
+            return
+    
+        weights_file = TFile.Open(weights_path)
+        weights_hist = weights_file.Get("histJetPtWeights")
+    
+        print("Calculating weights... ", end="")
+    
+        bin_factor = weights_hist.GetNbinsX() / (weights_hist.GetXaxis().GetXmax() - weights_hist.GetXaxis().GetXmin())
+    
+        def get_weight(pt):
+            return weights_hist.GetBinContent(int(bin_factor * pt) + 1)
+    
+        weights = self.df[['Pt']].copy()
+        weights = weights.apply(lambda x: get_weight(x.Pt), 1)
+    
+        print("done")
+    
+        self.weights = np.array(weights)
+    
     def __find_matching_names(self, input_list):
         """ Finds elements of provided list matching names of columns in this data table.
         

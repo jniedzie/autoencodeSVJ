@@ -1,5 +1,7 @@
+import importlib
+import argparse
+
 from module.Evaluator import Evaluator
-import importlib, argparse
 
 # ------------------------------------------------------------------------------------------------
 # This script will produce a CSV file with areas under ROC curves (AUCs) for each training
@@ -15,4 +17,5 @@ config = importlib.import_module(config_path)
 
 
 evaluator = Evaluator(**config.evaluation_general_settings, **config.evaluation_settings)
-evaluator.save_aucs(test_filename_pattern=config.test_filename_pattern)
+evaluator.save_aucs(test_filename_pattern=config.test_filename_pattern, use_qcd_weights_for_signal=True)
+# evaluator.save_aucs(test_filename_pattern="v", use_qcd_weights_for_signal=True)

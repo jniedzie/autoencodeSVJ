@@ -63,8 +63,8 @@ class TrainerBdt:
         Loading and splitting the data for the training, using data loader and data processor.
         """
         
-        QCD = self.data_loader.get_data(self.qcd_path, "QCD")
-        SVJ = self.data_loader.get_data(self.signal_path, "SVJ")
+        QCD = self.data_loader.get_data(self.qcd_path)
+        SVJ = self.data_loader.get_data(self.signal_path)
         
         (QCD_X_train, _, _) = self.data_processor.split_to_train_validate_test(QCD)
         (SVJ_X_train, _, _) = self.data_processor.split_to_train_validate_test(SVJ)
