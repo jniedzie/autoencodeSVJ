@@ -27,6 +27,8 @@ rootToH5converter/test_withConstituents.C
 *cmake_install.cmake
 *Makefile
 
+*.pclprof
+
 # CUSTOM
 #
 *outfull/
