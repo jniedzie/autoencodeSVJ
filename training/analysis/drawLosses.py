@@ -16,6 +16,8 @@ from ROOT import TCanvas, gApplication, gStyle, TLegend, gPad
 # ------------------------------------------------------------------------------------------------
 
 run_application = False
+apply_weights = False
+
 
 parser = argparse.ArgumentParser(description="Argument parser")
 parser.add_argument("-c", "--config", dest="config_path", default=None, required=True, help="Path to the config file")
@@ -26,12 +28,12 @@ config = importlib.import_module(config_path)
 saved_plots = []
 
 
-def get_loss_histograms(background_data, signals_data, suffix="", qcd_weights=None):
+def get_loss_histograms(background_data, signals_data, suffix="", qcd_weights=None, signals_weights=None):
     hist_background = get_histogram(background_data, "loss", config.qcd_input_color, suffix="QCD_"+suffix, weights=qcd_weights)
     
     hists_signal = []
     for i, signal_data in enumerate(signals_data):
-        hist_signal = get_histogram(signal_data, "loss", config.signal_input_color, suffix="SVJ_"+str(i)+"_"+suffix)
+        hist_signal = get_histogram(signal_data, "loss", config.signal_input_color, suffix="SVJ_"+str(i)+"_"+suffix, weights=signals_weights[i])
         hists_signal.append(hist_signal)
     
     return hist_background, hists_signal
@@ -40,26 +42,33 @@ def get_loss_histograms(background_data, signals_data, suffix="", qcd_weights=No
 def get_qcd_and_signal_losses(summary, evaluator):
     qcd_data = evaluator.get_qcd_data(summary=summary, test_data_only=True)
     qcd_loss = evaluator.get_error(qcd_data, summary=summary)
-    qcd_weights = qcd_data.weights
-    
+    qcd_weights = qcd_data.weights if apply_weights else None
+
     scaler = qcd_data.scaler
 
     signals_losses = []
+    signals_weights = []
     
     for path in get_signal_paths(config):
-        signal_data = evaluator.get_signal_data(path=path, summary=summary, test_data_only=False)
+        signal_data = evaluator.get_signal_data(path=path,
+                                                summary=summary,
+                                                test_data_only=False,
+                                                use_qcd_weights=apply_weights)
+
         signal_loss = evaluator.get_error(signal_data, summary=summary, scaler=scaler)
         signals_losses.append(signal_loss)
+        signals_weights.append(signal_data.weights)
     
-    return qcd_loss, signals_losses, qcd_weights
+    return qcd_loss, signals_losses, qcd_weights, signals_weights
 
 
 def draw_plots(summary, evaluator):
     version = summaryProcessor.get_version(summary.summary_path)
     
-    qcd_loss, signals_losses, qcd_weights = get_qcd_and_signal_losses(summary, evaluator)
+    qcd_loss, signals_losses, qcd_weights, signals_weights = get_qcd_and_signal_losses(summary, evaluator)
     
-    hist_background, hists_signal = get_loss_histograms(qcd_loss, signals_losses, suffix="v"+str(version), qcd_weights=qcd_weights)
+    hist_background, hists_signal = get_loss_histograms(qcd_loss, signals_losses, suffix="v"+str(version),
+                                                        qcd_weights=qcd_weights, signals_weights=signals_weights)
     
     hist_background.SetTitle("v" + str(version))
     hist_background.GetXaxis().SetTitle("loss")
