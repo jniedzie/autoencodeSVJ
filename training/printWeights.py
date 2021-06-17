@@ -15,7 +15,7 @@ config = importlib.import_module(config_path)
 
 
 evaluator = Evaluator(**config.evaluation_general_settings, **config.evaluation_settings)
-weights_per_file = evaluator.get_weights(config.test_filename_pattern)
+weights_per_file = evaluator.get_model_weights(config.test_filename_pattern)
 
 
 for filename, weights in weights_per_file.items():

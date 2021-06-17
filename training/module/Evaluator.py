@@ -33,7 +33,7 @@ class Evaluator:
         
         self.model_evaluator = self.model_class(**evaluation_setting)
     
-    def get_weights(self, test_file_name):
+    def get_model_weights(self, test_file_name):
         summaries = summaryProcessor.get_summaries_from_path(self.summary_path)
     
         weights = {}
@@ -181,22 +181,21 @@ class Evaluator:
         data_loader = DataLoader(summary=summary)
         return self.model_evaluator.get_qcd_data(summary, data_processor, data_loader, normalize, test_data_only)
 
-    def get_signal_data(self, path, summary, test_data_only):
+    def get_signal_data(self, path, summary, test_data_only, use_qcd_weights):
         utils.set_random_seed(summary.seed)
         data_processor = DataProcessor(summary=summary)
         data_loader = DataLoader(summary=summary)
         return self.model_evaluator.get_signal_data(path, summary, data_processor, data_loader,
-                                                    normalize=False, scaler=None, test_data_only=test_data_only)
+                                                    normalize=False, scaler=None, test_data_only=test_data_only,
+                                                    use_qcd_weights=use_qcd_weights)
 
     def get_reconstruction(self, input_data, summary, scaler=None):
         utils.set_random_seed(summary.seed)
-        data_processor = DataProcessor(summary=summary)
-        return self.model_evaluator.get_reconstruction(input_data, summary, data_processor,scaler)
+        return self.model_evaluator.get_reconstruction(input_data, summary, scaler)
 
     def get_error(self, input_data, summary, scaler=None):
         utils.set_random_seed(summary.seed)
-        data_processor = DataProcessor(summary=summary)
-        return self.model_evaluator.get_error(input_data, summary, data_processor, scaler)
+        return self.model_evaluator.get_error(input_data, summary, scaler)
 
     def get_latent_space_values(self, input_data, summary, scaler=None):
         utils.set_random_seed(summary.seed)

@@ -8,9 +8,7 @@ from module.architectures.DenseTiedLayer import DenseTiedLayer
 
 # Model type
 model_type = "AutoEncoder"
-
 train_on_signal = False
-
 
 # ---------------------------------------------
 # Output paths
@@ -35,7 +33,10 @@ results_path = output_path+"trainingRuns/"
 plots_path = output_path+"plots/"
 stat_hists_path = output_path+"stat_hists.root"
 
-output_file_suffix = "_noPt_oneEFP_noConstituents_weighted"
+# output_file_suffix = ""
+# output_file_suffix = "_noPt_oneEFP_noConstituents_unweighted"
+output_file_suffix = "_withPt_oneEFP_noConstituents_unweighted"
+# output_file_suffix = "_withPt_allEFP_noConstituents_unweighted"
 # output_file_suffix = "_smallConstituents"
 # output_file_suffix = "_noPt_notWeighted"
 # output_file_suffix = "_withPt_weighted"
@@ -50,15 +51,14 @@ output_file_suffix = "_noPt_oneEFP_noConstituents_weighted"
 def __get_variables_to_drop():
     to_drop = ["MET", "METEta", "METPhi", "MT", "Mjj", "genWeight"]
     
-    to_drop.extend(["efp 0", "Energy", "Flavor", "ChargedFraction", "Pt"])
-
+    # to_drop.extend(["efp 0", "Energy", "Flavor", "ChargedFraction", "Pt"])
+    to_drop.extend(["efp 0", "Energy", "Flavor", "ChargedFraction"])
     to_drop.extend(["efp {}".format(i) for i in range(2, 13)])
     # to_drop.extend(["constituent_Rapidity_*", "constituent_Eta_*", "constituent_Phi_*"])
     # to_drop.extend(["constituent_*_{}".format(i) for i in range(30, 150)])
     to_drop.extend(["constituent_*"])
 
     return to_drop
-
 
 training_general_settings = {
     "model_trainer_path": "module/architectures/TrainerAutoEncoder.py",
@@ -74,21 +74,14 @@ evaluation_general_settings = {
     "aucs_path": output_path+"aucs/",
 }
 
-
 # ---------------------------------------------
 # Path to training data
 efp_base = 3
-qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/base_{}/*.h5".format(efp_base)
-# qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents0_maxJets2/base_{}/*.h5".format(efp_base)
-# qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/base_{}/QCD_part_0.h5".format(efp_base)
-
-signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/"
-# signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents0_maxJets2/"
-
+qcd_path = "/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents100_maxJets2/base_{}/*.h5".format(efp_base)
+signals_base_path = "/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents100_maxJets2/"
 
 # Path to testing data
 input_path = signals_base_path+"/*/base_{}/*.h5".format(efp_base)
-
 
 # ---------------------------------------------
 # Training parameters
@@ -154,8 +147,8 @@ training_params = {
     # "bottleneck_size": 20,
     # "intermediate_architecture": (100, 100),
 
-    "bottleneck_size": 3,
-    "intermediate_architecture": (6, 6),
+    "bottleneck_size": 5,
+    "intermediate_architecture": (8, 8),
 
     # activation functions documentation
     # https://keras.io/api/layers/activations/
@@ -176,7 +169,7 @@ training_params = {
 
 # ---------------------------------------------
 # Number of models to train
-n_models = 5
+n_models = 1
 
 # ---------------------------------------------
 # Pick normalization type (definitions below):
@@ -245,8 +238,8 @@ n_events_per_class = 10000
 # Output file names
 arch_summary = str(training_params["intermediate_architecture"]).replace("(","").replace(")","").replace(",","_").replace(" ","_")
 
-file_name = "efp_{}".format(efp_base)
-file_name += "_bottle_{}".format(training_params["bottleneck_size"])
+
+file_name = "bottle_{}".format(training_params["bottleneck_size"])
 file_name += "_arch_{}".format(arch_summary)
 file_name += "_loss_{}".format(training_params["loss"])
 file_name += "_optimizer_{}".format(training_params["optimizer"])
@@ -271,8 +264,8 @@ training_settings = {
     "EFP_base": efp_base,
     "norm_type": norm_type,
     "norm_args": normalizations[norm_type],
-    "qcd_weights_path": "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/weighting/results/weights_qcd_realistic_to_flatJetPt_events100000_nBins100_maxPt2000.000000.root"
-    # "qcd_weights_path": ""
+    # "qcd_weights_path": "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/weighting/results/weights_qcd_realistic_to_flatJetPt_events100000_nBins100_maxPt2000.000000.root"
+    "qcd_weights_path": ""
 }
 
 evaluation_settings = {

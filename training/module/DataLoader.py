@@ -3,6 +3,7 @@ from glob import glob
 
 import h5py
 import numpy as np
+import pandas as pd
 
 from module.DataTable import DataTable
 
@@ -31,7 +32,7 @@ class DataLoader:
         self.data = OrderedDict()
         self.labels = OrderedDict()
         self.already_added_paths = []
-        
+
     def get_data(self, data_path, weights_path=None, per_event=False):
         """ Loads data from provided path and returns as a data table
         Args:
@@ -44,6 +45,7 @@ class DataLoader:
             DataTable
         """
 
+        self.data = OrderedDict()
         keys_to_skip = [] if per_event else ["event_features"]
     
         for f in DataLoader.__get_files_from_path(data_path):
@@ -53,7 +55,7 @@ class DataLoader:
             data = self.__make_table("event_features")
         else:
             data = self.__make_tables()
-            data.drop(data[data.Eta == 0].index, inplace=True)  # removes empty jets
+            data.remove_empty_rows()
             data.calculate_weights(weights_path)
             data.drop_columns(self.variables_to_drop)
     
@@ -79,8 +81,8 @@ class DataLoader:
             keys = set(h5_file.keys())
             
             if self.sample_keys is None:
-                self.sample_keys = keys
-            elif keys != self.sample_keys:
+                self.sample_keys = sorted(keys)
+            elif sorted(keys) != self.sample_keys:
                 print("ERROR -- different h5 samples seem to have different groups/keys")
                 exit()
             
@@ -128,7 +130,7 @@ class DataLoader:
             return DataTable(stacked_data, headers=constituents_labels)
         else:
             raise AttributeError
-    
+
     def __make_tables(self):
         """Prepares a table containing all jet-level information
         
@@ -140,12 +142,10 @@ class DataLoader:
         print("done")
 
         print("Merging tables... ", end="")
-        merged, tables = tables[0], tables[1:]
-        for table in tables:
-            merged = merged.merge_columns(table)
+        merged = pd.concat(tables, axis=1)
         print("done")
-        
-        return merged
+
+        return DataTable(merged)
        
     def __add_data_and_labels(self, h5_file, keys_to_skip):
         """ Adds data and labels (variable names) from h5 file

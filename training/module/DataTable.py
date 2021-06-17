@@ -121,18 +121,12 @@ class DataTable:
         self.headers = list(self.df.columns)
         self.data = np.asarray(self.df)
 
-    def merge_columns(self, other):
-        """ Appends columns of other data table to this one
-
-        Args:
-            other (DataTable): Data table to append to this one
-
-        Returns:
-            (DataTable): Merged data table
+    def remove_empty_rows(self):
+        """ Removes rows containing empty jets
         """
-    
-        assert self.shape[0] == other.shape[0], 'data tables must have same number of samples'
-        return DataTable(self.df.join(other.df))
+        print("Removing empty rows... ", end="")
+        self.drop(self[self.Eta == 0].index, inplace=True)
+        print("done")
 
     def calculate_weights(self, weights_path):
         """Calculates jet weights and stores them in self.weights

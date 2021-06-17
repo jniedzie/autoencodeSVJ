@@ -61,14 +61,15 @@ class EvaluatorAutoEncoder:
         
         return data
         
-    def get_reconstruction(self, input_data, summary, data_processor, scaler):
+    def get_reconstruction(self, input_data, summary, scaler, model=None):
     
         input_data_normed = DataProcessor.normalize(data=input_data,
                                                     normalization_type=summary.norm_type,
                                                     norm_args=summary.norm_args,
                                                     scaler=scaler)
 
-        model = self.__load_model(summary)
+        if model is None:
+            model = self.__load_model(summary)
         
         reconstructed = pd.DataFrame(model.predict(input_data_normed.data),
                                      columns=input_data_normed.columns,
@@ -106,8 +107,8 @@ class EvaluatorAutoEncoder:
 
         return latent_values
 
-    def get_error(self, input_data, summary, data_processor, scaler):
-        recon = self.get_reconstruction(input_data, summary, data_processor, scaler)
+    def get_error(self, input_data, summary, scaler, model=None):
+        recon = self.get_reconstruction(input_data, summary, scaler, model)
         
         print("Calculating error using loss: ", summary.loss)
         
@@ -142,7 +143,6 @@ class EvaluatorAutoEncoder:
                                data_processor=data_processor,
                                data_loader=data_loader,
                                model=model,
-                               loss_function=summary.loss,
                                use_qcd_weights_for_signal=use_qcd_weights_for_signal)
         
         print("aucs: ", aucs)
@@ -250,54 +250,38 @@ class EvaluatorAutoEncoder:
             
             self.signal_dict[name] = new_path
          
-    def __get_normalized_data(self, summary, data_processor, data_loader,
-                              test_key="qcd", use_qcd_weights_for_signal=False):
-        normed = {
-            test_key: self.get_qcd_data(summary, data_processor, data_loader, normalize=True, test_data_only=True)
+    def __get_data(self, summary, data_processor, data_loader,
+                   test_key="qcd", use_qcd_weights_for_signal=False):
+        data = {
+            test_key: self.get_qcd_data(summary, data_processor, data_loader, test_data_only=True)
         }
-    
-        self.__update_signals_efp_base(summary, test_key)
-    
+        
         for name, path in self.signal_dict.items():
             if name == test_key: continue
         
-            normed[name] = self.get_signal_data(path=path,
-                                                summary=summary,
-                                                data_processor=data_processor, data_loader=data_loader,
-                                                normalize=True, scaler=normed[test_key].scaler,
-                                                use_qcd_weights=use_qcd_weights_for_signal)
-            
-        return normed
+            data[name] = self.get_signal_data(path=path,
+                                              summary=summary,
+                                              data_processor=data_processor,
+                                              data_loader=data_loader,
+                                              test_data_only=False,
+                                              use_qcd_weights=use_qcd_weights_for_signal)
+
+        return data
         
-    def __get_losses(self, data, model, loss_function):
+    def __get_losses(self, data, model, summary, test_key):
         losses = {}
     
-        for key, data in data.items():
-            recon = pd.DataFrame(model.predict(data.data), columns=data.columns, index=data.index, dtype="float64")
-            func = getattr(keras.losses, loss_function)
-            loss = keras.backend.eval(func(data.data, recon))
-            losses[key] = loss.tolist()
-            
+        for key, normed_data in data.items():
+            losses[key] = self.get_error(normed_data, summary, scaler=data[test_key].scaler, model=model)
         return losses
         
-    def __get_aucs(self, summary, data_processor, data_loader, model, loss_function,
+    def __get_aucs(self, summary, data_processor, data_loader, model,
                    test_key='qcd', use_qcd_weights_for_signal=False):
-        """
+    
+        self.__update_signals_efp_base(summary, test_key)
         
-        Args:
-            summary:
-            data_processor:
-            data_loader (DataLoader):
-            model:
-            loss_function:
-            test_key:
-
-        Returns:
-
-        """
-        
-        normed = self.__get_normalized_data(summary, data_processor, data_loader, test_key, use_qcd_weights_for_signal)
-        errors = self.__get_losses(normed, model, loss_function)
+        normed = self.__get_data(summary, data_processor, data_loader, test_key, use_qcd_weights_for_signal)
+        errors = self.__get_losses(normed, model, summary, test_key)
 
         background_errors = errors[test_key]
         background_labels = [0] * len(background_errors)
