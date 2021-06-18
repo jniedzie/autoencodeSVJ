@@ -12,7 +12,7 @@ train_on_signal = False
 
 # ---------------------------------------------
 # Output paths
-output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_v1/"
+output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_reproduceOldCode/"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_weighting/"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_archs/"
 # output_path = "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/training/trainingResults_inputs/"
@@ -33,16 +33,12 @@ results_path = output_path+"trainingRuns/"
 plots_path = output_path+"plots/"
 stat_hists_path = output_path+"stat_hists.root"
 
-# output_file_suffix = ""
+output_file_suffix = ""
 # output_file_suffix = "_noPt_oneEFP_noConstituents_unweighted"
-output_file_suffix = "_withPt_oneEFP_noConstituents_unweighted"
+# output_file_suffix = "_withPt_oneEFP_noConstituents_unweighted"
 # output_file_suffix = "_withPt_allEFP_noConstituents_unweighted"
-# output_file_suffix = "_smallConstituents"
-# output_file_suffix = "_noPt_notWeighted"
-# output_file_suffix = "_withPt_weighted"
-# output_file_suffix = "_1jet"
-# output_file_suffix = "_allEFPs"
-# output_file_suffix = "_30constituents"
+# output_file_suffix = "_noPt_allEFP_noConstituents_weighted"
+# output_file_suffix = "_noPt_30constituents_weighted"
 
 
 # ---------------------------------------------
@@ -52,13 +48,16 @@ def __get_variables_to_drop():
     to_drop = ["MET", "METEta", "METPhi", "MT", "Mjj", "genWeight"]
     
     # to_drop.extend(["efp 0", "Energy", "Flavor", "ChargedFraction", "Pt"])
-    to_drop.extend(["efp 0", "Energy", "Flavor", "ChargedFraction"])
-    to_drop.extend(["efp {}".format(i) for i in range(2, 13)])
+    # to_drop.extend(["efp 0", "Energy", "Flavor", "ChargedFraction"])
+    to_drop.extend(["Energy", "Flavor", "ChargedFraction"])
+    
+    # to_drop.extend(["efp {}".format(i) for i in range(1, 13)])
     # to_drop.extend(["constituent_Rapidity_*", "constituent_Eta_*", "constituent_Phi_*"])
     # to_drop.extend(["constituent_*_{}".format(i) for i in range(30, 150)])
     to_drop.extend(["constituent_*"])
 
     return to_drop
+
 
 training_general_settings = {
     "model_trainer_path": "module/architectures/TrainerAutoEncoder.py",
@@ -147,8 +146,9 @@ training_params = {
     # "bottleneck_size": 20,
     # "intermediate_architecture": (100, 100),
 
-    "bottleneck_size": 5,
     "intermediate_architecture": (8, 8),
+    "bottleneck_size": 5,
+    
 
     # activation functions documentation
     # https://keras.io/api/layers/activations/
@@ -169,7 +169,7 @@ training_params = {
 
 # ---------------------------------------------
 # Number of models to train
-n_models = 1
+n_models = 0
 
 # ---------------------------------------------
 # Pick normalization type (definitions below):
@@ -212,8 +212,6 @@ best_model = 0
 fraction_of_models_for_avg_chi2 = 0.8
 
 # only files matching this pattern will be used for tests
-
-
 
 
 # signal points for which tests will be done
@@ -265,7 +263,7 @@ training_settings = {
     "norm_type": norm_type,
     "norm_args": normalizations[norm_type],
     # "qcd_weights_path": "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/weighting/results/weights_qcd_realistic_to_flatJetPt_events100000_nBins100_maxPt2000.000000.root"
-    "qcd_weights_path": ""
+    "qcd_weights_path": None
 }
 
 evaluation_settings = {

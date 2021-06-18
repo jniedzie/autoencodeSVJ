@@ -3,13 +3,16 @@ from ROOT import TLegend, TH1D, TCanvas, gApplication, TGraph, TGraphErrors
 from ROOT import kRed, kOrange, kGreen, kBlue, kViolet, kBlack
 import glob
 
-show_plots = True
+show_plots = False
 
 input_paths = [
-    (glob.glob("../trainingResults_weighting/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_withPt_notWeighted_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_weighting/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_withPt_weighted_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_weighting/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_noPt_notWeighted_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_weighting/aucs/efp_3_bottle_5_arch_8__8_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_noPt_weighted_v*"), kBlue, "(7, 7), BN: 1"),
+    
+    
+    (glob.glob("../trainingResults_v2/aucs/bottle_10_arch_30__30_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_noPt_30constituents_weighted_v*"), kBlue, "(7, 7), BN: 1"),
+    (glob.glob("../trainingResults_v2/aucs/bottle_30_arch_120__120_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_noPt_30constituents_weighted_v*"), kBlue, "(7, 7), BN: 1"),
+    (glob.glob("../trainingResults_v2/aucs/bottle_50_arch_130__130_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_noPt_30constituents_weighted_v*"), kBlue, "(7, 7), BN: 1"),
+    
+    
 ]
 
 draw_auc_distributions = False
