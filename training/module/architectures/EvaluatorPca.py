@@ -59,7 +59,7 @@ class EvaluatorPca:
 
         model = self.__load_model(summary)
 
-        reconstructed = model.transform(input_data_normed.data)
+        reconstructed = model.transform(input_data_normed.df)
         reconstructed = pd.DataFrame(reconstructed)
         reconstructed.index = input_data_normed.index
 
@@ -131,7 +131,7 @@ class EvaluatorPca:
         model = self.__load_model(summary)
 
         for key, data in normed.items():
-            recon = pd.DataFrame(model.transform(data.data), columns=data.columns, index=data.index, dtype="float64")
+            recon = pd.DataFrame(model.transform(data.df), columns=data.columns, index=data.index, dtype="float64")
             data_test = np.array(recon.values)
             dist_test = self.__get_mahalanobis_distance(summary.inv_cov_matrix, summary.mean_distribution, data_test, verbose=False)
             errors[key] = dist_test
@@ -248,7 +248,7 @@ class EvaluatorPca:
         for key, data in normed.items():
             model = self.__load_model(summary)
 
-            reconstructed = model.transform(data.data)
+            reconstructed = model.transform(data.df)
             reconstructed = pd.DataFrame(reconstructed)
             reconstructed.index = data.index
 

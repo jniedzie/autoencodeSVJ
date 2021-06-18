@@ -123,8 +123,8 @@ class TrainerPca:
         """
         
         print("Filename: ", self.training_output_path)
-        print("Number of training samples: ", len(self.train_data_normalized.data))
-        print("Number of validation samples: ", len(self.validation_data_normalized.data))
+        print("Number of training samples: ", len(self.train_data_normalized.df))
+        print("Number of validation samples: ", len(self.validation_data_normalized.df))
         
         if self.verbose:
             print("\nTraining params:")

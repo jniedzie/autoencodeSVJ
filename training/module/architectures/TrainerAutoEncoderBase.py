@@ -83,8 +83,8 @@ class TrainerAutoEncoderBase:
         """
         
         print("Filename: ", self.training_output_path)
-        print("Number of training samples: ", len(self.train_data_normalized.data))
-        print("Number of validation samples: ", len(self.validation_data_normalized.data))
+        print("Number of training samples: ", len(self.train_data_normalized.df))
+        print("Number of validation samples: ", len(self.validation_data_normalized.df))
         
         if self.verbose:
             self.model.summary()
@@ -95,9 +95,9 @@ class TrainerAutoEncoderBase:
         callbacks = self.__get_callbacks()
         
         self.model.fit(
-            x=self.train_data_normalized.data,
-            y=self.train_data_normalized.data,
-            validation_data=(self.validation_data_normalized.data, self.validation_data_normalized.data),
+            x=self.train_data_normalized.df,
+            y=self.train_data_normalized.df,
+            validation_data=(self.validation_data_normalized.df, self.validation_data_normalized.df),
             epochs=self.training_params["epochs"],
             batch_size=self.training_params["batch_size"],
             verbose=self.verbose,

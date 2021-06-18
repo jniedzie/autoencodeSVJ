@@ -70,8 +70,8 @@ class EvaluatorAutoEncoder:
 
         if model is None:
             model = self.__load_model(summary)
-        
-        reconstructed = pd.DataFrame(model.predict(input_data_normed.data),
+
+        reconstructed = pd.DataFrame(model.predict(input_data_normed.df),
                                      columns=input_data_normed.columns,
                                      index=input_data_normed.index,
                                      dtype="float64")
@@ -102,18 +102,15 @@ class EvaluatorAutoEncoder:
         print("\n\nEncoder:")
         encoder.summary()
 
-        predicted_data = encoder.predict(input_data_normed.data)
+        predicted_data = encoder.predict(input_data_normed.df)
         latent_values = pd.DataFrame(predicted_data, dtype="float64")
 
         return latent_values
 
     def get_error(self, input_data, summary, scaler, model=None):
         recon = self.get_reconstruction(input_data, summary, scaler, model)
-        
-        print("Calculating error using loss: ", summary.loss)
-        
         func = getattr(keras.losses, summary.loss)
-        losses = keras.backend.eval(func(input_data.data, recon))
+        losses = keras.backend.eval(func(input_data.df, recon))
         
         return losses.tolist()
         
