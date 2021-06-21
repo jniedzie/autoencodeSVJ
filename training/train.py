@@ -39,11 +39,12 @@ def get_sigal_name_for_index(i_sample, mass, rinv):
     else:
         rinv /= 100
 
-    
     signal_name = "{}GeV_{:3.2f}_mDark20_alphaPeak".format(mass, rinv)
     
     return signal_name
 
+
+print("Will train ", config.n_models, " models")
 
 for i in range(config.n_models):
 

@@ -20,63 +20,26 @@ class DataTable:
         RobustScaler = 2
         MaxAbsScaler = 3
 
-    table_count = 0
-    
     def __init__(self, data, headers=None):
         """ DataTable constructor.
         
         Args:
-            data: Data to be put in this data table (supports multiple types)
-            headers: (Optional) Names of columns
+            data (Any): Data to be put in this data table (pandas Dataframe or something that can be converted to it)
+            headers: (Optional) Names of columns, needed if input data is not a Dataframe
         """
-        
-        self.name = "Table {}".format(DataTable.table_count)
-        self.scaler = None
-        DataTable.table_count += 1
-        
-        # TODO: this can clearly be further simplified...
-        if headers is not None:
-            self.headers = headers
-            data = np.asarray(data)
-            if len(data.shape) < 2:
-                data = np.expand_dims(data, 1)
-            self.data = data
-        elif isinstance(data, pd.DataFrame):
-            self.headers = data.columns
-            self.data = data
-        elif isinstance(data, DataTable):
-            self.headers = data.headers
-            self.data = data.df.values
-            self.name = data.name
-        
-        assert len(self.data.shape) == 2, "data must be matrix!"
-        assert len(self.headers) == self.data.shape[1], "n columns must be equal to n column headers"
-        assert len(self.data) > 0, "n samples must be greater than zero"
-        
-        if isinstance(self.data, pd.DataFrame):
-            self.df = self.data
-            self.data = self.df.values
-        else:
-            self.df = pd.DataFrame(self.data, columns=self.headers)
-            
+
+        self.df = data if isinstance(data, pd.DataFrame) else pd.DataFrame(data, columns=headers)
         self.__update_column_names()
+
+        self.scaler = None
         self.weights = None
-    
+
     def __getattr__(self, attr):
-        if hasattr(self.df, attr):
-            return self.df.__getattr__(attr)
-        else:
-            raise AttributeError
+        return self.df.__getattr__(attr)
 
     def __getitem__(self, item):
         return self.df[item]
 
-    def __str__(self):
-        return self.df.__str__()
-
-    def __repr__(self):
-        return self.df.__repr__()
-    
     def setup_scaler(self, norm_type, scaler_args):
         """ Creates scaler and fits it to the data in this data table
         
@@ -118,8 +81,6 @@ class DataTable:
     
         to_drop = self.__find_matching_names(columns_to_drop)
         self.df.drop(to_drop, axis=1, inplace=True)
-        self.headers = list(self.df.columns)
-        self.data = np.asarray(self.df)
 
     def remove_empty_rows(self):
         """ Removes rows containing empty jets
@@ -163,7 +124,7 @@ class DataTable:
             input_list (list[str]): Input list to filter
 
         Returns:
-            (list[str]): List of names matching column names in this data table
+            list[str]: List of names matching column names in this data table
         """
         
         match_list = list(self.df.columns)
@@ -185,4 +146,3 @@ class DataTable:
             new_names[column] = "efp %s" % new_name if column.isdigit() else new_name
     
         self.df.rename(columns=new_names, inplace=True)
-        self.headers = list(self.df.columns)

@@ -169,7 +169,7 @@ training_params = {
 
 # ---------------------------------------------
 # Number of models to train
-n_models = 0
+n_models = 1
 
 # ---------------------------------------------
 # Pick normalization type (definitions below):
