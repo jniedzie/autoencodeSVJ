@@ -17,5 +17,9 @@ config = importlib.import_module(config_path)
 
 
 evaluator = Evaluator(**config.evaluation_general_settings, **config.evaluation_settings)
-evaluator.save_aucs(test_filename_pattern=config.test_filename_pattern, use_qcd_weights_for_signal=True)
-# evaluator.save_aucs(test_filename_pattern="v", use_qcd_weights_for_signal=True)
+evaluator.save_aucs(
+    # test_filename_pattern=config.test_filename_pattern,
+    test_filename_pattern="v",
+    use_qcd_weights_for_signal=True,
+    force_no_weights=True
+)

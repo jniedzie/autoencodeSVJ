@@ -29,9 +29,12 @@ class EvaluatorAutoEncoder:
         model = self.__load_model(summary)
         return model.get_weights()
 
-    def get_qcd_data(self, summary, data_processor, data_loader, normalize=False, test_data_only=True):
+    def get_qcd_data(self, summary, data_processor, data_loader, normalize=False,
+                     test_data_only=True, force_no_weights=False):
         
-        self.qcd_data = data_loader.get_data(data_path=summary.qcd_path, weights_path=summary.qcd_weights_path)
+        weights_path = None if force_no_weights else summary.qcd_weights_path
+        
+        self.qcd_data = data_loader.get_data(data_path=summary.qcd_path, weights_path=weights_path)
         
         if test_data_only:
             (_, _, self.qcd_data) = data_processor.split_to_train_validate_test(self.qcd_data)
@@ -114,7 +117,8 @@ class EvaluatorAutoEncoder:
         
         return losses.tolist()
         
-    def get_aucs(self, summary, AUCs_path, filename, data_processor, data_loader, use_qcd_weights_for_signal=False):
+    def get_aucs(self, summary, AUCs_path, filename, data_processor, data_loader,
+                 use_qcd_weights_for_signal=False, force_no_weights=False):
         
         auc_path = AUCs_path + "/" + filename
     
@@ -140,7 +144,8 @@ class EvaluatorAutoEncoder:
                                data_processor=data_processor,
                                data_loader=data_loader,
                                model=model,
-                               use_qcd_weights_for_signal=use_qcd_weights_for_signal)
+                               use_qcd_weights_for_signal=use_qcd_weights_for_signal,
+                               force_no_weights=force_no_weights)
         
         print("aucs: ", aucs)
         
@@ -248,9 +253,11 @@ class EvaluatorAutoEncoder:
             self.signal_dict[name] = new_path
          
     def __get_data(self, summary, data_processor, data_loader,
-                   test_key="qcd", use_qcd_weights_for_signal=False):
+                   test_key="qcd",
+                   use_qcd_weights_for_signal=False, force_no_weights=False):
         data = {
-            test_key: self.get_qcd_data(summary, data_processor, data_loader, test_data_only=True)
+            test_key: self.get_qcd_data(summary, data_processor, data_loader,
+                                        test_data_only=True, force_no_weights=force_no_weights)
         }
         
         for name, path in self.signal_dict.items():
@@ -273,11 +280,13 @@ class EvaluatorAutoEncoder:
         return losses
         
     def __get_aucs(self, summary, data_processor, data_loader, model,
-                   test_key='qcd', use_qcd_weights_for_signal=False):
+                   use_qcd_weights_for_signal=False, force_no_weights=False):
     
+        test_key = "qcd"
         self.__update_signals_efp_base(summary, test_key)
         
-        normed = self.__get_data(summary, data_processor, data_loader, test_key, use_qcd_weights_for_signal)
+        normed = self.__get_data(summary, data_processor, data_loader, test_key,
+                                 use_qcd_weights_for_signal, force_no_weights)
         errors = self.__get_losses(normed, model, summary, test_key)
 
         background_errors = errors[test_key]

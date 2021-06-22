@@ -48,7 +48,7 @@ class Evaluator:
     
         return weights
     
-    def save_aucs(self, test_filename_pattern="*", use_qcd_weights_for_signal=False):
+    def save_aucs(self, test_filename_pattern="*", use_qcd_weights_for_signal=False, force_no_weights=False):
     
         summaries = summaryProcessor.get_summaries_from_path(self.summary_path)
 
@@ -71,7 +71,8 @@ class Evaluator:
                                                        filename=filename,
                                                        data_processor=data_processor,
                                                        data_loader=data_loader,
-                                                       use_qcd_weights_for_signal=use_qcd_weights_for_signal)
+                                                       use_qcd_weights_for_signal=use_qcd_weights_for_signal,
+                                                       force_no_weights=force_no_weights)
             
             if auc_params is None:
                 continue
