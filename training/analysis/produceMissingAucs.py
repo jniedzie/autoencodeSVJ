@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(1, "../")
+
 import importlib
 import argparse
 
@@ -12,7 +15,7 @@ from module.Evaluator import Evaluator
 parser = argparse.ArgumentParser(description="Argument parser")
 parser.add_argument("-c", "--config", dest="config_path", default=None, required=True, help="Path to the config file")
 args = parser.parse_args()
-config_path = args.config_path.strip(".py").replace("/", ".")
+config_path = args.config_path.replace(".py", "").replace("../", "").replace("/", ".")
 config = importlib.import_module(config_path)
 
 

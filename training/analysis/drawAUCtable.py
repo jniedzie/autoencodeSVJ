@@ -5,6 +5,10 @@ import matplotlib.pyplot as plt
 import importlib, argparse
 import csv
 
+import sys
+sys.path.insert(1, "../")
+
+
 # ------------------------------------------------------------------------------------------------
 # This script will draw a table with AUCs (areas under ROC curve) values based on the CSV
 # file stored in "AUCs_path" with version specified by "training_version" from the provided
@@ -14,7 +18,7 @@ import csv
 parser = argparse.ArgumentParser(description="Argument parser")
 parser.add_argument("-c", "--config", dest="config_path", default=None, required=True, help="Path to the config file")
 args = parser.parse_args()
-config_path = args.config_path.strip(".py").replace("/", ".")
+config_path = args.config_path.replace(".py", "").replace("../", "").replace("/", ".")
 config = importlib.import_module(config_path)
 
 n_bins_rinv = 3

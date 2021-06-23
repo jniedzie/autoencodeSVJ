@@ -35,6 +35,7 @@ class DataLoader:
 
     def get_data(self, data_path, weights_path=None, per_event=False):
         """ Loads data from provided path and returns as a data table
+        
         Args:
             data_path (str): Path to data to load (can contain wildcards)
             weights_path (str): If specified, will load weights histogram and calculate weights that can be later

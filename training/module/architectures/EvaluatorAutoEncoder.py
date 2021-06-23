@@ -1,15 +1,17 @@
 import glob
 import os
+import pickle
+
 import tensorflow as tf
+import pandas as pd
 import keras
 from keras.models import model_from_json
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
-import pandas as pd
-import pickle
 
 from module.DataLoader import DataLoader
-from module.DataProcessor import *
+from module.DataProcessor import DataProcessor
+from module.DataTable import DataTable
 from module.architectures.DenseTiedLayer import DenseTiedLayer
 
 
@@ -31,6 +33,19 @@ class EvaluatorAutoEncoder:
 
     def get_qcd_data(self, summary, data_processor, data_loader, normalize=False,
                      test_data_only=True, force_no_weights=False):
+        """
+        
+        Args:
+            summary (DataTable):
+            data_processor (DataProcessor):
+            data_loader (DataLoader):
+            normalize (bool):
+            test_data_only (bool):
+            force_no_weights (bool):
+
+        Returns:
+            DataTable
+        """
         
         weights_path = None if force_no_weights else summary.qcd_weights_path
         

@@ -33,8 +33,8 @@ results_path = output_path+"trainingRuns/"
 plots_path = output_path+"plots/"
 stat_hists_path = output_path+"stat_hists.root"
 
-# output_file_suffix = "_noEfp0_withPt_unweighted"
-output_file_suffix = "_noEfp0_noPt_weighted"
+output_file_suffix = "_noEfp0_withPt_unweighted"
+# output_file_suffix = "_noEfp0_noPt_weighted"
 
 # ---------------------------------------------
 # Build general training/evaluation settings dictionary
@@ -42,8 +42,8 @@ output_file_suffix = "_noEfp0_noPt_weighted"
 def __get_variables_to_drop():
     to_drop = ["MET", "METEta", "METPhi", "MT", "Mjj", "genWeight"]
     
-    to_drop.extend(["efp 0", "Energy", "Flavor", "ChargedFraction", "Pt"])
-    # to_drop.extend(["efp 0", "Energy", "Flavor", "ChargedFraction"])
+    # to_drop.extend(["efp 0", "Energy", "Flavor", "ChargedFraction", "Pt"])
+    to_drop.extend(["efp 0", "Energy", "Flavor", "ChargedFraction"])
     # to_drop.extend(["Energy", "Flavor", "ChargedFraction"])
     
     # to_drop.extend(["efp {}".format(i) for i in range(1, 13)])
@@ -141,10 +141,9 @@ training_params = {
     # "bottleneck_size": 20,
     # "intermediate_architecture": (100, 100),
 
-    "intermediate_architecture": (17, 17),
-    "bottleneck_size": 5,
+    "intermediate_architecture": (13, 13),
+    "bottleneck_size": 7,
     
-
     # activation functions documentation
     # https://keras.io/api/layers/activations/
     # "activation": "relu",
@@ -201,7 +200,7 @@ normalizations = {
 
 # ---------------------------------------------
 # Once the training is done, you can specify which model was the best and use it for further tests/plotting
-best_model = 3
+best_model = 2
 
 # how many best models to include in the chi2 calculation
 fraction_of_models_for_avg_chi2 = 0.8
@@ -257,8 +256,8 @@ training_settings = {
     "EFP_base": efp_base,
     "norm_type": norm_type,
     "norm_args": normalizations[norm_type],
-    "qcd_weights_path": "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/weighting/results/weights_qcd_realistic_to_flatJetPt_events100000_nBins100_maxPt2000.000000.root"
-    # "qcd_weights_path": None
+    # "qcd_weights_path": "/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/weighting/results/weights_qcd_realistic_to_flatJetPt_events100000_nBins100_maxPt2000.000000.root"
+    "qcd_weights_path": None
 }
 
 evaluation_settings = {

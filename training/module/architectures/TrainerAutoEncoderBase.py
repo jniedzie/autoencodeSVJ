@@ -1,5 +1,3 @@
-import numpy as np
-
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TerminateOnNaN, ModelCheckpoint, CSVLogger
 
 from module.DataLoader import DataLoader

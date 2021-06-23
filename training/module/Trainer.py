@@ -36,6 +36,8 @@ class Trainer:
         self.test_data_fraction = test_data_fraction
         self.variables_to_drop = variables_to_drop
         self.max_jets = max_jets
+        self.start_timestamp = None
+        self.end_timestamp = None
     
         # Draw, set and save random seed
         self.seed = np.random.randint(0, 99999999)

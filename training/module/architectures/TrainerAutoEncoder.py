@@ -89,5 +89,3 @@ class TrainerAutoEncoder(TrainerAutoEncoderBase):
                             metrics=[self.training_params["metric"]])
 
         return autoencoder
-
-
