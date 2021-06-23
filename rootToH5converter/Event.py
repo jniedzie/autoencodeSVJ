@@ -29,8 +29,12 @@ class Event:
         self.metPhi = data_processor.get_value_from_tree("MET_phi", i_event, i_object)
         self.metEta = data_processor.get_value_from_tree("MET_eta", i_event, i_object)
         self.genWeight = data_processor.get_value_from_tree("Gen_weight", i_event, i_object)
+       
         
-        self.nJets = data_processor.get_value_from_tree("N_fat_jets" if use_fat_jets else "N_jets", i_event)
+        if input_type == InputTypes.scoutingAtHlt:
+            self.nJets = len(data_processor.branches["Jet_eta"][i_event])
+        else:
+            self.nJets = data_processor.get_value_from_tree("N_fat_jets" if use_fat_jets else "N_jets", i_event)
         if input_type == InputTypes.PFnanoAOD102X:
             if use_fat_jets:
                 N_tracks_variable = "N_tracks_AK8"
@@ -38,9 +42,18 @@ class Event:
                 N_tracks_variable = "N_tracks_AK4"
         else:
             N_tracks_variable = "N_tracks"
-        self.nTracks = data_processor.get_value_from_tree(N_tracks_variable, i_event)
+        
+        if input_type == InputTypes.scoutingAtHlt:
+            self.nTracks = len(data_processor.branches["Track_eta"][i_event])
+        else:
+            self.nTracks = data_processor.get_value_from_tree(N_tracks_variable, i_event)
+        
         self.nNeutralHadrons = data_processor.get_value_from_tree("N_neutral_hadrons", i_event)
-        self.nPhotons = data_processor.get_value_from_tree("N_photons", i_event)
+        
+        if input_type == InputTypes.scoutingAtHlt:
+            self.nPhotons = len(data_processor.branches["Photon_eta"][i_event])
+        else:        
+            self.nPhotons = data_processor.get_value_from_tree("N_photons", i_event)
         
         # load tracks from tree
         self.tracks = []
