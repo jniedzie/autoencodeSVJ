@@ -49,7 +49,7 @@ class Converter:
         self.max_n_jets = store_n_jets
         self.EFP_size = 0
         self.use_fat_jets = use_fat_jets
-
+        
         # initialize EFP set
         if efp_degree >= 0:
             if self.verbosity_level > 0:
@@ -60,10 +60,9 @@ class Converter:
             self.EFP_size = self.efpset.count()
             if self.verbosity_level > 0:
                 print("EFP set is size: {}".format(self.EFP_size))
-                print("=======================================================\n\n")
-            
+                print("=======================================================\n\n")    
         # prepare arrays for event & jet features, EFPs and jet constituents
-        
+
         self.output_arrays = {
             OutputTypes.EventFeatures: np.empty((self.n_events, len(Event.get_features_names()))),
             OutputTypes.JetFeatures: np.empty((self.n_events, self.max_n_jets, len(Jet.get_feature_names()))),
@@ -110,10 +109,10 @@ class Converter:
 
     def read_trees(self):
         """
-        Reads input ROOT files, extracts trees and recognizes type of the input file (Delphes/nanoAOD/PFnanoAOD).
+        Reads input ROOT files, extracts trees and recognizes type of the input file (Delphes/nanoAOD/PFnanoAOD/scoutingAtHlt).
         """
         for path, file in self.files.items():
-        
+            print(file.keys()) 
             for key in file.keys():
                 if key.startswith("Delphes"):
                     self.trees[path] = file["Delphes"]
@@ -127,6 +126,10 @@ class Converter:
                         self.input_types[path] = InputTypes.PFnanoAOD106X
                     elif "FatJetPFCands_jetIdx" in file[key].keys():
                         self.input_types[path] = InputTypes.PFnanoAOD102X
+                    elif "double_hltScoutingPFPacker_pfMetPhi_HLT2018." in file[key].keys():
+                        self.input_types[path] = InputTypes.scoutingAtHlt
+                        if self.verbosity_level > 0:
+                            print("Adding scoutingAtHlt tree: ", key)
                     else:
                         self.input_types[path] = InputTypes.nanoAOD
 
@@ -135,6 +138,7 @@ class Converter:
                 else:
                     if self.verbosity_level > 0:
                         print("Unknown tree type: ", key, ". Skipping...")
+                
 
 
     def set_selections_all_events(self):
@@ -151,12 +155,11 @@ class Converter:
         """
         Reads all selected events from input trees and stores requested features in arrays prepared in the constructor.
         """
-        
+	        
         total_count = 0
         n_jets_without_constituents = 0
         
-        for file_name, tree in self.trees.items():
-    
+        for file_name, tree in self.trees.items(): 
             input_type = self.input_types[file_name]
             data_processor = DataProcessor(tree, input_type)
 

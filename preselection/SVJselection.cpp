@@ -15,7 +15,7 @@ const double minJetMt = 1500; //GeV
 const double minMetRatio = 0.25;
 
 const bool useFatJets = true;
-const bool readScoutingNtuples = false;
+const bool readScoutingNtuples = true;
 
 
 int leptonCount(vector<LorentzMock>* leptons)

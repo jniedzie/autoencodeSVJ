@@ -5,8 +5,8 @@ class InputTypes(Enum):
     Delphes = 0,
     nanoAOD = 1,
     PFnanoAOD102X = 2,
-    PFnanoAOD106X = 3
-
+    PFnanoAOD106X = 3,
+    scoutingAtHlt = 4
 
 class DataProcessor:
     def __init__(self, tree, input_type):
@@ -162,14 +162,38 @@ class DataProcessor:
                 "Photon_phi": "Photon_phi",
                 "Photon_pt": "Photon_pt",
                 "Photon_mass": "Photon_mass",
-            }
+            },
+	    InputTypes.scoutingAtHlt:{
+                # number of objects
+                #"N_jets": "Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018./Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018.obj.pt_",
+                #"N_tracks": "Run3ScoutingTracks_hltScoutingTrackPacker__HLT2018./Run3ScoutingTracks_hltScoutingTrackPacker__HLT2018.obj.pt_",
+                #"N_photons": "Run3ScoutingPhotons_hltScoutingEgammaPacker__HLT2018./Run3ScoutingPhotons_hltScoutingEgammaPacker__HLT2018.obj.pt_",
+                # event features
+                "MET_pt": "double_hltScoutingPFPacker_pfMetPt_HLT2018./double_hltScoutingPFPacker_pfMetPt_HLT2018.obj",
+                "MET_phi": "double_hltScoutingPFPacker_pfMetPhi_HLT2018./double_hltScoutingPFPacker_pfMetPhi_HLT2018.obj",
+                # jet features
+                "Jet_eta": "Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018./Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018.obj/Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018.obj.eta_",
+                "Jet_phi": "Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018./Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018.obj/Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018.obj.phi_",
+                "Jet_pt": "Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018./Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018.obj/Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018.obj.pt_",
+                "Jet_mass": "Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018./Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018.obj/Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018.obj.m_",
+                "Jet_nCharged": "Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018./Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018.obj/Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018.obj.chargedHadronMultiplicity_",# ! only take hadrons into account !
+                "Jet_nNeutral": "Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018./Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018.obj/Run3ScoutingPFJets_hltScoutingPFPacker__HLT2018.obj.neutralHadronMultiplicity_",# ! only take hadrons into account !
+                # tracks
+                "Track_eta": "Run3ScoutingTracks_hltScoutingTrackPacker__HLT2018./Run3ScoutingTracks_hltScoutingTrackPacker__HLT2018.obj/Run3ScoutingTracks_hltScoutingTrackPacker__HLT2018.obj.tk_eta_",
+                "Track_phi": "Run3ScoutingTracks_hltScoutingTrackPacker__HLT2018./Run3ScoutingTracks_hltScoutingTrackPacker__HLT2018.obj/Run3ScoutingTracks_hltScoutingTrackPacker__HLT2018.obj.tk_phi_",
+                "Track_pt": "Run3ScoutingTracks_hltScoutingTrackPacker__HLT2018./Run3ScoutingTracks_hltScoutingTrackPacker__HLT2018.obj/Run3ScoutingTracks_hltScoutingTrackPacker__HLT2018.obj.tk_pt_",
+                # photons
+                "Photon_eta": "Run3ScoutingPhotons_hltScoutingEgammaPacker__HLT2018./Run3ScoutingPhotons_hltScoutingEgammaPacker__HLT2018.obj/Run3ScoutingPhotons_hltScoutingEgammaPacker__HLT2018.obj.eta_",
+                "Photon_phi": "Run3ScoutingPhotons_hltScoutingEgammaPacker__HLT2018./Run3ScoutingPhotons_hltScoutingEgammaPacker__HLT2018.obj/Run3ScoutingPhotons_hltScoutingEgammaPacker__HLT2018.obj.phi_",
+                "Photon_pt": "Run3ScoutingPhotons_hltScoutingEgammaPacker__HLT2018./Run3ScoutingPhotons_hltScoutingEgammaPacker__HLT2018.obj/Run3ScoutingPhotons_hltScoutingEgammaPacker__HLT2018.obj.pt_",	
+	    }
         }
         
         # pre-load all branches for this tree to avoid calling this for every event/track/jet
         self.branches = {}
         
         print("Keys found in the tree:", tree.keys())
-        
+         
         for key, value in self.variables[input_type].items():
             if value in tree.keys():
                 self.branches[key] = tree[value].array()
