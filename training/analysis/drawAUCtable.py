@@ -56,6 +56,9 @@ def plot_aucs(dataframe, title=None):
 def read_csv_file():
     aucs_path = config.evaluation_general_settings["aucs_path"]
     filename = aucs_path + config.file_name + "_v" + str(config.best_model)
+    
+    print("Drawing AUC table for file: ", filename)
+    
     data = {}
     masses = []
     rinvs = []

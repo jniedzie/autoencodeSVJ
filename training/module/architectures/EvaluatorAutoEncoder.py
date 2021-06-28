@@ -169,12 +169,15 @@ class EvaluatorAutoEncoder:
         
         return (aucs, auc_path, append, write_header)
 
-    def draw_roc_curves(self, summary, data_processor, data_loader, ax, colors, **kwargs):
+    def draw_roc_curves(self, summary, data_processor, data_loader, ax, colors,
+                        use_qcd_weights_for_signal=False, force_no_weights=False, **kwagrs):
         model = self.__load_model(summary)
 
         test_key = "qcd"
-        normed = self.__get_normalized_data(summary, data_processor, data_loader, test_key)
-        errors = self.__get_losses(normed, model, summary.loss)
+        self.__update_signals_efp_base(summary, test_key)
+        data = self.__get_data(summary, data_processor, data_loader, test_key,
+                               use_qcd_weights_for_signal, force_no_weights)
+        errors = self.__get_losses(data, model, summary, test_key)
         
         signals_errors = {k: v for k, v in errors.items() if k != test_key}
         qcd_errors = errors[test_key]
@@ -300,13 +303,13 @@ class EvaluatorAutoEncoder:
         test_key = "qcd"
         self.__update_signals_efp_base(summary, test_key)
         
-        normed = self.__get_data(summary, data_processor, data_loader, test_key,
+        data = self.__get_data(summary, data_processor, data_loader, test_key,
                                  use_qcd_weights_for_signal, force_no_weights)
-        errors = self.__get_losses(normed, model, summary, test_key)
+        errors = self.__get_losses(data, model, summary, test_key)
 
         background_errors = errors[test_key]
         background_labels = [0] * len(background_errors)
-        background_weights = normed[test_key].weights
+        background_weights = data[test_key].weights
     
         if background_weights is None:
             background_weights = [1] * len(background_errors)

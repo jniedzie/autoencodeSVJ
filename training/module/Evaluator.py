@@ -88,7 +88,7 @@ class Evaluator:
             for element in aucs:
                 out_file.write("{},{},{}\n".format(element["mass"], element["rinv"], element["auc"]))
 
-    def draw_roc_curves(self, summary_version, **kwargs):
+    def draw_roc_curves(self, summary_version, use_qcd_weights_for_signal=False, force_no_weights=False, **kwargs):
 
         summaries = summaryProcessor.get_summaries_from_path(self.summary_path)
 
@@ -112,7 +112,10 @@ class Evaluator:
                                                  data_processor=data_processor,
                                                  data_loader=data_loader,
                                                  ax=ax,
-                                                 colors=colors)
+                                                 colors=colors,
+                                                 use_qcd_weights_for_signal=use_qcd_weights_for_signal,
+                                                 force_no_weights=force_no_weights
+                                                 )
 
         x = [i for i in np.arange(0, 1.1, 0.1)]
         ax.plot(x, x, '--', c='black')

@@ -8,16 +8,12 @@ show_plots = False
 input_paths = [
     
     
-    (glob.glob("../trainingResults_v3/aucs/bottle_3_arch_13__13_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_noEfp0_withPt_unweighted_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_v3/aucs/bottle_4_arch_13__13_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_noEfp0_withPt_unweighted_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_v3/aucs/bottle_5_arch_13__13_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_noEfp0_withPt_unweighted_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_v3/aucs/bottle_6_arch_13__13_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_noEfp0_withPt_unweighted_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_v3/aucs/bottle_7_arch_13__13_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_noEfp0_withPt_unweighted_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_v3/aucs/bottle_8_arch_13__13_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_noEfp0_withPt_unweighted_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_v3/aucs/bottle_9_arch_13__13_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_noEfp0_withPt_unweighted_v*"), kBlue, "(7, 7), BN: 1"),
-    (glob.glob("../trainingResults_v3/aucs/bottle_10_arch_13__13_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_noEfp0_withPt_unweighted_v*"), kBlue, "(7, 7), BN: 1"),
-
-
+    (glob.glob("../trainingResults_v3/aucs/bottle_7_arch_17__17_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_noEfp0_withPt_unweighted_v*"), kBlue, "(7, 7), BN: 1"),
+    (glob.glob("../trainingResults_v3/aucs/bottle_7_arch_17__17_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_noEfp0_withPt_weighted_v*"), kBlue, "(7, 7), BN: 1"),
+    
+    (glob.glob("../trainingResults_v3/aucs/bottle_7_arch_13__13_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_noEfp0_noPt_unweighted_v*"), kBlue, "(7, 7), BN: 1"),
+    (glob.glob("../trainingResults_v3/aucs/bottle_7_arch_13__13_loss_mean_absolute_error_optimizer_Adam_batchSize_256_StandardScaler_activation_elu_tiedWeights_False_epochs_200_maxJets_2_metric_accuracy_noEfp0_noPt_weighted_v*"), kBlue, "(7, 7), BN: 1"),
+    
 
 ]
 

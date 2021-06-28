@@ -1,5 +1,10 @@
+import sys
+sys.path.insert(1, "../")
+
+import importlib
+import argparse
+
 from module.Evaluator import Evaluator
-import importlib, argparse
 
 # ------------------------------------------------------------------------------------------------
 # This script will draw ROC curves for a specified model against all signals found in the
@@ -10,7 +15,7 @@ import importlib, argparse
 parser = argparse.ArgumentParser(description="Argument parser")
 parser.add_argument("-c", "--config", dest="config_path", default=None, required=True, help="Path to the config file")
 args = parser.parse_args()
-config_path = args.config_path.strip(".py").replace("/", ".")
+config_path = args.config_path.replace(".py", "").replace("../", "").replace("/", ".")
 config = importlib.import_module(config_path)
 
 # masses = [1500, 2000, 2500, 3000, 3500, 4000]
