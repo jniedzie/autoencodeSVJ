@@ -139,23 +139,22 @@ class Jet:
         m_00 = 0
         m_01 = 0
         m_11 = 0
-        
-        sum_pt = 0
+        sum_pt2 = 0
         
         for constituent in self.constituents:
             delta_eta = constituent.Eta() - self.eta
             delta_phi = constituent.DeltaPhi(self.get_four_vector())
+            pt2 = constituent.Pt() ** 2
             
-            m_00 += pow(constituent.Pt() * delta_eta, 2)
-            m_01 += pow(constituent.Pt(), 2) * delta_eta * delta_phi
-            m_11 += pow(constituent.Pt() * delta_phi, 2)
-
-            sum_pt += pow(constituent.Pt(), 2)
+            m_00 += pt2 * delta_eta ** 2
+            m_01 += pt2 * delta_eta * delta_phi
+            m_11 += pt2 * delta_phi ** 2
+            sum_pt2 += pt2
         
         eigen_values = LA.eigvals(np.array([[m_00, -m_01], [-m_01, m_11]]))
 
-        axis_major = np.sqrt(max(eigen_values) / sum_pt)
-        axis_minor = np.sqrt(min(eigen_values) / sum_pt)
+        axis_major = np.sqrt(max(eigen_values) / sum_pt2)
+        axis_minor = np.sqrt(min(eigen_values) / sum_pt2)
         
         return axis_minor, axis_major
 
@@ -200,14 +199,28 @@ class Jet:
         return axis2
 
     def get_girth(self):
-        
+    
         girth = 0
+        
+        for constituent in self.constituents:
+            delta_r = constituent.DeltaR(self.get_four_vector())
+            girth += constituent.Pt()/self.pt * delta_r
         
         return girth
     
     def get_lha(self):
         
         lha = 0
+
+        sum_pt = 0
+
+        for constituent in self.constituents:
+            delta_theta = constituent.DeltaR(self.get_four_vector())
+            lha += constituent.Pt() * delta_theta
+            sum_pt += constituent.Pt()
+        
+        lha /= sum_pt
+        lha /= 0.8
         
         return lha
         
