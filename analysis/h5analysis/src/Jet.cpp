@@ -12,7 +12,7 @@ void Jet::print()
 {
   cout<<"Jet:"<<endl;
   cout<<"\teta: "<<eta<<"\tphi: "<<phi<<"\tpt: "<<pt<<"\tmass: "<<mass<<"\tcharged fraction: "<<chargedFraction;
-  cout<<"\tPTD: "<<PTD<<"\taxis2: "<<axis2<<"\tflavor: "<<flavor<<"\tenergy: "<<energy<<endl;
+  cout<<"\tPTD: "<<PTD<<"\taxis minor: "<<axisMinor<<"\tflavor: "<<flavor<<"\tenergy: "<<energy<<endl;
   cout<<"\tEFPs:";
   for(double EFP : EFPs) cout<<EFP<<"\t";
   

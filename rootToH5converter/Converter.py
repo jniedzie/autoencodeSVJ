@@ -45,7 +45,7 @@ class Converter:
 
         # set internal parameters
         self.jet_delta_r = jet_delta_r
-        self.max_n_constituents = max_n_constituents if max_n_constituents > 0 else 100
+        self.max_n_constituents = max_n_constituents if max_n_constituents >= 0 else 100
         self.max_n_jets = store_n_jets
         self.EFP_size = 0
         self.use_fat_jets = use_fat_jets

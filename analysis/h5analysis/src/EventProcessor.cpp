@@ -165,9 +165,18 @@ void EventProcessor::fillJets(Group groupJet)
       jet->mass            = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 3];
       jet->chargedFraction = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 4];
       jet->PTD             = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 5];
-      jet->axis2           = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 6];
-      jet->flavor          = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 7];
-      jet->energy          = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 8];
+      jet->axisMinor       = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 6];
+      jet->axisMajor       = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 7];
+      jet->girth           = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 8];
+      jet->lha             = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 9];
+      jet->flavor          = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 10];
+      jet->energy          = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 11];
+      jet->ecf1            = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 12];
+      jet->ecf2            = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 13];
+      jet->ecf3            = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 14];
+      jet->e2              = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 15];
+      jet->C2              = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 16];
+      jet->D3              = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 17];
     }
   }
 }

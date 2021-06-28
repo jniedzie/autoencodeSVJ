@@ -58,9 +58,18 @@ class Jet:
             'M',
             'ChargedFraction',
             'PTD',
-            'Axis2',
+            'AxisMinor',
+            'AxisMajor',
+            'Girth',
+            'LHA',
             'Flavor',
             'Energy',
+            'ECF1',
+            'ECF2',
+            'ECF3',
+            'e2',
+            'C2',
+            'D3',
         ]
 
     def get_features(self):
@@ -74,9 +83,18 @@ class Jet:
             self.mass,
             self.chargedHadronEnergyFraction,
             self.get_ptD(),
-            self.get_axis2(),
+            self.get_axes()[0],
+            self.get_axes()[1],
+            self.get_girth(),
+            self.get_lha(),
             self.flavor,
             self.get_four_vector().E(),
+            self.get_ecfs()[0],
+            self.get_ecfs()[1],
+            self.get_ecfs()[2],
+            self.get_ecfs()[3],
+            self.get_ecfs()[4],
+            self.get_ecfs()[5],
         ]
 
     @staticmethod
@@ -110,6 +128,38 @@ class Jet:
         ptD = np.sqrt(sum_weight) / sum_pt if sum_weight > 0 else 0
 
         return ptD
+
+    def get_axes(self):
+        
+        axis_minor = 0
+        axis_major = 0
+        
+        return axis_minor, axis_major
+
+    def get_girth(self):
+        
+        girth = 0
+        
+        return girth
+    
+    def get_lha(self):
+        
+        lha = 0
+        
+        return lha
+        
+    
+    def get_ecfs(self):
+        
+        ecf_1 = 0
+        ecf_2 = 0
+        ecf_3 = 0
+        
+        e2 = 0
+        C2 = 0
+        D3 = 0
+        
+        return ecf_1, ecf_2, ecf_3, e2, C2, D3
 
     def get_axis2(self):
         """

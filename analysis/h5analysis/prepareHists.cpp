@@ -18,11 +18,17 @@ const int maxEvents = 999999999;
 
 //const string inputPath = "/Users/Jeremi/Documents/Physics/ETH/data/training_data/qcd/base_3/data_0_data.h5";
 
+//vector<tuple<string, double, int>> inputPaths = {
+//  {"/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/base_3/QCD_part_0.h5", 1, 1},
+//};
+//
+//const string outputPath = "results/h5histsQCD_delphes_new.root";
+
 vector<tuple<string, double, int>> inputPaths = {
-  {"/Users/Jeremi/Documents/Physics/ETH/data/backgrounds_delphes/qcd/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/base_3/QCD_part_0.h5", 1, 1},
+  {"/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/rootToH5converter/test.h5", 1, 1},
 };
 
-const string outputPath = "results/h5histsQCD_delphes_new.root";
+const string outputPath = "results/h5histsQCD_delphes_test.root";
 
 //vector<tuple<string, double, int>> inputPaths = {
 //  {"/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/3000GeV_0.70_mDark20_alphaPeak/base_3/SVJ_m3000_mDark20_r70_alphaPeak.h5", 1, 1},
@@ -87,10 +93,19 @@ vector<tuple<string, int, double, double>> jetHistParams = {
   {"mass"             , 100, 0    , 800   },
   {"chargedFraction"  , 100, 0    , 1     },
   {"PTD"              , 100, 0    , 1     },
-  {"axis2"            , 100, 0    , 0.2   },
+  {"axisMinor"        , 100, 0    , 1.0   },
+  {"axisMajor"        , 100, 0    , 1.0   },
+  {"girth"            , 100, 0    , 1.0   },
+  {"lha"              , 100, 0    , 1.0   },
   {"flavor"           , 100, -50  , 50    },
   {"energy"           , 100, 0    , 5000  },
   {"efpMass"          , 100, 0    , 500   },
+  {"ecf1"             , 100, 0    , 1.0   },
+  {"ecf2"             , 100, 0    , 1.0   },
+  {"ecf3"             , 100, 0    , 1.0   },
+  {"e2"               , 100, 0    , 1.0   },
+  {"C2"               , 100, 0    , 1.0   },
+  {"D3"               , 100, 0    , 1.0   },
 };
 
 vector<tuple<string, int, double, double>> constituentHistParams = {
@@ -148,9 +163,18 @@ void fillJetHists(const shared_ptr<Jet> jet, int iJet, double eventWeight, strin
   jetHists["mass"+suffix]->Fill(jet->mass, eventWeight);
   jetHists["chargedFraction"+suffix]->Fill(jet->chargedFraction, eventWeight);
   jetHists["PTD"+suffix]->Fill(jet->PTD, eventWeight);
-  jetHists["axis2"+suffix]->Fill(jet->axis2, eventWeight);
+  jetHists["axisMinor"+suffix]->Fill(jet->axisMinor, eventWeight);
+  jetHists["axisMajor"+suffix]->Fill(jet->axisMajor, eventWeight);
+  jetHists["girth"+suffix]->Fill(jet->girth, eventWeight);
+  jetHists["lha"+suffix]->Fill(jet->lha, eventWeight);
   jetHists["flavor"+suffix]->Fill(jet->flavor, eventWeight);
   jetHists["energy"+suffix]->Fill(jet->energy, eventWeight);
+  jetHists["ecf1"+suffix]->Fill(jet->ecf1, eventWeight);
+  jetHists["ecf2"+suffix]->Fill(jet->ecf2, eventWeight);
+  jetHists["ecf3"+suffix]->Fill(jet->ecf3, eventWeight);
+  jetHists["e2"+suffix]->Fill(jet->e2, eventWeight);
+  jetHists["C2"+suffix]->Fill(jet->C2, eventWeight);
+  jetHists["D3"+suffix]->Fill(jet->D3, eventWeight);
   
   double recoMass = jet->pt * sqrt(0.1*jet->EFPs[1]/2);
   hists2d["efpVErification"]->Fill(jet->mass, recoMass, eventWeight);
@@ -287,22 +311,23 @@ void plotAndSaveHists()
     hist->Write();
   }
   
-  TCanvas *canvasJets = new TCanvas("Jets", "Jets", 2000, 1500);
-  canvasJets->Divide(4, 3);
+  TCanvas *canvasJets = new TCanvas("Jets", "Jets", 2880, 1800);
+  canvasJets->Divide(7, 3);
   
   iPad=1;
   canvasJets->cd(iPad++);
   hists2d["efpVErification"]->Draw("colz");
   
   for(auto &[name, hist] : jetHists){
-    canvasJets->cd(iPad++);
-    hist->DrawNormalized();
-    
-    if(name=="mass"){
-      jetHists["efpMass"]->SetLineColor(kRed);
-      jetHists["efpMass"]->Draw("same");
+    if(name.find("_ptWeighted") == string::npos){
+      canvasJets->cd(iPad++);
+      hist->DrawNormalized();
+      
+      if(name=="mass"){
+        jetHists["efpMass"]->SetLineColor(kRed);
+        jetHists["efpMass"]->Draw("same");
+      }
     }
-    
     outfile->cd();
     hist->Write();
   }

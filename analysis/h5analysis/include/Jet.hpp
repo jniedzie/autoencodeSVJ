@@ -18,7 +18,8 @@ public:
   Jet(){}
   
   
-  double eta, phi, pt, mass, chargedFraction, PTD, axis2, flavor, energy;
+  double eta, phi, pt, mass, chargedFraction, PTD, axisMinor, axisMajor, girth, lha, flavor, energy;
+  double ecf1, ecf2, ecf3, e2, C2, D3;
   vector<double> EFPs;
   vector<shared_ptr<Constituent>> constituents;
   
