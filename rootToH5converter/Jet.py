@@ -3,6 +3,8 @@ import numpy as np
 import energyflow as ef
 from numpy import linalg as LA
 
+from line_profiler_pycharm import profile
+
 class Jet:
     
     def __init__(self, eta, phi, pt, mass, flavor, n_charged=None, n_neutral=None, ch_hef=None, ne_hef=None):
@@ -64,12 +66,10 @@ class Jet:
             'LHA',
             'Flavor',
             'Energy',
-            'ECF1',
-            'ECF2',
-            'ECF3',
             'e2',
+            'e3',
             'C2',
-            'D3',
+            'D2',
         ]
 
     def get_features(self):
@@ -78,6 +78,7 @@ class Jet:
         """
         
         axis_minor, axis_major = self.get_axes()
+        ecf_2, ecf_3, C2, D2 = self.get_ecfs()
         
         # print("Axis2: ", self.get_axis2(), "\taxes:", self.get_axes())
         
@@ -94,12 +95,10 @@ class Jet:
             self.get_lha(),
             self.flavor,
             self.get_four_vector().E(),
-            self.get_ecfs()[0],
-            self.get_ecfs()[1],
-            self.get_ecfs()[2],
-            self.get_ecfs()[3],
-            self.get_ecfs()[4],
-            self.get_ecfs()[5],
+            ecf_2,
+            ecf_3,
+            C2,
+            D2,
         ]
 
     @staticmethod
@@ -201,11 +200,14 @@ class Jet:
     def get_girth(self):
     
         girth = 0
+        sum_pt = 0
         
         for constituent in self.constituents:
             delta_r = constituent.DeltaR(self.get_four_vector())
-            girth += constituent.Pt()/self.pt * delta_r
+            girth += constituent.Pt() * delta_r
+            sum_pt += constituent.Pt()
         
+        girth /= sum_pt
         return girth
     
     def get_lha(self):
@@ -220,28 +222,46 @@ class Jet:
             sum_pt += constituent.Pt()
         
         lha /= sum_pt
+        
+        # TODO: use real jet radius here
         lha /= 0.8
         
         return lha
         
-    
-    def get_ecfs(self):
+    def get_ecfs(self, beta=1.0):
         
         ecf_1 = 0
         ecf_2 = 0
         ecf_3 = 0
-        
-        e2 = 0
-        C2 = 0
-        D3 = 0
-        
-        return ecf_1, ecf_2, ecf_3, e2, C2, D3
 
-  
+        n_constituents = len(self.constituents)
 
-    def add_constituents(self, physObjects, pt_cut, delta_r, iJet=-1, track_jet_index=None, track_cand_index=None):
+        for i in range(n_constituents):
+            ecf_1 += self.constituents[i].Pt()
+            
+            for j in range(i+1, n_constituents):
+                val_2 = self.constituents[i].Pt() * self.constituents[j].Pt()
+                val_2 *= self.constituents[i].DeltaR(self.constituents[j]) ** (beta/0.5)
+                ecf_2 += val_2
+
+                for k in range(j+1, n_constituents):
+                    val_3 = val_2 * self.constituents[k].Pt()
+                    val_3 *= self.constituents[i].DeltaR(self.constituents[k]) ** (beta/0.5)
+                    val_3 *= self.constituents[j].DeltaR(self.constituents[k]) ** (beta/0.5)
+                    ecf_3 += val_3
+
+        # TODO: use real jet radius here
+        e_2 = ecf_2 / (ecf_1**2 * 0.8)
+        e_3 = ecf_3 / (ecf_1 * 0.8)**3
+        
+        C2 = e_3 / e_2**2
+        D2 = e_3 / e_2**3
+        
+        return e_2, e_3, C2, D2
+
+    def add_constituents(self, phys_objects, pt_cut, delta_r, iJet=-1, track_jet_index=None, track_cand_index=None):
         """
-        Adds constituents from physObjects collection, which pass the pt cut. If iJet and track_jet_index
+        Adds constituents from phys_objects collection, which pass the pt cut. If iJet and track_jet_index
         are not specified, it will add constituents within delta_r. Otherwise, it will check jet index for each
         constituent and add it only if it's the same as provided jet index iJet.
         """
@@ -249,7 +269,7 @@ class Jet:
         constituents = []
 
         if iJet < 0:
-            for i, object in enumerate(physObjects):
+            for i, object in enumerate(phys_objects):
                 if object.pt > pt_cut:
                     vec = object.get_four_vector()
                     
@@ -259,14 +279,14 @@ class Jet:
                         constituents.append(vec)
         else:
             if track_cand_index is None:
-                for i, track in enumerate(physObjects):
+                for i, track in enumerate(phys_objects):
                     jet_index = track_jet_index[i]
                     if jet_index == iJet:
                         constituents.append(track.get_four_vector())
             else:
                 cand_indices_for_jet = (track_jet_index == iJet)
                 cand_indices = track_cand_index[cand_indices_for_jet]
-                constituents = [track.get_four_vector() for itrack, track in enumerate(physObjects) if itrack in cand_indices]
+                constituents = [track.get_four_vector() for itrack, track in enumerate(phys_objects) if itrack in cand_indices]
 
         self.constituents.extend(constituents)
 
