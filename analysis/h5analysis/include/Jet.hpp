@@ -19,7 +19,7 @@ public:
   
   
   double eta, phi, pt, mass, chargedFraction, PTD, axisMinor, axisMajor, girth, lha, flavor, energy;
-  double ecf1, ecf2, ecf3, e2, C2, D3;
+  double e2, e3, C2, D2;
   vector<double> EFPs;
   vector<shared_ptr<Constituent>> constituents;
   

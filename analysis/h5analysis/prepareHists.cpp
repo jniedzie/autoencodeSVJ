@@ -24,11 +24,17 @@ const int maxEvents = 999999999;
 //
 //const string outputPath = "results/h5histsQCD_delphes_new.root";
 
+//vector<tuple<string, double, int>> inputPaths = {
+//  {"/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/rootToH5converter/test.h5", 1, 1},
+//};
+//
+//const string outputPath = "results/h5histsQCD_delphes_test.root";
+
 vector<tuple<string, double, int>> inputPaths = {
-  {"/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/rootToH5converter/test.h5", 1, 1},
+  {"/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/rootToH5converter/test_svj.h5", 1, 1},
 };
 
-const string outputPath = "results/h5histsQCD_delphes_test.root";
+const string outputPath = "results/h5histsSVJ_delphes_test.root";
 
 //vector<tuple<string, double, int>> inputPaths = {
 //  {"/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/3000GeV_0.70_mDark20_alphaPeak/base_3/SVJ_m3000_mDark20_r70_alphaPeak.h5", 1, 1},
@@ -93,19 +99,17 @@ vector<tuple<string, int, double, double>> jetHistParams = {
   {"mass"             , 100, 0    , 800   },
   {"chargedFraction"  , 100, 0    , 1     },
   {"PTD"              , 100, 0    , 1     },
-  {"axisMinor"        , 100, 0    , 1.0   },
-  {"axisMajor"        , 100, 0    , 1.0   },
+  {"axisMinor"        , 100, 0    , 0.5   },
+  {"axisMajor"        , 100, 0    , 0.5   },
   {"girth"            , 100, 0    , 1.0   },
   {"lha"              , 100, 0    , 1.0   },
   {"flavor"           , 100, -50  , 50    },
   {"energy"           , 100, 0    , 5000  },
   {"efpMass"          , 100, 0    , 500   },
-  {"ecf1"             , 100, 0    , 1.0   },
-  {"ecf2"             , 100, 0    , 1.0   },
-  {"ecf3"             , 100, 0    , 1.0   },
   {"e2"               , 100, 0    , 1.0   },
+  {"e3"               , 100, 0    , 1.0   },
   {"C2"               , 100, 0    , 1.0   },
-  {"D3"               , 100, 0    , 1.0   },
+  {"D2"               , 100, 0    , 100   },
 };
 
 vector<tuple<string, int, double, double>> constituentHistParams = {
@@ -169,12 +173,10 @@ void fillJetHists(const shared_ptr<Jet> jet, int iJet, double eventWeight, strin
   jetHists["lha"+suffix]->Fill(jet->lha, eventWeight);
   jetHists["flavor"+suffix]->Fill(jet->flavor, eventWeight);
   jetHists["energy"+suffix]->Fill(jet->energy, eventWeight);
-  jetHists["ecf1"+suffix]->Fill(jet->ecf1, eventWeight);
-  jetHists["ecf2"+suffix]->Fill(jet->ecf2, eventWeight);
-  jetHists["ecf3"+suffix]->Fill(jet->ecf3, eventWeight);
   jetHists["e2"+suffix]->Fill(jet->e2, eventWeight);
+  jetHists["e3"+suffix]->Fill(jet->e3, eventWeight);
   jetHists["C2"+suffix]->Fill(jet->C2, eventWeight);
-  jetHists["D3"+suffix]->Fill(jet->D3, eventWeight);
+  jetHists["D2"+suffix]->Fill(jet->D2, eventWeight);
   
   double recoMass = jet->pt * sqrt(0.1*jet->EFPs[1]/2);
   hists2d["efpVErification"]->Fill(jet->mass, recoMass, eventWeight);

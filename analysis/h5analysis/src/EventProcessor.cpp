@@ -171,12 +171,10 @@ void EventProcessor::fillJets(Group groupJet)
       jet->lha             = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 9];
       jet->flavor          = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 10];
       jet->energy          = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 11];
-      jet->ecf1            = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 12];
-      jet->ecf2            = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 13];
-      jet->ecf3            = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 14];
-      jet->e2              = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 15];
-      jet->C2              = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 16];
-      jet->D3              = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 17];
+      jet->e2            = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 12];
+      jet->e3            = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 13];
+      jet->C2              = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 14];
+      jet->D2              = valuesJets[iEvent*dimJets[1]*dimJets[2] + iJet*dimJets[2] + 15];
     }
   }
 }

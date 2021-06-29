@@ -5,7 +5,8 @@ const bool calculateAucs = false;
 vector<string> inputPaths = {
 //  "results/h5histsQCD_cmssw_mixed.root",
 //  "results/h5histsQCD_delphes_fixed.root",
-  "results/h5histsQCD_delphes_new.root",
+  "results/h5histsQCD_delphes_test.root",
+  "results/h5histsSVJ_delphes_test.root",
   
 //  "results/h5histsQCD_delphes.root",
 //  "results/h5histsQCD_cmssw_1000to1400.root",
@@ -40,7 +41,8 @@ vector<string> inputPaths = {
 map<string, tuple<string, int, int, int>> histParams = {
   // path                                           title                       color       style   width
 //  {"results/h5histsQCD_cmssw_mixed.root"                                  , {"QCD CMSSW mixed"              , kBlue       , 1     , 1   }},
-  {"results/h5histsQCD_delphes_new.root"                                , {"QCD"                  , kBlack      , 1     , 3   }},
+  {"results/h5histsQCD_delphes_test.root"                                , {"QCD"                  , kBlack      , 1     , 3   }},
+  {"results/h5histsSVJ_delphes_test.root"                                , {"SVJ, 3000, 0.3"       , kGreen      , 2     , 3   }},
   
 //  {"results/h5histsSVJ_m3500_r30_delphes.root"      , {"SVJ Delphes"              , kViolet     , 2     , 3   }},
   
@@ -86,7 +88,9 @@ vector<string> histNames1D = {
 };
 
 vector<string> histNamesJets = {
-  "pt_1_ptWeighted", "pt_2_ptWeighted", "mass_ptWeighted", "PTD_ptWeighted", "axis2_ptWeighted", "EFP_1"
+//  "pt_1_ptWeighted", "pt_2_ptWeighted", "mass_ptWeighted", "PTD_ptWeighted", "axis2_ptWeighted", "EFP_1"
+//  "lha", "axisMinor", "axisMajor", "e2", "C2", "D2"
+  "girth", "e3",
 };
 
 vector<int> colors = {kBlack, kRed, kOrange+1, kViolet, kBlue, kGreen+2, kMagenta+1, kCyan+1 };
@@ -196,7 +200,7 @@ void drawHists(const map<string, vector<TH1D*>> &histsCollection, TCanvas *canva
     }
     
     canvas->cd(iPad);
-//    legend->Draw();
+    legend->Draw();
     iPad++;
   }
 }
