@@ -3,7 +3,6 @@ import numpy as np
 import energyflow as ef
 from numpy import linalg as LA
 
-from line_profiler_pycharm import profile
 
 class Jet:
     
@@ -224,8 +223,9 @@ class Jet:
         sum_pt = 0
 
         for constituent in self.constituents:
+            # TODO: figure out which implementation is correct
             delta_theta = constituent.DeltaR(self.get_four_vector())
-
+            # delta_theta = constituent.Angle(self.get_four_vector().Vect())
             # delta_theta = abs(constituent.Theta() - self.get_four_vector().Theta())
             # delta_theta = delta_theta ** 0.5
             
