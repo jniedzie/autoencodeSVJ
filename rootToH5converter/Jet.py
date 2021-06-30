@@ -152,8 +152,12 @@ class Jet:
         
         eigen_values = LA.eigvals(np.array([[m_00, -m_01], [-m_01, m_11]]))
 
-        axis_major = np.sqrt(max(eigen_values) / sum_pt2)
-        axis_minor = np.sqrt(min(eigen_values) / sum_pt2)
+        axis_minor = -1
+        axis_major = -1
+
+        if sum_pt2 != 0:
+            axis_major = np.sqrt(max(eigen_values) / sum_pt2)
+            axis_minor = np.sqrt(min(eigen_values) / sum_pt2)
         
         return axis_minor, axis_major
 
@@ -207,28 +211,37 @@ class Jet:
             girth += constituent.Pt() * delta_r
             sum_pt += constituent.Pt()
         
-        girth /= sum_pt
+        if sum_pt != 0:
+            girth /= sum_pt
+        else:
+            girth = -1
+            
         return girth
     
     def get_lha(self):
         
         lha = 0
-
         sum_pt = 0
 
         for constituent in self.constituents:
             delta_theta = constituent.DeltaR(self.get_four_vector())
+
+            # delta_theta = abs(constituent.Theta() - self.get_four_vector().Theta())
+            # delta_theta = delta_theta ** 0.5
+            
             lha += constituent.Pt() * delta_theta
             sum_pt += constituent.Pt()
         
-        lha /= sum_pt
-        
-        # TODO: use real jet radius here
-        lha /= 0.8
+        if sum_pt != 0:
+            lha /= sum_pt
+            # TODO: use real jet radius here
+            lha /= 0.8
+        else:
+            lha = -1
         
         return lha
         
-    def get_ecfs(self, beta=1.0):
+    def get_ecfs(self, beta=0.5):
         
         ecf_1 = 0
         ecf_2 = 0
@@ -250,12 +263,20 @@ class Jet:
                     val_3 *= self.constituents[j].DeltaR(self.constituents[k]) ** (beta/0.5)
                     ecf_3 += val_3
 
-        # TODO: use real jet radius here
-        e_2 = ecf_2 / (ecf_1**2 * 0.8)
-        e_3 = ecf_3 / (ecf_1 * 0.8)**3
+        e_2 = -1
+        e_3 = -1
+
+        if ecf_1 != 0:
+            # TODO: use real jet radius here
+            e_2 = ecf_2 / (ecf_1**2 * 0.8)
+            e_3 = ecf_3 / (ecf_1 * 0.8)**3
+
+        C2 = -1
+        D2 = -1
         
-        C2 = e_3 / e_2**2
-        D2 = e_3 / e_2**3
+        if e_2 != 0 and e_2 != -1:
+            C2 = e_3 / e_2**2
+            D2 = e_3 / e_2**3
         
         return e_2, e_3, C2, D2
 
