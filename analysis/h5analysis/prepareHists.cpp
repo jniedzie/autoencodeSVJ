@@ -23,18 +23,49 @@ const int maxEvents = 999999999;
 //};
 //
 //const string outputPath = "results/h5histsQCD_delphes_new.root";
-
+//
 //vector<tuple<string, double, int>> inputPaths = {
-//  {"/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/rootToH5converter/test.h5", 1, 1},
+//  {"/Users/Jeremi/Documents/Physics/ETH/data/scouting_SVJ_m3000_r30.h5", 1, 1},
 //};
 //
-//const string outputPath = "results/h5histsQCD_delphes_test.root";
+//const string outputPath = "results/h5histsSVJ_m3000_r30_scouting.root";
+
+//vector<tuple<string, double, int>> inputPaths = {
+//  {"/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/rootToH5converter/test_qcd_b0p5_lhaMod.h5", 1, 1},
+//};
+//
+//const string outputPath = "results/h5histsQCD_delphes_test_b0p5_lhaMod.root";
+
 
 vector<tuple<string, double, int>> inputPaths = {
-  {"/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/rootToH5converter/test_svj.h5", 1, 1},
+  {"/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/rootToH5converter/test_svj_final.h5", 1, 1},
 };
 
-const string outputPath = "results/h5histsSVJ_delphes_test.root";
+const string outputPath = "results/h5histsSVJ_delphes_test_final.root";
+
+//vector<tuple<string, double, int>> inputPaths = {
+//  {"/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/rootToH5converter/test_qcd_b0p5.h5", 1, 1},
+//};
+//
+//const string outputPath = "results/h5histsQCD_delphes_test_b0p5.root";
+
+//vector<tuple<string, double, int>> inputPaths = {
+//  {"/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/rootToH5converter/test_qcd_b1p0.h5", 1, 1},
+//};
+//
+//const string outputPath = "results/h5histsQCD_delphes_test_b1p0.root";
+
+//vector<tuple<string, double, int>> inputPaths = {
+//  {"/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/rootToH5converter/test_svj_b0p5.h5", 1, 1},
+//};
+//
+//const string outputPath = "results/h5histsSVJ_delphes_test_b0p5.root";
+
+//vector<tuple<string, double, int>> inputPaths = {
+//  {"/Users/Jeremi/Documents/Physics/ETH/autoencodeSVJ/rootToH5converter/test_svj_b1p0.h5", 1, 1},
+//};
+//
+//const string outputPath = "results/h5histsSVJ_delphes_test_b1p0.root";
 
 //vector<tuple<string, double, int>> inputPaths = {
 //  {"/Users/Jeremi/Documents/Physics/ETH/data/s_channel_delphes/h5_no_lepton_veto_fat_jets_dr0p8_efp3_fatJetstrue_constituents150_maxJets2/3000GeV_0.70_mDark20_alphaPeak/base_3/SVJ_m3000_mDark20_r70_alphaPeak.h5", 1, 1},
@@ -107,7 +138,7 @@ vector<tuple<string, int, double, double>> jetHistParams = {
   {"energy"           , 100, 0    , 5000  },
   {"efpMass"          , 100, 0    , 500   },
   {"e2"               , 100, 0    , 1.0   },
-  {"e3"               , 100, 0    , 1.0   },
+  {"e3"               , 100, 0    , 0.1   },
   {"C2"               , 100, 0    , 1.0   },
   {"D2"               , 100, 0    , 100   },
 };

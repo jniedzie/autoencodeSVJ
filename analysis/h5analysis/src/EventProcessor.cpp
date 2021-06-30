@@ -73,7 +73,7 @@ void EventProcessor::fillEvents(Group groupEvent)
   datasetEvent.read(values, floatTypeEvent, dataspaceEvent);
   
   if(dimEvent[1] != 6){
-    cout<<"WARNING -- could not read getWeight, will assume 1.0!"<<endl;
+    cout<<"WARNING -- could not read genWeight, will assume 1.0!"<<endl;
   }
   
   for(int i=0; i<dimEvent[0]; i++){
@@ -91,7 +91,7 @@ void EventProcessor::fillEvents(Group groupEvent)
         genWeight = values[i][5];
       }
       else{
-        cout<<"WARNING -- could not read getWeight, will assume 1.0!"<<endl;
+        cout<<"WARNING -- could not read genWeight, will assume 1.0!"<<endl;
       }
     }
     

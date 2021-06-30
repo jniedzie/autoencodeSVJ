@@ -1,12 +1,17 @@
 //#include "Helpers.hpp"
 
-const bool calculateAucs = false;
+const bool calculateAucs = true;
 
 vector<string> inputPaths = {
 //  "results/h5histsQCD_cmssw_mixed.root",
 //  "results/h5histsQCD_delphes_fixed.root",
-  "results/h5histsQCD_delphes_test.root",
-  "results/h5histsSVJ_delphes_test.root",
+//  "results/h5histsQCD_delphes_test_b0p5_lhaMod.root",
+//  "results/h5histsSVJ_delphes_test_b0p5_lhaMod.root",
+  
+  "results/h5histsQCD_delphes_test_final.root",
+  "results/h5histsSVJ_delphes_test_final.root",
+  
+//  "results/h5histsSVJ_m3000_r30_scouting.root",
   
 //  "results/h5histsQCD_delphes.root",
 //  "results/h5histsQCD_cmssw_1000to1400.root",
@@ -41,8 +46,10 @@ vector<string> inputPaths = {
 map<string, tuple<string, int, int, int>> histParams = {
   // path                                           title                       color       style   width
 //  {"results/h5histsQCD_cmssw_mixed.root"                                  , {"QCD CMSSW mixed"              , kBlue       , 1     , 1   }},
-  {"results/h5histsQCD_delphes_test.root"                                , {"QCD"                  , kBlack      , 1     , 3   }},
-  {"results/h5histsSVJ_delphes_test.root"                                , {"SVJ, 3000, 0.3"       , kGreen      , 2     , 3   }},
+  {"results/h5histsQCD_delphes_test_final.root"                                , {"QCD"                  , kBlack      , 1     , 3   }},
+  {"results/h5histsSVJ_delphes_test_final.root"                                , {"SVJ, 3000, 0.3"       , kGreen      , 2     , 3   }},
+  
+//  {"results/h5histsSVJ_m3000_r30_scouting.root"                               , {"SVJ, 3000, 0.3 (scouting)"       , kRed      , 2     , 3   }},
   
 //  {"results/h5histsSVJ_m3500_r30_delphes.root"      , {"SVJ Delphes"              , kViolet     , 2     , 3   }},
   
@@ -89,8 +96,10 @@ vector<string> histNames1D = {
 
 vector<string> histNamesJets = {
 //  "pt_1_ptWeighted", "pt_2_ptWeighted", "mass_ptWeighted", "PTD_ptWeighted", "axis2_ptWeighted", "EFP_1"
-//  "lha", "axisMinor", "axisMajor", "e2", "C2", "D2"
-  "girth", "e3",
+  
+//  "eta", "phi", "pt_1", "pt_2", "mass", "PTD", "axis2", "EFP_1"
+//  "eta", "phi", "pt_1", "pt_2", "mass", "PTD", "axisMinor", "EFP_1"
+  "lha", "axisMinor", "axisMajor", "e2", "C2", "D2", "girth", "e3",
 };
 
 vector<int> colors = {kBlack, kRed, kOrange+1, kViolet, kBlue, kGreen+2, kMagenta+1, kCyan+1 };
@@ -248,7 +257,7 @@ void compareHists()
   canvas2D->Divide(3, 3);
   
   TCanvas *canvasJets = new TCanvas("Jets", "Jets", 2000, 2000);
-  canvasJets->Divide(2, 3);
+  canvasJets->Divide(2, 4);
   
   
   // plot 2d constutuents plots
